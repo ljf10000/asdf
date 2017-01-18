@@ -6,8 +6,7 @@ import (
 )
 
 const (
-	MacSize = 6
-
+	MacSize    = 6
 	MacStringS = 12 // AABBCCDDEEFF
 	MacStringM = 14 // AABB-CCDD-EEFF
 	MacStringL = 17 // AA:BB:CC:DD:EE:FF or AA-BB-CC-DD-EE-FF
@@ -18,6 +17,10 @@ const (
 
 type MAC [MacSize]byte
 type Mac []byte
+
+func (me MAC) ToString() string {
+	return Mac(me[:]).ToString()
+}
 
 func (me Mac) IsGood() bool {
 	return MacSize == len(me) && !Slice(me).IsZero() && !Slice(me).IsFull()
@@ -75,11 +78,11 @@ func (me Mac) ToString() string {
 	return me.ToStringLU()
 }
 
-func macFromString(mac Mac, s string) error {
-	Len := len(s)
+func (me Mac) FromString(s string) error {
 	b := []byte(s)
 
-	if MacStringL == Len { // AA:BB:CC:DD:EE:FF or AA-BB-CC-DD-EE-FF
+	switch len(s) {
+	case MacStringL: // AA:BB:CC:DD:EE:FF or AA-BB-CC-DD-EE-FF
 		ifs := b[2]
 
 		if (ifs != MacSepUnix && ifs != MacSepWindows) ||
@@ -92,13 +95,13 @@ func macFromString(mac Mac, s string) error {
 		}
 
 		for i := 0; i < 6; i++ {
-			if _, err := hex.Decode(mac[i:], b[3*i:3*i+2]); nil != err {
+			if _, err := hex.Decode(me[i:], b[3*i:3*i+2]); nil != err {
 				return err
 			}
 		}
 
 		return nil
-	} else if MacStringM == Len { // AABB-CCDD-EEFF or AABB:CCDD:EEFF
+	case MacStringM: // AABB-CCDD-EEFF or AABB:CCDD:EEFF
 		ifs := b[4]
 
 		if (ifs != MacSepUnix && ifs != MacSepWindows) ||
@@ -107,42 +110,44 @@ func macFromString(mac Mac, s string) error {
 		}
 
 		for i := 0; i < 3; i++ {
-			if _, err := hex.Decode(mac[2*i:], b[5*i:5*i+2]); nil != err {
+			if _, err := hex.Decode(me[2*i:], b[5*i:5*i+2]); nil != err {
 				return err
 			}
-			if _, err := hex.Decode(mac[2*i+1:], b[5*i+2:5*i+4]); nil != err {
+			if _, err := hex.Decode(me[2*i+1:], b[5*i+2:5*i+4]); nil != err {
 				return err
 			}
 		}
-	} else if MacStringS == Len { // AABBCCDDEEFF
-		_, err := hex.Decode(mac[:], b)
+
+		return nil
+	case MacStringS: // AABBCCDDEEFF
+		_, err := hex.Decode(me[:], b)
 
 		return err
+	default:
+		return ErrBadMac
 	}
-
-	return Error
-}
-
-func (me Mac) FromString(s string) error {
-	mac := [6]byte{}
-
-	if err := macFromString(mac[:], s); nil != err {
-		return err
-	}
-
-	copy(me, mac[:])
-
-	return nil
 }
 
 type MacString string
 
 func (me MacString) IsGood() bool {
-	mac := [6]byte{}
+	mac := MAC{}
 
-	if err := macFromString(mac[:], string(me)); nil != err {
+	if err := Mac(mac[:]).FromString(string(me)); nil != err {
 		return false
 	}
 
 	return true
+}
+
+func (me MacString) ToBinary() MAC {
+	mac := MAC{}
+
+	Mac(mac[:]).FromString(string(me))
+
+	return mac
+}
+
+func (me MacString) ToString() string {
+	return string(me)
 }

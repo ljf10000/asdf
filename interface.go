@@ -27,12 +27,12 @@ type IEq interface {
 	Eq(interface{}) bool
 }
 
-type ILt interface {
-	Lt(interface{}) bool
-}
-
 type IGt interface {
 	Gt(interface{}) bool
+}
+
+type ILt interface {
+	Lt(interface{}) bool
 }
 
 type IFirst interface {
@@ -87,6 +87,22 @@ type IGood interface {
 	IsGood() bool
 }
 
+type INew interface {
+	New() interface{}
+}
+
+type IFind interface {
+	Find() (interface{}, bool)
+}
+
+type ISave interface {
+	Save()
+}
+
+type IUnSave interface {
+	UnSave()
+}
+
 ////////////////////////////////////////////////////////////////////////////////
 // combination interface
 ////////////////////////////////////////////////////////////////////////////////
@@ -131,13 +147,88 @@ type IListNode interface {
 	INext
 }
 
-type ILogger interface {
+type IStorage interface {
+	INew
+	IFind
+	ISave
+	IUnSave
+}
+
+type ILogEmerg interface {
 	Emerg(format string, v ...interface{})
+}
+
+type ILogAlert interface {
 	Alert(format string, v ...interface{})
+}
+
+type ILogCrit interface {
 	Crit(format string, v ...interface{})
+}
+
+type ILogError interface {
 	Error(format string, v ...interface{})
+}
+
+type ILogWarning interface {
 	Warning(format string, v ...interface{})
+}
+
+type ILogNotice interface {
 	Notice(format string, v ...interface{})
+}
+
+type ILogInfo interface {
 	Info(format string, v ...interface{})
+}
+
+type ILogDebug interface {
 	Debug(format string, v ...interface{})
+}
+
+type ILogger interface {
+	ILogEmerg
+	ILogAlert
+	ILogCrit
+	ILogError
+	ILogWarning
+	ILogNotice
+	ILogInfo
+	ILogDebug
+}
+
+type IObjOwner interface {
+	ObjOwner() string
+}
+
+type IObjType interface {
+	ObjType() string
+}
+
+type IObjName interface {
+	ObjName() string
+}
+
+type IObjValue interface {
+	ObjValue() string
+}
+
+type IObj interface {
+	IObjOwner
+	IObjType
+	IObjName
+	//	IObjValue
+}
+
+type IEncode interface {
+	Encode([]byte) []byte
+}
+
+type IDecode interface {
+	Decode([]byte) ([]byte, error)
+}
+
+type ICodec interface {
+	IEncode
+	IDecode
 }
