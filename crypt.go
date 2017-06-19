@@ -45,7 +45,7 @@ func hmacEnumManagerInit() {
 
 type CryptKey [CryptKeySize]byte
 
-func (me *CryptKey) ToString() string {
+func (me *CryptKey) String() string {
 	return hex.EncodeToString((*me)[:])
 }
 
@@ -61,7 +61,7 @@ func (me *CryptKey) FromString(s string) error {
 
 type HmacType int
 
-func (me HmacType) ToString() string {
+func (me HmacType) String() string {
 	return hmacEnumManager.Name2(int(me))
 }
 
@@ -78,7 +78,7 @@ func (me *HmacType) FromString(s string) error {
 
 type CryptType int
 
-func (me CryptType) ToString() string {
+func (me CryptType) String() string {
 	return cryptEnumManager.Name2(int(me))
 }
 
@@ -102,9 +102,9 @@ func cryptToBinary(b *Crypt, s *CryptString) {
 }
 
 func cryptToString(s *CryptString, b *Crypt) {
-	s.Key = (&b.Key).ToString()
-	s.CryptType = b.CryptType.ToString()
-	s.HmacType = b.HmacType.ToString()
+	s.Key = (&b.Key).String()
+	s.CryptType = b.CryptType.String()
+	s.HmacType = b.HmacType.String()
 }
 
 type CryptString struct {

@@ -5,7 +5,7 @@ const InvalidEnum = -1
 type IEnum interface {
 	INumber
 	IGood
-	IToString
+	IString
 	// todo: IFromString
 }
 

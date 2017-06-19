@@ -18,8 +18,12 @@ const (
 type MAC [MacSize]byte
 type Mac []byte
 
-func (me MAC) ToString() string {
-	return Mac(me[:]).ToString()
+func (me MAC) Mac() Mac {
+	return Mac(me[:])
+}
+
+func (me MAC) String() string {
+	return me.Mac().String()
 }
 
 func (me Mac) IsGood() bool {
@@ -74,7 +78,7 @@ func (me Mac) ToStringS() string {
 		me[4], me[5])
 }
 
-func (me Mac) ToString() string {
+func (me Mac) String() string {
 	return me.ToStringLU()
 }
 

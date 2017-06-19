@@ -1,5 +1,9 @@
 package asdf
 
+import (
+	"fmt"
+)
+
 ////////////////////////////////////////////////////////////////////////////////
 // single interface
 ////////////////////////////////////////////////////////////////////////////////
@@ -67,20 +71,12 @@ type IRepeat interface {
 	Repeat(int) []interface{}
 }
 
-type IToString interface {
-	ToString() string
+type IString interface {
+	fmt.Stringer
 }
 
 type IFromString interface {
 	FromString(string) error
-}
-
-type IToBinary interface {
-	ToBinary([]byte) error
-}
-
-type IFromBinary interface {
-	FromBinary([]byte) error
 }
 
 type IGood interface {
@@ -115,16 +111,6 @@ type IBound interface {
 type INumber interface {
 	IBound
 	IInt
-}
-
-type IString interface {
-	IToString
-	IFromString
-}
-
-type IBinary interface {
-	IToBinary
-	IFromBinary
 }
 
 type ICompare interface {
@@ -231,4 +217,16 @@ type IDecode interface {
 type ICodec interface {
 	IEncode
 	IDecode
+}
+
+type ISerialize interface {
+	Serialize() error
+}
+
+type IUnserialize interface {
+	Unserialize() error
+}
+
+type IFileName interface {
+	FileName() FileName
 }

@@ -2,6 +2,7 @@ package asdf
 
 import (
 	"errors"
+	"os"
 )
 
 const (
@@ -19,6 +20,8 @@ const (
 	StdErrNoSupport
 	StdErrNoExist
 	StdErrNoFound
+	StdErrNoFile
+	StdErrNoDir
 	StdErrNoMatch
 	StdErrNoSpace
 	StdErrNoPermit
@@ -71,6 +74,8 @@ var stdErrMap = map[int]string{
 	StdErrNoSupport:   "no support",
 	StdErrNoExist:     "no exist",
 	StdErrNoFound:     "no found",
+	StdErrNoFile:      "no file",
+	StdErrNoDir:       "no dir",
 	StdErrNoMatch:     "no match",
 	StdErrNoSpace:     "no space",
 	StdErrNoPermit:    "no permit",
@@ -123,6 +128,8 @@ var (
 	ErrNoSupport   = newerrors(StdErrNoSupport)
 	ErrNoExist     = newerrors(StdErrNoExist)
 	ErrNoFound     = newerrors(StdErrNoFound)
+	ErrNoFile      = newerrors(StdErrNoFile)
+	ErrNoDir       = newerrors(StdErrNoDir)
 	ErrNoMatch     = newerrors(StdErrNoMatch)
 	ErrNoSpace     = newerrors(StdErrNoSpace)
 	ErrNoPermit    = newerrors(StdErrNoPermit)
@@ -201,6 +208,12 @@ func NewStdError(error int, desc ...string) *StdError {
 			ErrorString: StdErrorString(error),
 		}
 	}
+}
+
+func ExitError(error int) {
+	Log.Error("exit error:%s", StdErrorString(error))
+
+	os.Exit(error)
 }
 
 type MixError struct {
