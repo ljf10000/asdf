@@ -1,9 +1,5 @@
 package asdf
 
-import (
-	"fmt"
-)
-
 ////////////////////////////////////////////////////////////////////////////////
 // single interface
 ////////////////////////////////////////////////////////////////////////////////
@@ -72,7 +68,7 @@ type IRepeat interface {
 }
 
 type IString interface {
-	fmt.Stringer
+	String() string
 }
 
 type IFromString interface {
@@ -97,6 +93,86 @@ type ISave interface {
 
 type IUnSave interface {
 	UnSave()
+}
+
+type ISize interface {
+	Size() int
+}
+
+type IToBinary interface {
+	ToBinary(bin []byte) error
+}
+
+type IFromBinary interface {
+	FromBinary(bin []byte) error
+}
+
+type ILogEmerg interface {
+	Emerg(format string, v ...interface{})
+}
+
+type ILogAlert interface {
+	Alert(format string, v ...interface{})
+}
+
+type ILogCrit interface {
+	Crit(format string, v ...interface{})
+}
+
+type ILogError interface {
+	Error(format string, v ...interface{})
+}
+
+type ILogWarning interface {
+	Warning(format string, v ...interface{})
+}
+
+type ILogNotice interface {
+	Notice(format string, v ...interface{})
+}
+
+type ILogInfo interface {
+	Info(format string, v ...interface{})
+}
+
+type ILogDebug interface {
+	Debug(format string, v ...interface{})
+}
+
+type IObjOwner interface {
+	ObjOwner() string
+}
+
+type IObjType interface {
+	ObjType() string
+}
+
+type IObjName interface {
+	ObjName() string
+}
+
+type IObjValue interface {
+	ObjValue() string
+}
+
+type IEncode interface {
+	Encode([]byte) []byte
+}
+
+type IDecode interface {
+	Decode([]byte) ([]byte, error)
+}
+
+type ISerialize interface {
+	Serialize() error
+}
+
+type IUnserialize interface {
+	Unserialize() error
+}
+
+type IFileName interface {
+	FileName() FileName
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -140,38 +216,6 @@ type IStorage interface {
 	IUnSave
 }
 
-type ILogEmerg interface {
-	Emerg(format string, v ...interface{})
-}
-
-type ILogAlert interface {
-	Alert(format string, v ...interface{})
-}
-
-type ILogCrit interface {
-	Crit(format string, v ...interface{})
-}
-
-type ILogError interface {
-	Error(format string, v ...interface{})
-}
-
-type ILogWarning interface {
-	Warning(format string, v ...interface{})
-}
-
-type ILogNotice interface {
-	Notice(format string, v ...interface{})
-}
-
-type ILogInfo interface {
-	Info(format string, v ...interface{})
-}
-
-type ILogDebug interface {
-	Debug(format string, v ...interface{})
-}
-
 type ILogger interface {
 	ILogEmerg
 	ILogAlert
@@ -183,22 +227,6 @@ type ILogger interface {
 	ILogDebug
 }
 
-type IObjOwner interface {
-	ObjOwner() string
-}
-
-type IObjType interface {
-	ObjType() string
-}
-
-type IObjName interface {
-	ObjName() string
-}
-
-type IObjValue interface {
-	ObjValue() string
-}
-
 type IObj interface {
 	IObjOwner
 	IObjType
@@ -206,27 +234,24 @@ type IObj interface {
 	//	IObjValue
 }
 
-type IEncode interface {
-	Encode([]byte) []byte
-}
-
-type IDecode interface {
-	Decode([]byte) ([]byte, error)
-}
-
 type ICodec interface {
 	IEncode
 	IDecode
 }
 
-type ISerialize interface {
-	Serialize() error
+type IBinary interface {
+	ISize
+	IToBinary
+	IFromBinary
 }
 
-type IUnserialize interface {
-	Unserialize() error
-}
+func ToBinary(obj IBinary) ([]byte, error) {
+	bin := make([]byte, obj.Size())
 
-type IFileName interface {
-	FileName() FileName
+	err := obj.ToBinary(bin)
+	if nil != err {
+		return nil, err
+	} else {
+		return bin, nil
+	}
 }

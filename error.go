@@ -15,7 +15,9 @@ const (
 	StdErrHolding
 	StdErrPending
 	StdErrTimeout
+	StdErrListen
 
+	StdErrNoEnv
 	StdErrNoPending
 	StdErrNoSupport
 	StdErrNoExist
@@ -44,6 +46,7 @@ const (
 	StdErrBadBody
 	StdErrBadConf
 	StdErrBadFile
+	StdErrBadProto
 	StdErrBadPktLen
 	StdErrBadPktDir
 	StdErrBadVersion
@@ -57,6 +60,8 @@ const (
 	StdErrTooMore
 	StdErrTooShortBuffer
 	StdErrPktLenNoMatchBufferLen
+
+	StdErrEnd
 )
 
 var stdErrMap = map[int]string{
@@ -69,7 +74,9 @@ var stdErrMap = map[int]string{
 	StdErrHolding: "holding",
 	StdErrPending: "pending",
 	StdErrTimeout: "timeout",
+	StdErrListen:  "listen",
 
+	StdErrNoEnv:       "no env",
 	StdErrNoPending:   "no pending",
 	StdErrNoSupport:   "no support",
 	StdErrNoExist:     "no exist",
@@ -97,7 +104,8 @@ var stdErrMap = map[int]string{
 	StdErrBadJson:    "bad json",
 	StdErrBadBody:    "bad body",
 	StdErrBadConf:    "bad config",
-	StdErrBadFile:    "bad File",
+	StdErrBadFile:    "bad file",
+	StdErrBadProto:   "bad proto",
 	StdErrBadPktLen:  "invalid packet length",
 	StdErrBadPktDir:  "bad packet dir",
 	StdErrBadVersion: "bad version",
@@ -116,58 +124,61 @@ var stdErrMap = map[int]string{
 var (
 	Error = errors.New(Empty)
 
-	ErrError   = newerrors(StdErrError)
-	ErrEmpty   = newerrors(StdErrEmpty)
-	ErrFull    = newerrors(StdErrFull)
-	ErrExist   = newerrors(StdErrExist)
-	ErrHolding = newerrors(StdErrHolding)
-	ErrPending = newerrors(StdErrPending)
-	ErrTimeout = newerrors(StdErrTimeout)
+	ErrError   = NewError(StdErrError)
+	ErrEmpty   = NewError(StdErrEmpty)
+	ErrFull    = NewError(StdErrFull)
+	ErrExist   = NewError(StdErrExist)
+	ErrHolding = NewError(StdErrHolding)
+	ErrPending = NewError(StdErrPending)
+	ErrTimeout = NewError(StdErrTimeout)
+	ErrListen  = NewError(StdErrListen)
 
-	ErrNoPending   = newerrors(StdErrNoPending)
-	ErrNoSupport   = newerrors(StdErrNoSupport)
-	ErrNoExist     = newerrors(StdErrNoExist)
-	ErrNoFound     = newerrors(StdErrNoFound)
-	ErrNoFile      = newerrors(StdErrNoFile)
-	ErrNoDir       = newerrors(StdErrNoDir)
-	ErrNoMatch     = newerrors(StdErrNoMatch)
-	ErrNoSpace     = newerrors(StdErrNoSpace)
-	ErrNoPermit    = newerrors(StdErrNoPermit)
-	ErrNoAlign     = newerrors(StdErrNoAlign)
-	ErrNoIntf      = newerrors(StdErrNoIntf)
-	ErrNoIpAddress = newerrors(StdErrNoIpAddress)
-	ErrNoConnected = newerrors(StdErrNoConnected)
+	ErrNoEnv       = NewError(StdErrNoEnv)
+	ErrNoPending   = NewError(StdErrNoPending)
+	ErrNoSupport   = NewError(StdErrNoSupport)
+	ErrNoExist     = NewError(StdErrNoExist)
+	ErrNoFound     = NewError(StdErrNoFound)
+	ErrNoFile      = NewError(StdErrNoFile)
+	ErrNoDir       = NewError(StdErrNoDir)
+	ErrNoMatch     = NewError(StdErrNoMatch)
+	ErrNoSpace     = NewError(StdErrNoSpace)
+	ErrNoPermit    = NewError(StdErrNoPermit)
+	ErrNoAlign     = NewError(StdErrNoAlign)
+	ErrNoIntf      = NewError(StdErrNoIntf)
+	ErrNoIpAddress = NewError(StdErrNoIpAddress)
+	ErrNoConnected = NewError(StdErrNoConnected)
 
-	ErrBadID      = newerrors(StdErrBadID)
-	ErrBadObj     = newerrors(StdErrBadObj)
-	ErrBadBuf     = newerrors(StdErrBadBuf)
-	ErrBadLen     = newerrors(StdErrBadLen)
-	ErrBadIdx     = newerrors(StdErrBadIdx)
-	ErrBadFsm     = newerrors(StdErrBadFsm)
-	ErrBadIntf    = newerrors(StdErrBadIntf)
-	ErrBadType    = newerrors(StdErrBadType)
-	ErrBadMac     = newerrors(StdErrBadMac)
-	ErrBadName    = newerrors(StdErrBadName)
-	ErrBadJson    = newerrors(StdErrBadJson)
-	ErrBadBody    = newerrors(StdErrBadBody)
-	ErrBadConf    = newerrors(StdErrBadConf)
-	ErrBadFile    = newerrors(StdErrBadFile)
-	ErrBadPktLen  = newerrors(StdErrBadPktLen)
-	ErrBadPktDir  = newerrors(StdErrBadPktDir)
-	ErrBadVersion = newerrors(StdErrBadVersion)
+	ErrBadID      = NewError(StdErrBadID)
+	ErrBadObj     = NewError(StdErrBadObj)
+	ErrBadBuf     = NewError(StdErrBadBuf)
+	ErrBadLen     = NewError(StdErrBadLen)
+	ErrBadIdx     = NewError(StdErrBadIdx)
+	ErrBadFsm     = NewError(StdErrBadFsm)
+	ErrBadIntf    = NewError(StdErrBadIntf)
+	ErrBadType    = NewError(StdErrBadType)
+	ErrBadMac     = NewError(StdErrBadMac)
+	ErrBadName    = NewError(StdErrBadName)
+	ErrBadJson    = NewError(StdErrBadJson)
+	ErrBadBody    = NewError(StdErrBadBody)
+	ErrBadConf    = NewError(StdErrBadConf)
+	ErrBadFile    = NewError(StdErrBadFile)
+	ErrBadProto   = NewError(StdErrBadProto)
+	ErrBadPktLen  = NewError(StdErrBadPktLen)
+	ErrBadPktDir  = NewError(StdErrBadPktDir)
+	ErrBadVersion = NewError(StdErrBadVersion)
 
-	ErrBadHttpClientPost = newerrors(StdErrBadHttpClientPost)
+	ErrBadHttpClientPost = NewError(StdErrBadHttpClientPost)
 
-	ErrNilObj    = newerrors(StdErrNilObj)
-	ErrNilBuffer = newerrors(StdErrNilBuffer)
-	ErrNilIntf   = newerrors(StdErrNilIntf)
+	ErrNilObj    = NewError(StdErrNilObj)
+	ErrNilBuffer = NewError(StdErrNilBuffer)
+	ErrNilIntf   = NewError(StdErrNilIntf)
 
-	ErrTooMore                = newerrors(StdErrTooMore)
-	ErrTooShortBuffer         = newerrors(StdErrTooShortBuffer)
-	ErrPktLenNoMatchBufferLen = newerrors(StdErrPktLenNoMatchBufferLen)
+	ErrTooMore                = NewError(StdErrTooMore)
+	ErrTooShortBuffer         = NewError(StdErrTooShortBuffer)
+	ErrPktLenNoMatchBufferLen = NewError(StdErrPktLenNoMatchBufferLen)
 )
 
-func newerrors(err int) error {
+func NewError(err int) error {
 	return errors.New(StdErrorString(err))
 }
 
@@ -192,8 +203,12 @@ func (me *StdError) ObjValue() string {
 	return me.ErrorString
 }
 
-func StdErrorString(error int) string {
-	return stdErrMap[error]
+func StdErrorString(err int) string {
+	if err >= 0 && err < StdErrEnd {
+		return stdErrMap[err]
+	} else {
+		return "Unknow-Error"
+	}
 }
 
 func NewStdError(error int, desc ...string) *StdError {
