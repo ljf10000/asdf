@@ -1,5 +1,10 @@
 package asdf
 
+import (
+	"strings"
+	"unicode/utf8"
+)
+
 const (
 	Empty = ""
 	Space = " "
@@ -35,4 +40,24 @@ func TabN(n int) string {
 
 func CrlfN(n int) string {
 	return RepeatN(Crlf, n)
+}
+
+func HasPrefix(s string, ss []string) (int, bool) {
+	for k, v := range ss {
+		if strings.HasPrefix(s, v) {
+			return k, true
+		}
+	}
+
+	return 0, false
+}
+
+func FirstRune(line string) (rune, string) {
+	if len(line) > 0 {
+		c, _ := utf8.DecodeRuneInString(line)
+
+		return c, line[len(string(c)):]
+	} else {
+		return 0, Empty
+	}
 }

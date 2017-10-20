@@ -1,11 +1,77 @@
 package asdf
 
-func SetFlag(x, bit uint32) uint32 {
-	return x | bit
+type Flag32 uint32
+type Flag64 uint64
+
+const (
+	FlagOne32 Flag32 = 1
+	FlagOne64 Flag64 = 1
+)
+
+func (me Flag32) Flag(bit int) Flag32 {
+	return Flag32(1) << Flag32(bit)
 }
 
-func ClrFlag(x, bit uint32) uint32 {
-	return x & ^bit
+func (me Flag64) Flag(bit int) Flag64 {
+	return Flag64(1) << Flag64(bit)
+}
+
+func (me Flag32) Set(flag Flag32) Flag32 {
+	return me | flag
+}
+
+func (me Flag64) Set(flag Flag64) Flag64 {
+	return me | flag
+}
+
+func (me Flag32) SetBit(bit int) Flag32 {
+	return me.Set(me.Flag(bit))
+}
+
+func (me Flag64) SetBit(bit int) Flag64 {
+	return me.Set(me.Flag(bit))
+}
+
+func (me Flag32) Clear(flag Flag32) Flag32 {
+	return me & ^flag
+}
+
+func (me Flag64) Clear(flag Flag64) Flag64 {
+	return me & ^flag
+}
+
+func (me Flag32) ClearBit(bit int) Flag32 {
+	return me.Clear(me.Flag(bit))
+}
+
+func (me Flag64) ClearBit(bit int) Flag64 {
+	return me.Clear(me.Flag(bit))
+}
+
+func (me Flag32) Has(flag Flag32) bool {
+	return flag == (flag & me)
+}
+
+func (me Flag64) Has(flag Flag64) bool {
+	return flag == (flag & me)
+}
+
+func (me Flag64) HasBit(bit int) bool {
+	return me.Has(me.Flag(bit))
+}
+
+func (me Flag32) HasBit(bit int) bool {
+	return me.Has(me.Flag(bit))
+}
+
+//==============================================================================
+
+func SetFlag(x, flag uint32) uint32 {
+	return x | flag
+}
+
+func ClrFlag(x, flag uint32) uint32 {
+	return x & ^flag
 }
 
 func HasFlag(x, flag uint32) bool {

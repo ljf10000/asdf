@@ -79,5 +79,5 @@ func SuidGenerator(name string) ISuID {
 	return generator
 }
 
-var suidLock = &Lock{}
+var suidLock = &AccessLock{}
 var suidMap = make(map[string]*uint32)

@@ -59,38 +59,38 @@ func (me *RwLock) WHandle(handler func()) {
 	me.unlock()
 }
 
-type Lock struct {
+type AccessLock struct {
 	Debug bool
 	Name  string
 	m     sync.Mutex
 }
 
-func NewLock(name string, debug bool) *Lock {
-	return &Lock{
+func NewAccessLock(name string, debug bool) *AccessLock {
+	return &AccessLock{
 		Debug: debug,
 		Name:  name,
 	}
 }
 
-func (me *Lock) debug(format string, v ...interface{}) {
+func (me *AccessLock) debug(format string, v ...interface{}) {
 	if me.Debug {
 		Log.Debug(format, v...)
 	}
 }
 
-func (me *Lock) lock() {
+func (me *AccessLock) lock() {
 	me.debug("%s lock ...", me.Name)
 	me.m.Lock()
 	me.debug("%s lock ok.", me.Name)
 }
 
-func (me *Lock) unlock() {
+func (me *AccessLock) unlock() {
 	me.debug("%s unlock ...", me.Name)
 	me.m.Unlock()
 	me.debug("%s unlock ok.", me.Name)
 }
 
-func (me *Lock) Handle(handler func()) {
+func (me *AccessLock) Handle(handler func()) {
 	me.lock()
 	handler()
 	me.unlock()

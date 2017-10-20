@@ -107,6 +107,18 @@ type IFromBinary interface {
 	FromBinary(bin []byte) error
 }
 
+type ILogGetLevel interface {
+	GetLevel() LogLevel
+}
+
+type ILogSetLevel interface {
+	SetLevel(level LogLevel)
+}
+
+type ILogLog interface {
+	Log(level LogLevel, format string, v ...interface{})
+}
+
 type ILogEmerg interface {
 	Emerg(format string, v ...interface{})
 }
@@ -225,6 +237,10 @@ type ILogger interface {
 	ILogNotice
 	ILogInfo
 	ILogDebug
+
+	ILogLog
+	ILogGetLevel
+	ILogSetLevel
 }
 
 type IObj interface {
