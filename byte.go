@@ -1,17 +1,5 @@
 package asdf
 
-func Copy(dst, src []byte) int {
-	if nil != dst {
-		if nil != src {
-			return copy(dst, src)
-		} else {
-			return 0
-		}
-	} else {
-		return 0
-	}
-}
-
 func IsByteUpper(b byte) bool {
 	return b >= 'A' && b <= 'Z'
 }
@@ -26,4 +14,10 @@ func IsByteNumber(b byte) bool {
 
 func IsByteUnder(b byte) bool {
 	return b == '_'
+}
+
+func GetBytes(bin []byte, offset, size int) ([]byte, int) {
+	end := offset + size
+
+	return bin[offset:end], end
 }

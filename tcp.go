@@ -6,23 +6,42 @@ import (
 	"net"
 )
 
-type TcpStream net.TCPConn
+type TcpAddr = net.TCPAddr
+type TcpListener = net.TCPListener
+type TcpConn = net.TCPConn
 
-func (me *TcpStream) TcpConn() *net.TCPConn {
-	return (*net.TCPConn)(me)
+func NewTcpAddr(port int, ip string) *TcpAddr {
+	return &TcpAddr{
+		Port: port,
+		IP:   net.ParseIP(ip),
+	}
+}
+
+func ListenTcp(port int, ip string) (*TcpListener, error) {
+	return net.ListenTCP("tcp", NewTcpAddr(port, ip))
+}
+
+func DialTcp(laddr, raddr *TcpAddr) (*TcpConn, error) {
+	return net.DialTCP("tcp", laddr, raddr)
+}
+
+type TcpStream TcpConn
+
+func (me *TcpStream) TcpConn() *TcpConn {
+	return (*TcpConn)(me)
+}
+
+func NewTcpStream(conn *net.TCPConn) *TcpStream {
+	return (*TcpStream)(conn)
 }
 
 func TcpStreamDial(addr *net.TCPAddr) (*TcpStream, error) {
-	conn, err := net.DialTCP("tcp", nil, addr)
+	conn, err := DialTcp(nil, addr)
 	if nil != err {
 		return nil, err
 	} else {
 		return NewTcpStream(conn), nil
 	}
-}
-
-func NewTcpStream(conn *net.TCPConn) *TcpStream {
-	return (*TcpStream)(conn)
 }
 
 func (me *TcpStream) ReadN(size int) ([]byte, error) {
