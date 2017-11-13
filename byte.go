@@ -21,3 +21,13 @@ func GetBytes(bin []byte, offset, size int) ([]byte, int) {
 
 	return bin[offset:end], end
 }
+
+func ByteReverse(bin []byte) {
+	count := len(bin)
+
+	if count > 1 {
+		for i := 0; i < count/2; i++ {
+			bin[i], bin[count-i] = bin[count-i], bin[i]
+		}
+	}
+}

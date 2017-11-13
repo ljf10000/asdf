@@ -1,5 +1,10 @@
 package asdf
 
+import (
+	"reflect"
+	"unsafe"
+)
+
 type Slice []byte
 
 func (me Slice) IsValue(Value byte) bool {
@@ -42,4 +47,22 @@ func (me Slice) Eq(it interface{}) bool {
 	}
 
 	return true
+}
+
+func (me *Slice) Header() *reflect.SliceHeader {
+	return (*reflect.SliceHeader)(unsafe.Pointer(me))
+}
+
+func PointerToSlice(p unsafe.Pointer, len, cap int) []byte {
+	if nil != p {
+		s := Slice{}
+		h := s.Header()
+		h.Data = uintptr(p)
+		h.Len = len
+		h.Cap = cap
+
+		return s
+	} else {
+		return nil
+	}
 }
