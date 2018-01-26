@@ -3,6 +3,7 @@ package asdf
 import (
 	"encoding/binary"
 	"fmt"
+	"net"
 	. "strconv"
 )
 
@@ -42,4 +43,22 @@ func IpAddressFromString(s string) IpAddress {
 	fmt.Sscanf(s, "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3])
 
 	return IpAddress(binary.BigEndian.Uint32(ip[:]))
+}
+
+func GetLocalAddress() []string {
+	addrs, err := net.InterfaceAddrs()
+	if nil != err {
+		return nil
+	}
+
+	var ipaddrs []string
+
+	for _, addr := range addrs {
+		ipnet, ok := addr.(*net.IPNet)
+		if ok && !ipnet.IP.IsLoopback() && nil != ipnet.IP.To4() {
+			ipaddrs = append(ipaddrs, addr.String())
+		}
+	}
+
+	return ipaddrs
 }

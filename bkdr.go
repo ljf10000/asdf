@@ -1,43 +1,27 @@
 package asdf
 
-import (
-	"io"
-)
-
 const BkdrFactor = 37
 
 type Bkdr uint32
 
-type IBkdrWriter interface {
-	Write(buf []byte) (int, error)
-}
-
 type IBkdr interface {
-	io.Writer
-
 	Bkdr(buf []byte) Bkdr
 }
 
-type DeftBkdr struct {
-	bkdr Bkdr
-}
+type DeftBkdr struct{}
 
-func (me *DeftBkdr) Bkdr(buf []byte) Bkdr {
-	me.Write(buf)
-
-	return me.bkdr
-}
-
-func (me *DeftBkdr) Write(buf []byte) (int, error) {
+func GenBkdr(buf []byte) Bkdr {
 	bkdr := uint64(BkdrFactor)
 
 	for _, b := range buf {
 		bkdr = bkdr*BkdrFactor + uint64(b)
 	}
 
-	me.bkdr = Bkdr(bkdr)
+	return Bkdr(bkdr)
+}
 
-	return len(buf), nil
+func (me *DeftBkdr) Bkdr(buf []byte) Bkdr {
+	return GenBkdr(buf)
 }
 
 var DeftBkdrer = &DeftBkdr{}

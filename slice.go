@@ -53,16 +53,22 @@ func (me *Slice) Header() *reflect.SliceHeader {
 	return (*reflect.SliceHeader)(unsafe.Pointer(me))
 }
 
-func PointerToSlice(p unsafe.Pointer, len, cap int) []byte {
-	if nil != p {
-		s := Slice{}
-		h := s.Header()
-		h.Data = uintptr(p)
-		h.Len = len
-		h.Cap = cap
+func ObjToSlice(obj unsafe.Pointer, size int) []byte {
+	if nil != obj {
+		bin := Slice{}
+		hdr := bin.Header()
+		hdr.Data = uintptr(obj)
+		hdr.Len = size
+		hdr.Cap = size
 
-		return s
+		return bin
 	} else {
 		return nil
 	}
+}
+
+func MemberToSlice(obj unsafe.Pointer, offset, size uintptr) []byte {
+	member := unsafe.Pointer(uintptr(obj) + offset)
+
+	return ObjToSlice(member, int(size))
 }
