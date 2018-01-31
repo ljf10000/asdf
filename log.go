@@ -42,28 +42,22 @@ func (me LogLevel) String() string {
 	}
 }
 
-type levelLogger struct {
-	level LogLevel
-}
-
-func (me *levelLogger) GetLevel() LogLevel {
-	return me.level
-}
-
-func (me *levelLogger) SetLevel(level LogLevel) {
-	me.level = level
-}
-
 //==============================================================================
 
 type consoleLogger struct {
-	levelLogger
+	level LogLevel
 }
 
 var logConsole = &consoleLogger{
-	levelLogger: levelLogger{
-		level: LogLevelInfo,
-	},
+	level: LogLevelInfo,
+}
+
+func (me *consoleLogger) GetLevel() LogLevel {
+	return me.level
+}
+
+func (me *consoleLogger) SetLevel(level LogLevel) {
+	me.level = level
 }
 
 func (me *consoleLogger) Log(level LogLevel, format string, v ...interface{}) {
@@ -107,7 +101,7 @@ func (me *consoleLogger) Debug(format string, v ...interface{}) {
 //==============================================================================
 
 type fileLogger struct {
-	levelLogger
+	level LogLevel
 
 	filename string
 	lock     *AccessLock
@@ -128,6 +122,14 @@ func newFileLogger(filename string) (*fileLogger, error) {
 		file:     file,
 		lock:     NewAccessLock("file-logger", false),
 	}, nil
+}
+
+func (me *fileLogger) GetLevel() LogLevel {
+	return me.level
+}
+
+func (me *fileLogger) SetLevel(level LogLevel) {
+	me.level = level
 }
 
 func (me *fileLogger) Log(level LogLevel, format string, v ...interface{}) {
