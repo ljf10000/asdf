@@ -61,7 +61,7 @@ func (me *consoleLogger) SetLevel(level LogLevel) {
 }
 
 func (me *consoleLogger) Log(level LogLevel, format string, v ...interface{}) {
-	if me.level <= level {
+	if me.level >= level {
 		fmt.Printf(format, v...)
 	}
 }
