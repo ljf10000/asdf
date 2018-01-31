@@ -115,9 +115,7 @@ func newFileLogger(filename string) (*fileLogger, error) {
 	}
 
 	return &fileLogger{
-		levelLogger: levelLogger{
-			level: LogLevelInfo,
-		},
+		level:    LogLevelInfo,
 		filename: filename,
 		file:     file,
 		lock:     NewAccessLock("file-logger", false),
