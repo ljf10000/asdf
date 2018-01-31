@@ -10,12 +10,16 @@ var RandSeed = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 type RandBuffer []byte
 
-func (me RandBuffer) Rand() {
-	count := len(me)
+func GenRandBuffer(buf []byte) {
+	count := len(buf)
 
 	for i := 0; i < count; i++ {
-		me[i] = byte(RandSeed.Uint32())
+		buf[i] = byte(RandSeed.Uint32())
 	}
+}
+
+func (me RandBuffer) Rand() {
+	GenRandBuffer([]byte(me))
 }
 
 func (me RandBuffer) RandTime() {
