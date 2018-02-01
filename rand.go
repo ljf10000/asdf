@@ -11,11 +11,7 @@ var RandSeed = rand.New(rand.NewSource(time.Now().UnixNano()))
 type RandBuffer []byte
 
 func GenRandBuffer(buf []byte) {
-	count := len(buf)
-
-	for i := 0; i < count; i++ {
-		buf[i] = byte(RandSeed.Uint32())
-	}
+	RandSeed.Read(buf)
 }
 
 func (me RandBuffer) Rand() {
