@@ -2,6 +2,7 @@ package asdf
 
 import (
 	"errors"
+	"fmt"
 	"os"
 )
 
@@ -180,6 +181,10 @@ var (
 
 func NewError(err int) error {
 	return errors.New(StdErrorString(err))
+}
+
+func ErrSprintf(format string, v ...interface{}) error {
+	return errors.New(fmt.Sprintf(format, v...))
 }
 
 type StdError struct {

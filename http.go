@@ -3,7 +3,6 @@ package asdf
 import (
 	"bytes"
 	"encoding/base64"
-	"encoding/json"
 	"io"
 	"io/ioutil"
 	"net/http"
