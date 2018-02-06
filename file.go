@@ -27,6 +27,10 @@ func (me FileName) Append(buf []byte) error {
 	return nil //todo
 }
 
+func (me FileName) AppendLine(line string) error {
+	return nil //todo
+}
+
 func (me FileName) Save(buf []byte) error {
 	err := ioutil.WriteFile(me.String(), buf, FilePermNormal)
 	if nil != err {
@@ -97,6 +101,16 @@ func (me FileName) Load() ([]byte, error) {
 	}
 
 	return buf, err
+}
+
+func (me FileName) LoadByLine(lineHandle func(line string) error) error {
+	line := Empty
+
+	if err := lineHandle(line); nil != err {
+		return err
+	}
+
+	return nil
 }
 
 func (me FileName) SaveJson(obj interface{}) error {

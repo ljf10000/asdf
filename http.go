@@ -81,6 +81,11 @@ type IHttpPost interface {
 	IHttpBodyType
 }
 
+type IHttpGet interface {
+	IHttpUser
+	IHttpUrl
+}
+
 func HttpError(w http.ResponseWriter, error int, codec ICodec) {
 	HttpReply(w, NewStdError(error), codec)
 }
@@ -102,6 +107,26 @@ func HttpBody(rBody io.ReadCloser, iBody interface{}, codec ICodec) error {
 		Log.Debug("http body:%s", string(body))
 		Log.Debug("http body==>obj:%+v", iBody)
 
+		return nil
+	}
+}
+
+func HttpGet(get IHttpGet, output interface{}, codec ICodec) error {
+	Log.Debug("%s get %s ...", get.HttpUser(), get.HttpUrl())
+
+	r, err := http.Get(get.HttpUrl())
+	if nil != err {
+		Log.Debug("%s get %s error:%s",
+			get.HttpUser(), get.HttpUrl(), err.Error())
+
+		return err
+	}
+
+	Log.Debug("%s get %s ok.", get.HttpUser(), get.HttpUrl())
+
+	if nil != output {
+		return HttpBody(r.Body, output, codec)
+	} else {
 		return nil
 	}
 }
