@@ -90,7 +90,7 @@ func HttpError(w http.ResponseWriter, error int, codec ICodec) {
 	HttpReply(w, NewStdError(error), codec)
 }
 
-// hex==>crypt==>json==>obj
+// [hex==>crypt==>]json==>obj
 func HttpBody(rBody io.ReadCloser, iBody interface{}, codec ICodec) error {
 	body, err := ioutil.ReadAll(rBody)
 	rBody.Close()
@@ -111,18 +111,18 @@ func HttpBody(rBody io.ReadCloser, iBody interface{}, codec ICodec) error {
 	}
 }
 
-func HttpGet(get IHttpGet, output interface{}, codec ICodec) error {
-	Log.Debug("%s get %s ...", get.HttpUser(), get.HttpUrl())
+func HttpGet(iGet IHttpGet, output interface{}, codec ICodec) error {
+	Log.Debug("%s get %s ...", iGet.HttpUser(), iGet.HttpUrl())
 
-	r, err := http.Get(get.HttpUrl())
+	r, err := http.Get(iGet.HttpUrl())
 	if nil != err {
 		Log.Debug("%s get %s error:%s",
-			get.HttpUser(), get.HttpUrl(), err.Error())
+			iGet.HttpUser(), iGet.HttpUrl(), err.Error())
 
 		return err
 	}
 
-	Log.Debug("%s get %s ok.", get.HttpUser(), get.HttpUrl())
+	Log.Debug("%s get %s ok.", iGet.HttpUser(), iGet.HttpUrl())
 
 	if nil != output {
 		return HttpBody(r.Body, output, codec)
@@ -131,26 +131,26 @@ func HttpGet(get IHttpGet, output interface{}, codec ICodec) error {
 	}
 }
 
-func HttpPost(post IHttpPost, input, output interface{}, codec ICodec) error {
+func HttpPost(iPost IHttpPost, input, output interface{}, codec ICodec) error {
 	buf, _ := json.Marshal(input)
-	Log.Debug("%s post %s ...", post.HttpUser(), post.HttpUrl())
+	Log.Debug("%s post %s ...", iPost.HttpUser(), iPost.HttpUrl())
 
 	buf = httpEncode(buf, codec)
 
-	bodyType := post.HttpBodyType()
+	bodyType := iPost.HttpBodyType()
 	if Empty == bodyType {
 		bodyType = httpBodyType
 	}
 
-	r, err := http.Post(post.HttpUrl(), bodyType, bytes.NewBuffer(buf))
+	r, err := http.Post(iPost.HttpUrl(), bodyType, bytes.NewBuffer(buf))
 	if nil != err {
 		Log.Debug("%s post %s type:%s data:%s error:%s",
-			post.HttpUser(), post.HttpUrl(), bodyType, string(buf), err.Error())
+			iPost.HttpUser(), iPost.HttpUrl(), bodyType, string(buf), err.Error())
 
 		return err
 	}
 
-	Log.Debug("%s post %s ok.", post.HttpUser(), post.HttpUrl())
+	Log.Debug("%s post %s ok.", iPost.HttpUser(), iPost.HttpUrl())
 
 	if nil != output {
 		return HttpBody(r.Body, output, codec)
@@ -161,13 +161,29 @@ func HttpPost(post IHttpPost, input, output interface{}, codec ICodec) error {
 
 // output==>json==>crypt==>hex
 func HttpReply(w http.ResponseWriter, output interface{}, codec ICodec) {
-	buf, _ := json.Marshal(output)
+	if buf, err := json.Marshal(output); nil == err {
+		Log.Debug("http reply before encode:%s", string(buf))
 
-	Log.Debug("http reply before encode:%s", string(buf))
+		buf = httpEncode(buf, codec)
 
-	buf = httpEncode(buf, codec)
+		Log.Debug("http reply after encode:%s", string(buf))
 
-	Log.Debug("http reply after encode:%s", string(buf))
+		w.Write(buf)
+	}
+}
 
-	w.Write(buf)
+func StdHttpBody(rBody io.ReadCloser, iBody interface{}) error {
+	return HttpBody(rBody, iBody, nil)
+}
+
+func StdHttpGet(iGet IHttpGet, output interface{}) error {
+	return HttpGet(iGet, output, nil)
+}
+
+func StdHttpPost(iPost IHttpPost, input, output interface{}) error {
+	return HttpPost(iPost, input, output, nil)
+}
+
+func StdHttpReply(w http.ResponseWriter, output interface{}) {
+	HttpReply(w, output, nil)
 }

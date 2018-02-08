@@ -6,7 +6,11 @@ import (
 	"time"
 )
 
-var RandSeed = rand.New(rand.NewSource(time.Now().UnixNano()))
+var RandSeed = NewRandSeed()
+
+func NewRandSeed() *rand.Rand {
+	return rand.New(rand.NewSource(time.Now().UnixNano()))
+}
 
 type RandBuffer []byte
 
