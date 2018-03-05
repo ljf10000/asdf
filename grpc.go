@@ -12,22 +12,19 @@ func RunGrpcServer(port string, register func(server *grpc.Server)) error {
 	if err != nil {
 		return err
 	}
+	defer listen.Close()
 
 	server := grpc.NewServer()
 	register(server)
 	reflection.Register(server)
 
-	if err := server.Serve(listen); err != nil {
-		return err
-	}
-
-	return nil
+	return server.Serve(listen)
 }
 
 func GrpcCall(server string, call func(conn *grpc.ClientConn) error) error {
 	// Set up a connection to the server.
 	conn, err := grpc.Dial(server, grpc.WithInsecure())
-	if err != nil {
+	if nil != err {
 		return err
 	}
 

@@ -58,3 +58,51 @@ func Htonll(bin []byte, v uint64) {
 func Hton64(bin []byte, v uint64) {
 	binary.BigEndian.PutUint64(bin, v)
 }
+
+func HtonsE(v uint16) []byte {
+	bin := [2]byte{}
+
+	Htons(bin[:], v)
+
+	return bin[:]
+}
+
+func Hton16E(v uint16) []byte {
+	bin := [2]byte{}
+
+	Hton16(bin[:], v)
+
+	return bin[:]
+}
+
+func HtonlE(v uint32) []byte {
+	bin := [4]byte{}
+
+	Htonl(bin[:], v)
+
+	return bin[:]
+}
+
+func Hton32E(v uint32) []byte {
+	bin := [4]byte{}
+
+	Hton32(bin[:], v)
+
+	return bin[:]
+}
+
+func HtonllE(v uint64) []byte {
+	bin := [8]byte{}
+
+	Htonll(bin[:], v)
+
+	return bin[:]
+}
+
+func Hton64E(v uint64) []byte {
+	bin := [8]byte{}
+
+	Hton64(bin[:], v)
+
+	return bin[:]
+}
