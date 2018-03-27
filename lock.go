@@ -4,6 +4,11 @@ import (
 	"sync"
 )
 
+type ILock interface {
+	Write(handler func() error) error
+	Read(handler func() error) error
+}
+
 type RwLock struct {
 	Debug bool
 	Name  string
@@ -59,6 +64,26 @@ func (me *RwLock) WHandle(handler func()) {
 	me.unlock()
 }
 
+func (me *RwLock) Read(handler func() error) error {
+	var err error
+
+	me.rlock()
+	err = handler()
+	me.runlock()
+
+	return err
+}
+
+func (me *RwLock) Write(handler func() error) error {
+	var err error
+
+	me.lock()
+	err = handler()
+	me.unlock()
+
+	return err
+}
+
 type AccessLock struct {
 	Debug bool
 	Name  string
@@ -94,4 +119,30 @@ func (me *AccessLock) Handle(handler func()) {
 	me.lock()
 	handler()
 	me.unlock()
+}
+
+func (me *AccessLock) RHandle(handler func()) {
+	me.Handle(handler)
+}
+
+func (me *AccessLock) WHandle(handler func()) {
+	me.Handle(handler)
+}
+
+func (me *AccessLock) HandleE(handler func() error) error {
+	var err error
+
+	me.lock()
+	err = handler()
+	me.unlock()
+
+	return err
+}
+
+func (me *AccessLock) Read(handler func() error) error {
+	return me.HandleE(handler)
+}
+
+func (me *AccessLock) Write(handler func() error) error {
+	return me.HandleE(handler)
 }

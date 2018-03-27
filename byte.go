@@ -22,6 +22,14 @@ func GetBytes(bin []byte, offset, size int) ([]byte, int) {
 	return bin[offset:end], end
 }
 
+func CloneBytes(bin []byte) []byte {
+	obj := make([]byte, len(bin))
+
+	copy(obj, bin)
+
+	return obj
+}
+
 func ByteReverse(bin []byte) {
 	count := len(bin)
 

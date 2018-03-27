@@ -1,6 +1,8 @@
 package asdf
 
 import (
+	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -20,30 +22,60 @@ func (me FileName) String() string {
 }
 
 func (me FileName) Abs() FileName {
-	return FileName(CurrentDirFile(me.String()))
+	return FileName(CurrentDirFile(string(me)))
+}
+
+func FileShortName(path string) string {
+	for i := len(path) - 1; i >= 0; i-- {
+		if os.IsPathSeparator(path[i]) {
+			return path[i:]
+		}
+	}
+
+	return Empty
+}
+
+func (me FileName) ShortName() string {
+	return FileShortName(me.String())
 }
 
 func (me FileName) Append(buf []byte) error {
-	return nil //todo
+	f, err := os.OpenFile(string(me), os.O_RDWR|os.O_APPEND, 0666)
+	if nil != err {
+		Log.Error("open %s error:%v", me, err)
+
+		return err
+	}
+
+	_, err = f.Write(buf)
+	if nil != err {
+		Log.Error("write %s error:%v", me, err)
+
+		return err
+	}
+
+	f.Close()
+
+	return nil
 }
 
 func (me FileName) AppendLine(line string) error {
-	return nil //todo
+	return me.Append([]byte(line + Crlf))
 }
 
 func (me FileName) Save(buf []byte) error {
-	err := ioutil.WriteFile(me.String(), buf, FilePermNormal)
+	err := ioutil.WriteFile(string(me), buf, FilePermNormal)
 	if nil != err {
-		Log.Info("save %s error:%v\n", me, err)
+		Log.Error("save %s error:%v", me, err)
 	}
 
 	return err
 }
 
 func (me FileName) Delete() error {
-	err := os.Remove(me.String())
+	err := os.Remove(string(me))
 	if nil != err {
-		Log.Info("delete %s error:%v\n", me, err)
+		Log.Error("delete %s error:%v", me, err)
 	}
 
 	return err
@@ -56,18 +88,18 @@ func (me FileName) Touch(Time Time32) error {
 
 	tm := time.Unix(int64(Time), 0)
 
-	err := os.Chtimes(me.String(), tm, tm)
+	err := os.Chtimes(string(me), tm, tm)
 	if nil != err {
-		Log.Info("change %s time error:%v\n", me, err)
+		Log.Error("change %s time error:%v", me, err)
 	}
 
 	return err
 }
 
 func (me FileName) Saves(texts []string, crlf bool) error {
-	f, err := os.Create(me.String())
+	f, err := os.Create(string(me))
 	if nil != err {
-		Log.Info("create %s error:%v\n", me, err)
+		Log.Error("create %s error:%v", me, err)
 
 		return err
 	}
@@ -76,7 +108,7 @@ func (me FileName) Saves(texts []string, crlf bool) error {
 	for _, text := range texts {
 		_, err := f.WriteString(text)
 		if nil != err {
-			Log.Info("writes %s error:%v\n", me, err)
+			Log.Error("writes %s error:%v", me, err)
 
 			return err
 		}
@@ -84,7 +116,7 @@ func (me FileName) Saves(texts []string, crlf bool) error {
 		if crlf {
 			_, err := f.WriteString(Crlf)
 			if nil != err {
-				Log.Info("writes %s error:%v\n", me, err)
+				Log.Error("writes %s error:%v", me, err)
 
 				return err
 			}
@@ -95,9 +127,9 @@ func (me FileName) Saves(texts []string, crlf bool) error {
 }
 
 func (me FileName) Load() ([]byte, error) {
-	buf, err := ioutil.ReadFile(me.String())
+	buf, err := ioutil.ReadFile(string(me))
 	if nil != err {
-		Log.Info("load %s error:%v\n", me, err)
+		Log.Error("load %s error:%v", me, err)
 	}
 
 	return buf, err
@@ -116,7 +148,7 @@ func (me FileName) LoadByLine(lineHandle func(line string) error) error {
 func (me FileName) SaveJson(obj interface{}) error {
 	buf, err := json.Marshal(obj)
 	if nil != err {
-		Log.Info("save %s json error:%v\n", me, err)
+		Log.Error("save %s json error:%v", me, err)
 
 		return err
 	}
@@ -132,7 +164,7 @@ func (me FileName) LoadJson(obj interface{}) error {
 
 	err = json.Unmarshal(buf, obj)
 	if nil != err {
-		Log.Info("load %s json error:%v\n", me, err)
+		Log.Error("load %s json error:%v", me, err)
 
 		return err
 	}
@@ -149,7 +181,7 @@ func (me FileName) ReadPid() int {
 	pidstr := string(b)
 	pid, err := strconv.Atoi(pidstr)
 	if nil != err {
-		Log.Info("load pidfile %s error:%v\n", me, err)
+		Log.Error("load pidfile %s error:%v", me, err)
 
 		return 0
 	}
@@ -167,25 +199,51 @@ func (me FileName) WritePid() {
 func (me FileName) Exist() bool {
 	if Empty == me {
 		return false
-	} else if _, err := os.Stat(me.String()); nil != err {
+	} else if _, err := os.Stat(string(me)); nil != err {
 		return false
 	} else {
 		return true
 	}
 }
 
+func (me FileName) FileSize() (int64, error) {
+	if Empty == me {
+		return 0, errors.New("empty filename")
+	} else if info, err := os.Stat(string(me)); nil != err {
+		return 0, err
+	} else {
+		return info.Size(), nil
+	}
+}
+
 func (me FileName) DirExist() bool {
 	if Empty == me {
 		return false
-	} else if f, err := os.Stat(me.String()); nil != err {
+	} else if f, err := os.Stat(string(me)); nil != err {
 		return false
 	} else {
 		return f.IsDir()
 	}
 }
 
+func (me FileName) DirScanSimple(scan func(path string, info os.FileInfo) error) error {
+	if !me.DirExist() {
+		return errors.New(fmt.Sprintf("dir:%s not exist", me))
+	}
+
+	return filepath.Walk(me.String(), func(path string, info os.FileInfo, err error) error {
+		if nil != err {
+			return err
+		} else if info.IsDir() {
+			return filepath.SkipDir
+		}
+
+		return scan(path, info)
+	})
+}
+
 func (me FileName) DirUnserialize(creator func() IUnserialize) error {
-	return filepath.Walk(me.String(), func(path string, f os.FileInfo, err error) error {
+	return filepath.Walk(string(me), func(path string, f os.FileInfo, err error) error {
 		if nil == f {
 			return err
 		} else if f.IsDir() {

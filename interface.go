@@ -151,6 +151,10 @@ type ILogDebug interface {
 	Debug(format string, v ...interface{})
 }
 
+type IClose interface {
+	Close() error
+}
+
 type IObjOwner interface {
 	ObjOwner() string
 }
@@ -241,6 +245,8 @@ type ILogger interface {
 	ILogLog
 	ILogGetLevel
 	ILogSetLevel
+
+	IClose
 }
 
 type IObj interface {
