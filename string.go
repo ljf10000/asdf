@@ -6,18 +6,24 @@ import (
 )
 
 const (
-	Empty = ""
-	Space = " "
-	Tab   = Space + Space + Space + Space
-	Tab2  = Tab + Tab
-	Tab3  = Tab2 + Tab
-	Tab4  = Tab3 + Tab
+	Empty  = ""
+	Space  = " "
+	Unknow = "unknow"
+
+	Tab  = Space + Space + Space + Space
+	Tab2 = Tab + Tab
+	Tab3 = Tab2 + Tab
+	Tab4 = Tab3 + Tab
+
+	TabR  = "\t"
+	TabR2 = TabR + TabR
+	TabR3 = TabR2 + TabR
+	TabR4 = TabR3 + TabR
+
 	Crlf  = "\n"
 	Crlf2 = Crlf + Crlf
 	Crlf3 = Crlf2 + Crlf
 	Crlf4 = Crlf3 + Crlf
-
-	Unknow = "unknow"
 )
 
 func RepeatN(r string, n int) string {

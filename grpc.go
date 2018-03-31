@@ -9,8 +9,8 @@ import (
 	"google.golang.org/grpc/reflection"
 )
 
-func RunGrpcServer(port string, register func(server *grpc.Server)) error {
-	listen, err := net.Listen("tcp", port)
+func RunGrpcServer(address string, register func(server *grpc.Server)) error {
+	listen, err := net.Listen("tcp", address)
 	if err != nil {
 		return err
 	}
@@ -20,7 +20,7 @@ func RunGrpcServer(port string, register func(server *grpc.Server)) error {
 	register(server)
 	reflection.Register(server)
 
-	Log.Info("run grpc server %s", port)
+	Log.Crit("run grpc server %s", address)
 
 	return server.Serve(listen)
 }

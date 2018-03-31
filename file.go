@@ -146,7 +146,7 @@ func (me FileName) LoadByLine(lineHandle func(line string) error) error {
 }
 
 func (me FileName) SaveJson(obj interface{}) error {
-	buf, err := json.Marshal(obj)
+	buf, err := json.MarshalIndent(obj, Empty, "\t")
 	if nil != err {
 		Log.Error("save %s json error:%v", me, err)
 

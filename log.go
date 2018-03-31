@@ -69,7 +69,7 @@ type consoleLogger struct {
 	level LogLevel
 }
 
-var logConsole = &consoleLogger{
+var Console = &consoleLogger{
 	level: LogLevelDeft,
 }
 
@@ -303,4 +303,4 @@ func (me *coLogger) Close() error {
 }
 
 //==============================================================================
-var Log ILogger = logConsole
+var Log ILogger = Console
