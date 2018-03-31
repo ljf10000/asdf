@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net"
 	. "strconv"
+	"strings"
 )
 
 type IpAddress uint32
@@ -56,7 +57,8 @@ func GetLocalAddress() []string {
 	for _, addr := range addrs {
 		ipnet, ok := addr.(*net.IPNet)
 		if ok && !ipnet.IP.IsLoopback() && nil != ipnet.IP.To4() {
-			ipaddrs = append(ipaddrs, addr.String())
+			arr := strings.Split(addr.String(), "/")
+			ipaddrs = append(ipaddrs, arr[0])
 		}
 	}
 
