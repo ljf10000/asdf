@@ -40,7 +40,7 @@ func (me FileName) ShortName() string {
 }
 
 func (me FileName) Append(buf []byte) error {
-	f, err := os.OpenFile(string(me), os.O_RDWR|os.O_APPEND, 0666)
+	f, err := os.OpenFile(string(me), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if nil != err {
 		Log.Error("open %s error:%v", me, err)
 
