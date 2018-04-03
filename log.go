@@ -6,6 +6,49 @@ import (
 )
 
 const (
+	LogTypeInvalid LogType = 0
+	LogTypeConsole LogType = 1
+	LogTypeFile    LogType = 2
+	LogTypeCo      LogType = 3
+	LogTypeEnd     LogType = 4
+
+	LogTypeDeft LogType = LogTypeConsole
+)
+
+type LogType int
+
+var arrLogType = [LogTypeEnd]string{
+	LogTypeInvalid: "invalid",
+	LogTypeConsole: "console",
+	LogTypeFile:    "file",
+	LogTypeCo:      "co",
+}
+var mapLogType = map[string]LogType{
+	"invalid": LogTypeInvalid,
+	"console": LogTypeConsole,
+	"file":    LogTypeFile,
+	"co":      LogTypeCo,
+}
+
+func (me LogType) IsGood() bool {
+	return me > LogTypeInvalid && me < LogTypeEnd
+}
+
+func (me LogType) String() string {
+	if me.IsGood() {
+		return arrLogType[me]
+	} else {
+		return Unknow
+	}
+}
+
+func (me *LogType) FromString(s string) {
+	if level, ok := mapLogType[s]; ok {
+		*me = level
+	}
+}
+
+const (
 	LogLevelInvalid LogLevel = 0
 	LogLevelEmerg   LogLevel = 1
 	LogLevelAlert   LogLevel = 2
@@ -65,67 +108,67 @@ func (me *LogLevel) FromString(s string) {
 
 //==============================================================================
 
-type consoleLogger struct {
+type ConsoleLogger struct {
 	level LogLevel
 }
 
-var Console = &consoleLogger{
+var Console = &ConsoleLogger{
 	level: LogLevelDeft,
 }
 
-func (me *consoleLogger) GetLevel() LogLevel {
+func (me *ConsoleLogger) GetLevel() LogLevel {
 	return me.level
 }
 
-func (me *consoleLogger) SetLevel(level LogLevel) {
+func (me *ConsoleLogger) SetLevel(level LogLevel) {
 	me.level = level
 }
 
-func (me *consoleLogger) Log(level LogLevel, format string, v ...interface{}) {
+func (me *ConsoleLogger) Log(level LogLevel, format string, v ...interface{}) {
 	if level <= me.level {
 		fmt.Printf(format, v...)
 	}
 }
 
-func (me *consoleLogger) Emerg(format string, v ...interface{}) {
+func (me *ConsoleLogger) Emerg(format string, v ...interface{}) {
 	me.Log(LogLevelEmerg, format+Crlf, v...)
 }
 
-func (me *consoleLogger) Alert(format string, v ...interface{}) {
+func (me *ConsoleLogger) Alert(format string, v ...interface{}) {
 	me.Log(LogLevelAlert, format+Crlf, v...)
 }
 
-func (me *consoleLogger) Crit(format string, v ...interface{}) {
+func (me *ConsoleLogger) Crit(format string, v ...interface{}) {
 	me.Log(LogLevelCrit, format+Crlf, v...)
 }
 
-func (me *consoleLogger) Error(format string, v ...interface{}) {
+func (me *ConsoleLogger) Error(format string, v ...interface{}) {
 	me.Log(LogLevelError, format+Crlf, v...)
 }
 
-func (me *consoleLogger) Warning(format string, v ...interface{}) {
+func (me *ConsoleLogger) Warning(format string, v ...interface{}) {
 	me.Log(LogLevelWarning, format+Crlf, v...)
 }
 
-func (me *consoleLogger) Notice(format string, v ...interface{}) {
+func (me *ConsoleLogger) Notice(format string, v ...interface{}) {
 	me.Log(LogLevelNotice, format+Crlf, v...)
 }
 
-func (me *consoleLogger) Info(format string, v ...interface{}) {
+func (me *ConsoleLogger) Info(format string, v ...interface{}) {
 	me.Log(LogLevelInfo, format+Crlf, v...)
 }
 
-func (me *consoleLogger) Debug(format string, v ...interface{}) {
+func (me *ConsoleLogger) Debug(format string, v ...interface{}) {
 	me.Log(LogLevelDebug, format+Crlf, v...)
 }
 
-func (me *consoleLogger) Close() error {
+func (me *ConsoleLogger) Close() error {
 	return nil
 }
 
 //==============================================================================
 
-type fileLogger struct {
+type FileLogger struct {
 	level LogLevel
 
 	file string
@@ -139,7 +182,7 @@ func OpenFileLogger(file string) error {
 		return err
 	}
 
-	logger := &fileLogger{
+	logger := &FileLogger{
 		level: LogLevelDeft,
 		file:  file,
 		fd:    fd,
@@ -150,15 +193,15 @@ func OpenFileLogger(file string) error {
 	return nil
 }
 
-func (me *fileLogger) GetLevel() LogLevel {
+func (me *FileLogger) GetLevel() LogLevel {
 	return me.level
 }
 
-func (me *fileLogger) SetLevel(level LogLevel) {
+func (me *FileLogger) SetLevel(level LogLevel) {
 	me.level = level
 }
 
-func (me *fileLogger) Log(level LogLevel, format string, v ...interface{}) {
+func (me *FileLogger) Log(level LogLevel, format string, v ...interface{}) {
 	if level <= me.level {
 		me.lock.Handle(func() {
 			me.fd.WriteString(fmt.Sprintf(format, v...))
@@ -166,45 +209,45 @@ func (me *fileLogger) Log(level LogLevel, format string, v ...interface{}) {
 	}
 }
 
-func (me *fileLogger) Emerg(format string, v ...interface{}) {
+func (me *FileLogger) Emerg(format string, v ...interface{}) {
 	me.Log(LogLevelEmerg, format+Crlf, v...)
 }
 
-func (me *fileLogger) Alert(format string, v ...interface{}) {
+func (me *FileLogger) Alert(format string, v ...interface{}) {
 	me.Log(LogLevelAlert, format+Crlf, v...)
 }
 
-func (me *fileLogger) Crit(format string, v ...interface{}) {
+func (me *FileLogger) Crit(format string, v ...interface{}) {
 	me.Log(LogLevelCrit, format+Crlf, v...)
 }
 
-func (me *fileLogger) Error(format string, v ...interface{}) {
+func (me *FileLogger) Error(format string, v ...interface{}) {
 	me.Log(LogLevelError, format+Crlf, v...)
 }
 
-func (me *fileLogger) Warning(format string, v ...interface{}) {
+func (me *FileLogger) Warning(format string, v ...interface{}) {
 	me.Log(LogLevelWarning, format+Crlf, v...)
 }
 
-func (me *fileLogger) Notice(format string, v ...interface{}) {
+func (me *FileLogger) Notice(format string, v ...interface{}) {
 	me.Log(LogLevelNotice, format+Crlf, v...)
 }
 
-func (me *fileLogger) Info(format string, v ...interface{}) {
+func (me *FileLogger) Info(format string, v ...interface{}) {
 	me.Log(LogLevelInfo, format+Crlf, v...)
 }
 
-func (me *fileLogger) Debug(format string, v ...interface{}) {
+func (me *FileLogger) Debug(format string, v ...interface{}) {
 	me.Log(LogLevelDebug, format+Crlf, v...)
 }
 
-func (me *fileLogger) Close() error {
+func (me *FileLogger) Close() error {
 	return me.fd.Close()
 }
 
 //==============================================================================
 
-type coLogger struct {
+type CoLogger struct {
 	level LogLevel
 	file  string
 	fd    *os.File
@@ -219,7 +262,7 @@ func OpenCoLogger(file string, size int) error {
 
 	ch := make(chan string, size)
 
-	logger := &coLogger{
+	logger := &CoLogger{
 		level: LogLevelDeft,
 		file:  file,
 		fd:    fd,
@@ -232,7 +275,7 @@ func OpenCoLogger(file string, size int) error {
 	return nil
 }
 
-func (me *coLogger) run(ch chan string) {
+func (me *CoLogger) run(ch chan string) {
 	fmt.Printf("cologger running...\n")
 
 	for {
@@ -248,53 +291,53 @@ func (me *coLogger) run(ch chan string) {
 	}
 }
 
-func (me *coLogger) GetLevel() LogLevel {
+func (me *CoLogger) GetLevel() LogLevel {
 	return me.level
 }
 
-func (me *coLogger) SetLevel(level LogLevel) {
+func (me *CoLogger) SetLevel(level LogLevel) {
 	me.level = level
 }
 
-func (me *coLogger) Log(level LogLevel, format string, v ...interface{}) {
+func (me *CoLogger) Log(level LogLevel, format string, v ...interface{}) {
 	if level <= me.level {
 		me.ch <- fmt.Sprintf(format, v...)
 	}
 }
 
-func (me *coLogger) Emerg(format string, v ...interface{}) {
+func (me *CoLogger) Emerg(format string, v ...interface{}) {
 	me.Log(LogLevelEmerg, format+Crlf, v...)
 }
 
-func (me *coLogger) Alert(format string, v ...interface{}) {
+func (me *CoLogger) Alert(format string, v ...interface{}) {
 	me.Log(LogLevelAlert, format+Crlf, v...)
 }
 
-func (me *coLogger) Crit(format string, v ...interface{}) {
+func (me *CoLogger) Crit(format string, v ...interface{}) {
 	me.Log(LogLevelCrit, format+Crlf, v...)
 }
 
-func (me *coLogger) Error(format string, v ...interface{}) {
+func (me *CoLogger) Error(format string, v ...interface{}) {
 	me.Log(LogLevelError, format+Crlf, v...)
 }
 
-func (me *coLogger) Warning(format string, v ...interface{}) {
+func (me *CoLogger) Warning(format string, v ...interface{}) {
 	me.Log(LogLevelWarning, format+Crlf, v...)
 }
 
-func (me *coLogger) Notice(format string, v ...interface{}) {
+func (me *CoLogger) Notice(format string, v ...interface{}) {
 	me.Log(LogLevelNotice, format+Crlf, v...)
 }
 
-func (me *coLogger) Info(format string, v ...interface{}) {
+func (me *CoLogger) Info(format string, v ...interface{}) {
 	me.Log(LogLevelInfo, format+Crlf, v...)
 }
 
-func (me *coLogger) Debug(format string, v ...interface{}) {
+func (me *CoLogger) Debug(format string, v ...interface{}) {
 	me.Log(LogLevelDebug, format+Crlf, v...)
 }
 
-func (me *coLogger) Close() error {
+func (me *CoLogger) Close() error {
 	ch := me.ch
 	me.ch = make(chan string)
 	close(ch)

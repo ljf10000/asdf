@@ -42,14 +42,14 @@ func (me FileName) ShortName() string {
 func (me FileName) Append(buf []byte) error {
 	f, err := os.OpenFile(string(me), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if nil != err {
-		Log.Error("open %s error:%v", me, err)
+		Log.Error("open %s error: %s", me, err)
 
 		return err
 	}
 
 	_, err = f.Write(buf)
 	if nil != err {
-		Log.Error("write %s error:%v", me, err)
+		Log.Error("write %s error: %s", me, err)
 
 		return err
 	}
@@ -66,7 +66,7 @@ func (me FileName) AppendLine(line string) error {
 func (me FileName) Save(buf []byte) error {
 	err := ioutil.WriteFile(string(me), buf, FilePermNormal)
 	if nil != err {
-		Log.Error("save %s error:%v", me, err)
+		Log.Error("save %s error: %s", me, err)
 	}
 
 	return err
@@ -75,7 +75,7 @@ func (me FileName) Save(buf []byte) error {
 func (me FileName) Delete() error {
 	err := os.Remove(string(me))
 	if nil != err {
-		Log.Error("delete %s error:%v", me, err)
+		Log.Error("delete %s error: %s", me, err)
 	}
 
 	return err
@@ -90,7 +90,7 @@ func (me FileName) Touch(Time Time32) error {
 
 	err := os.Chtimes(string(me), tm, tm)
 	if nil != err {
-		Log.Error("change %s time error:%v", me, err)
+		Log.Error("change %s time error: %s", me, err)
 	}
 
 	return err
@@ -99,7 +99,7 @@ func (me FileName) Touch(Time Time32) error {
 func (me FileName) Saves(texts []string, crlf bool) error {
 	f, err := os.Create(string(me))
 	if nil != err {
-		Log.Error("create %s error:%v", me, err)
+		Log.Error("create %s error: %s", me, err)
 
 		return err
 	}
@@ -108,7 +108,7 @@ func (me FileName) Saves(texts []string, crlf bool) error {
 	for _, text := range texts {
 		_, err := f.WriteString(text)
 		if nil != err {
-			Log.Error("writes %s error:%v", me, err)
+			Log.Error("writes %s error: %s", me, err)
 
 			return err
 		}
@@ -116,7 +116,7 @@ func (me FileName) Saves(texts []string, crlf bool) error {
 		if crlf {
 			_, err := f.WriteString(Crlf)
 			if nil != err {
-				Log.Error("writes %s error:%v", me, err)
+				Log.Error("writes %s error: %s", me, err)
 
 				return err
 			}
@@ -129,7 +129,7 @@ func (me FileName) Saves(texts []string, crlf bool) error {
 func (me FileName) Load() ([]byte, error) {
 	buf, err := ioutil.ReadFile(string(me))
 	if nil != err {
-		Log.Error("load %s error:%v", me, err)
+		Log.Error("load %s error: %s", me, err)
 	}
 
 	return buf, err
@@ -148,7 +148,7 @@ func (me FileName) LoadByLine(lineHandle func(line string) error) error {
 func (me FileName) SaveJson(obj interface{}) error {
 	buf, err := json.MarshalIndent(obj, Empty, "\t")
 	if nil != err {
-		Log.Error("save %s json error:%v", me, err)
+		Log.Error("save %s json error: %s", me, err)
 
 		return err
 	}
@@ -159,12 +159,14 @@ func (me FileName) SaveJson(obj interface{}) error {
 func (me FileName) LoadJson(obj interface{}) error {
 	buf, err := me.Load()
 	if nil != err {
+		Log.Error("load %s json error: %s", me, err)
+
 		return err
 	}
 
 	err = json.Unmarshal(buf, obj)
 	if nil != err {
-		Log.Error("load %s json error:%v", me, err)
+		Log.Error("unmarshal %s json error: %s", me, err)
 
 		return err
 	}

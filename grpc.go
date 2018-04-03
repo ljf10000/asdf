@@ -20,7 +20,7 @@ func RunGrpcServer(address string, register func(server *grpc.Server)) error {
 	register(server)
 	reflection.Register(server)
 
-	Log.Crit("run grpc server %s", address)
+	Console.Crit("run grpc server %s", address)
 
 	return server.Serve(listen)
 }
@@ -46,7 +46,7 @@ type GrpcClientPool struct {
 	lock *AccessLock
 }
 
-func NewGrpcClientPoll(server string, count int) (*GrpcClientPool, error) {
+func NewGrpcClientPool(server string, count int) (*GrpcClientPool, error) {
 	pool := &GrpcClientPool{
 		server: server,
 		q:      list.New(),
