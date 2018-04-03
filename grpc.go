@@ -12,6 +12,8 @@ import (
 func RunGrpcServer(address string, register func(server *grpc.Server)) error {
 	listen, err := net.Listen("tcp", address)
 	if err != nil {
+		Log.Crit("grpc server %s listen error: %s", address, err)
+
 		return err
 	}
 	defer listen.Close()
@@ -20,7 +22,7 @@ func RunGrpcServer(address string, register func(server *grpc.Server)) error {
 	register(server)
 	reflection.Register(server)
 
-	Console.Crit("run grpc server %s", address)
+	Log.Crit("run grpc server %s", address)
 
 	return server.Serve(listen)
 }
