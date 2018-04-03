@@ -12,7 +12,7 @@ import (
 func RunGrpcServer(address string, register func(server *grpc.Server)) error {
 	listen, err := net.Listen("tcp", address)
 	if err != nil {
-		Log.Crit("grpc server %s listen error: %s", address, err)
+		Log.Error("grpc server %s listen error: %s", address, err)
 
 		return err
 	}
@@ -31,14 +31,21 @@ func GrpcCall(server string, call func(conn *grpc.ClientConn) error) error {
 	// Set up a connection to the server.
 	conn, err := grpc.Dial(server, grpc.WithInsecure())
 	if nil != err {
+		Log.Error("grpc dial %s error: %s", server, err)
+
 		return err
 	}
 
 	err = call(conn)
+	if nil != err {
+		Log.Error("grpc call %s error: %s", server, err)
+
+		return err
+	}
 
 	conn.Close()
 
-	return err
+	return nil
 }
 
 type GrpcClientPool struct {
