@@ -1,5 +1,8 @@
 package asdf
 
+import (
+	"encoding/json"
+)
 
 type MsgChanResponse struct {
 	Err  error

@@ -2,6 +2,7 @@ package asdf
 
 import (
 	"encoding/binary"
+	"encoding/json"
 	"net"
 )
 
