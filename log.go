@@ -108,7 +108,7 @@ func (me *LogLevel) FromString(s string) {
 }
 
 func addLogPrefix(msg string) string {
-	time.Now().Format("2006-01-02 15:04:05") + "==>" + msg
+	return time.Now().Format("2006-01-02 15:04:05") + "==>" + msg
 }
 
 //==============================================================================
