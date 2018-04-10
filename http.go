@@ -161,11 +161,9 @@ func HttpPost(iPost IHttpPost, input, output interface{}, codec ICodec) error {
 // output==>json==>crypt==>hex
 func HttpReply(w http.ResponseWriter, output interface{}, codec ICodec) {
 	if buf, err := json.Marshal(output); nil == err {
-		Log.Debug("http reply before encode:%s", string(buf))
-
 		buf = httpEncode(buf, codec)
 
-		Log.Debug("http reply after encode:%s", string(buf))
+		Log.Debug("http reply: %s", string(buf))
 
 		w.Write(buf)
 	}
