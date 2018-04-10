@@ -104,8 +104,7 @@ func HttpBody(rBody io.ReadCloser, iBody interface{}, codec ICodec) error {
 
 		return err
 	} else {
-		Log.Debug("http body:%s", string(body))
-		Log.Debug("http body==>obj:%+v", iBody)
+		Log.Debug("http body to obj: %+v", iBody)
 
 		return nil
 	}
