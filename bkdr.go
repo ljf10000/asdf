@@ -1,6 +1,6 @@
 package asdf
 
-const BkdrFactor = 37
+const BkdrFactor Bkdr = 37
 
 type Bkdr uint32
 
@@ -11,13 +11,15 @@ type IBkdr interface {
 type DeftBkdr struct{}
 
 func GenBkdr(buf []byte) Bkdr {
-	bkdr := uint64(BkdrFactor)
+	bkdr := Bkdr(0)
 
+	//Console.Info("make bkdr s=%s n=%d", string(buf), bkdr)
 	for _, b := range buf {
-		bkdr = bkdr*BkdrFactor + uint64(b)
+		bkdr = bkdr*BkdrFactor + Bkdr(b)
+		//Console.Info("make bkdr s=%s n=%d c=%d", string(buf), bkdr, b)
 	}
 
-	return Bkdr(bkdr)
+	return bkdr
 }
 
 func (me *DeftBkdr) Bkdr(buf []byte) Bkdr {

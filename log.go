@@ -3,6 +3,7 @@ package asdf
 import (
 	"fmt"
 	"os"
+	"time"
 )
 
 const (
@@ -106,6 +107,10 @@ func (me *LogLevel) FromString(s string) {
 	}
 }
 
+func addLogPrefix(msg string) string {
+	return time.Now().String() + ": " + msg
+}
+
 //==============================================================================
 
 type ConsoleLogger struct {
@@ -204,7 +209,9 @@ func (me *FileLogger) SetLevel(level LogLevel) {
 func (me *FileLogger) Log(level LogLevel, format string, v ...interface{}) {
 	if level <= me.level {
 		me.lock.Handle(func() {
-			me.fd.WriteString(fmt.Sprintf(format, v...))
+			msg := addLogPrefix(fmt.Sprintf(format, v...))
+
+			me.fd.WriteString(msg)
 		})
 	}
 }
@@ -286,6 +293,7 @@ func (me *CoLogger) run(ch chan string) {
 			return
 		}
 
+		msg = addLogPrefix(msg)
 		me.fd.WriteString(msg)
 		fmt.Print(msg)
 	}
