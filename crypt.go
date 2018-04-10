@@ -274,6 +274,9 @@ func PKCS7Padding(ciphertext []byte, blockSize int) []byte {
 func PKCS7UnPadding(plantText []byte) []byte {
 	length := len(plantText)
 	unpadding := int(plantText[length-1])
+	if unpadding < 0 || unpadding > 32 {
+		unpadding = 0
+	}
 
 	return plantText[:(length - unpadding)]
 }
