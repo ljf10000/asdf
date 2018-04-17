@@ -40,12 +40,6 @@ func (me FileName) ShortName() string {
 	return FileShortName(me.String())
 }
 
-func (me FileName) MkDir() error {
-	dir := filepath.Dir(string(me))
-
-	return os.MkdirAll(dir, 0755)
-}
-
 func (me FileName) Append(buf []byte) error {
 	f, err := os.OpenFile(string(me), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if nil != err {
