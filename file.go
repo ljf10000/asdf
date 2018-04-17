@@ -41,7 +41,9 @@ func (me FileName) ShortName() string {
 }
 
 func (me FileName) MkDir() error {
-	return me.Append(nil)
+	dir := filepath.Dir(string(me))
+
+	return os.MkdirAll(dir, 0755)
 }
 
 func (me FileName) Append(buf []byte) error {
@@ -52,13 +54,11 @@ func (me FileName) Append(buf []byte) error {
 		return err
 	}
 
-	if nil != buf {
-		_, err := f.Write(buf)
-		if nil != err {
-			Log.Error("write %s error: %s", me, err)
+	_, err = f.Write(buf)
+	if nil != err {
+		Log.Error("write %s error: %s", me, err)
 
-			return err
-		}
+		return err
 	}
 
 	f.Close()
