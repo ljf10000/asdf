@@ -1,9 +1,11 @@
 package asdf
 
 import (
+	"bufio"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -15,6 +17,15 @@ const (
 	FilePermExec   = 0755
 	FilePermNormal = 0644
 )
+
+func FileSize(f *os.File) int64 {
+	st, err := f.Stat()
+	if err != nil {
+		return -1
+	}
+
+	return st.Size()
+}
 
 type FileName string
 
@@ -137,10 +148,27 @@ func (me FileName) Load() ([]byte, error) {
 }
 
 func (me FileName) LoadByLine(lineHandle func(line string) error) error {
-	line := Empty
-
-	if err := lineHandle(line); nil != err {
+	f, err := os.Open(me.String())
+	if nil != err {
 		return err
+	}
+	defer f.Close()
+
+	r := bufio.NewReader(f)
+
+	for {
+		line, err := r.ReadString('\n')
+		if err2 := lineHandle(line); nil != err2 {
+			return err2
+		}
+
+		if err != nil {
+			if err == io.EOF {
+				return nil
+			} else {
+				return err
+			}
+		}
 	}
 
 	return nil

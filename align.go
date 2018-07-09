@@ -1,5 +1,21 @@
 package asdf
 
+import (
+	"os"
+)
+
+func PageAlign64(size int64) int64 {
+	page := int64(os.Getpagesize())
+
+	return ((size + page - 1) / page) * page
+}
+
+func PageAlign(size int) int {
+	page := os.Getpagesize()
+
+	return ((size + page - 1) / page) * page
+}
+
 func Align(x, align uint) uint {
 	return ((x + align - 1) / align) * align
 }
@@ -18,4 +34,22 @@ func AlignE(x, align uint) uint {
 
 func AlignDownE(x, align uint) uint {
 	return x & ^(align - 1)
+}
+
+const DEFT_ALIGN = 4
+
+func Align8(size, align byte) byte {
+	return (size + align - 1) & ^byte(align-1)
+}
+
+func Align16(size, align uint16) uint16 {
+	return (size + align - 1) & ^uint16(align-1)
+}
+
+func Align32(size, align uint32) uint32 {
+	return (size + align - 1) & ^uint32(align-1)
+}
+
+func Align64(size, align uint64) uint64 {
+	return (size + align - 1) & ^uint64(align-1)
 }

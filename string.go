@@ -26,6 +26,22 @@ const (
 	Crlf4 = Crlf3 + Crlf
 )
 
+func YesNo(yes bool) string {
+	if yes {
+		return "yes"
+	} else {
+		return "no"
+	}
+}
+
+func OnOff(on bool) string {
+	if on {
+		return "on"
+	} else {
+		return "off"
+	}
+}
+
 func RepeatN(r string, n int) string {
 	s := Empty
 
