@@ -48,7 +48,7 @@ func (me *SizeChecker) Exec(show bool) {
 	}
 
 	if me.SizeX != int(me.Size) {
-		panic(fmt.Sprintf("%s self check failed", me.Name))
+		panic(fmt.Sprintf("%s self check failed xsize(%d)!=size(%d)", me.Name, me.SizeX, me.Size))
 	}
 }
 

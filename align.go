@@ -4,16 +4,16 @@ import (
 	"os"
 )
 
+var PAGESIZE = os.Getpagesize()
+
 func PageAlign64(size int64) int64 {
-	page := int64(os.Getpagesize())
+	page := int64(PAGESIZE)
 
 	return ((size + page - 1) / page) * page
 }
 
 func PageAlign(size int) int {
-	page := os.Getpagesize()
-
-	return ((size + page - 1) / page) * page
+	return ((size + PAGESIZE - 1) / PAGESIZE) * PAGESIZE
 }
 
 func Align(x, align uint) uint {

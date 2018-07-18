@@ -51,6 +51,26 @@ func (me FileName) ShortName() string {
 	return FileShortName(me.String())
 }
 
+func (me FileName) Create(size int) error {
+	f, err := os.OpenFile(string(me), os.O_RDWR|os.O_CREATE|os.O_EXCL|os.O_TRUNC, 0666)
+	if nil != err {
+		Log.Error("create %s error: %s", me, err)
+
+		return err
+	}
+
+	err = f.Truncate(int64(size))
+	if nil != err {
+		Log.Error("turncate %s error: %s", me, err)
+
+		return err
+	}
+
+	f.Close()
+
+	return nil
+}
+
 func (me FileName) Append(buf []byte) error {
 	f, err := os.OpenFile(string(me), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if nil != err {
