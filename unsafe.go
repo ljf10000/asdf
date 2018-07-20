@@ -2,8 +2,6 @@ package asdf
 
 import (
 	"fmt"
-	"reflect"
-	"unsafe"
 )
 
 func MakeTimespec(second, nano uint32) uint64 {
@@ -12,20 +10,6 @@ func MakeTimespec(second, nano uint32) uint64 {
 
 func SplitTimespec(timespec uint64) (uint32, uint32) {
 	return uint32(timespec >> 32), uint32(timespec & 0xffffffff)
-}
-
-func MakeSlice(Data uintptr, Len, Cap int) []byte {
-	var s = reflect.SliceHeader{
-		Data: Data,
-		Len:  Len,
-		Cap:  Cap,
-	}
-
-	return *(*[]byte)(unsafe.Pointer(&s))
-}
-
-func SliceAddress(buf []byte) uintptr {
-	return ((*reflect.SliceHeader)(unsafe.Pointer(&buf))).Data
 }
 
 type SizeChecker struct {
@@ -48,7 +32,9 @@ func (me *SizeChecker) Exec(show bool) {
 	}
 
 	if me.SizeX != int(me.Size) {
-		panic(fmt.Sprintf("%s self check failed xsize(%d)!=size(%d)", me.Name, me.SizeX, me.Size))
+		s := fmt.Sprintf("%s self check failed xsize(%d)!=size(%d)", me.Name, me.SizeX, me.Size)
+
+		panic(s)
 	}
 }
 

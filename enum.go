@@ -97,3 +97,30 @@ func (me *EnumManager) IsGoodIndex(idx int) bool {
 
 	return ok
 }
+
+type EnumMapper struct {
+	Enum string
+	ItoA []string
+	AtoI map[string]int
+}
+
+func (me *EnumMapper) Index(name string) (int, error) {
+	idx, ok := me.AtoI[name]
+	if ok {
+		return idx, nil
+	} else {
+		return 0, ErrSprintf("invalid %s: %s", me.Enum, name)
+	}
+}
+
+func (me *EnumMapper) Name(idx int) (string, bool) {
+	if me.IsGoodIndex(idx) {
+		return me.ItoA[idx], true
+	} else {
+		return Unknow, false
+	}
+}
+
+func (me *EnumMapper) IsGoodIndex(idx int) bool {
+	return idx >= 0 && idx < len(me.ItoA)
+}

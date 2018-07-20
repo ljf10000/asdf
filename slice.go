@@ -7,6 +7,10 @@ import (
 
 type Slice []byte
 
+func (me *Slice) Header() *reflect.SliceHeader {
+	return (*reflect.SliceHeader)(unsafe.Pointer(me))
+}
+
 func (me Slice) IsValue(Value byte) bool {
 	for i := 0; i < len(me); i++ {
 		if Value != me[i] {
@@ -49,10 +53,6 @@ func (me Slice) Eq(it interface{}) bool {
 	return true
 }
 
-func (me *Slice) Header() *reflect.SliceHeader {
-	return (*reflect.SliceHeader)(unsafe.Pointer(me))
-}
-
 func ObjToSlice(obj unsafe.Pointer, size int) []byte {
 	if nil != obj {
 		bin := Slice{}
@@ -71,4 +71,23 @@ func MemberToSlice(obj unsafe.Pointer, offset, size uintptr) []byte {
 	member := unsafe.Pointer(uintptr(obj) + offset)
 
 	return ObjToSlice(member, int(size))
+}
+
+func MakeSlice(Data uintptr, Len, Cap int) []byte {
+	s := Slice{}
+	h := s.Header()
+
+	h.Data = Data
+	h.Len = Len
+	h.Cap = Cap
+
+	return s
+}
+
+func SliceAddress(buf []byte) uintptr {
+	return ((*reflect.SliceHeader)(unsafe.Pointer(&buf))).Data
+}
+
+func SlicePointer(buf []byte) unsafe.Pointer {
+	return unsafe.Pointer(((*reflect.SliceHeader)(unsafe.Pointer(&buf))).Data)
 }
