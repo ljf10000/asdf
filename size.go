@@ -4,14 +4,6 @@ import (
 	"fmt"
 )
 
-func MakeTimespec(second, nano uint32) uint64 {
-	return (uint64(second) << 32) | uint64(nano)
-}
-
-func SplitTimespec(timespec uint64) (uint32, uint32) {
-	return uint32(timespec >> 32), uint32(timespec & 0xffffffff)
-}
-
 type SizeChecker struct {
 	Name  string
 	Size  uintptr
