@@ -99,13 +99,21 @@ func (me *EnumManager) IsGoodIndex(idx int) bool {
 }
 
 type EnumMapper struct {
-	Enum string
-	ItoA []string
-	AtoI map[string]int
+	Enum   string
+	Names  []string
+	values map[string]int
+}
+
+func (me *EnumMapper) Init() {
+	me.values = map[string]int{}
+
+	for k, v := range me.Names {
+		me.values[v] = k
+	}
 }
 
 func (me *EnumMapper) Index(name string) (int, error) {
-	idx, ok := me.AtoI[name]
+	idx, ok := me.values[name]
 	if ok {
 		return idx, nil
 	} else {
@@ -113,14 +121,22 @@ func (me *EnumMapper) Index(name string) (int, error) {
 	}
 }
 
-func (me *EnumMapper) Name(idx int) (string, bool) {
+func (me *EnumMapper) Name(idx int) string {
 	if me.IsGoodIndex(idx) {
-		return me.ItoA[idx], true
+		return me.Names[idx]
+	} else {
+		return Unknow
+	}
+}
+
+func (me *EnumMapper) NameEx(idx int) (string, bool) {
+	if me.IsGoodIndex(idx) {
+		return me.Names[idx], true
 	} else {
 		return Unknow, false
 	}
 }
 
 func (me *EnumMapper) IsGoodIndex(idx int) bool {
-	return idx >= 0 && idx < len(me.ItoA)
+	return idx >= 0 && idx < len(me.Names)
 }

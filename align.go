@@ -4,7 +4,9 @@ import (
 	"os"
 )
 
-var PAGESIZE = os.Getpagesize()
+var (
+	PAGESIZE = os.Getpagesize()
+)
 
 func PageAlign64(size int64) int64 {
 	page := int64(PAGESIZE)

@@ -95,8 +95,20 @@ type IUnSave interface {
 	UnSave()
 }
 
+type IGet interface {
+	Get() interface{}
+}
+
+type ISet interface {
+	Set(v interface{})
+}
+
 type ISize interface {
 	Size() int
+}
+
+type ICount interface {
+	Count() int
 }
 
 type IToBinary interface {
