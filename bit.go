@@ -123,3 +123,46 @@ func (me BitMap) HasBit(bit uint32) bool {
 
 	return HasBit(me[idx], bit%BitMapSlot)
 }
+
+type BitsMapper struct {
+	Type  string
+	Names map[int]string
+}
+
+func (me *BitsMapper) name(flags, bits uint64) string {
+	name := make([]byte, 0, 1024)
+	for i := uint64(0); i < bits; i++ {
+		flag := uint64(1) << i
+
+		if flag == (flag & flags) {
+			v, ok := me.Names[int(flag)]
+			if ok {
+				name = append(name, []byte(v)...)
+				name = append(name, '|')
+			}
+		}
+	}
+
+	Len := len(name)
+	if Len > 0 {
+		return string(name[:Len-1])
+	} else {
+		return Unknow
+	}
+}
+
+func (me *BitsMapper) Name8(flags int) string {
+	return me.name(uint64(flags), 8*SizeofByte)
+}
+
+func (me *BitsMapper) Name16(flags int) string {
+	return me.name(uint64(flags), 8*SizeofInt16)
+}
+
+func (me *BitsMapper) Name32(flags int) string {
+	return me.name(uint64(flags), 8*SizeofInt32)
+}
+
+func (me *BitsMapper) Name64(flags int) string {
+	return me.name(uint64(flags), 8*SizeofInt64)
+}
