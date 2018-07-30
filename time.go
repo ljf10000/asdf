@@ -31,6 +31,11 @@ type Timespec struct {
 	Nano   uint32
 }
 
+func (me *Timespec) Zero() {
+	me.Second = 0
+	me.Nano = 0
+}
+
 func (me *Timespec) MakeTimespec() uint64 {
 	return MakeTimespec(me.Second, me.Nano)
 }
