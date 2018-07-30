@@ -1,15 +1,15 @@
 package asdf
 
 import (
-	. "strconv"
 	"fmt"
-	"time"
+	. "strconv"
 	"testing"
+	"time"
 )
 
 type Entry struct {
 	timer ITimer
-	
+
 	number int
 }
 
@@ -30,9 +30,9 @@ func EntryCallback(proxy ITimerProxy) (bool, error) {
 	if !ok {
 		return true, ErrBadType
 	}
-	
+
 	fmt.Printf(" %d", e.number)
-	
+
 	return true, nil
 }
 
@@ -47,10 +47,10 @@ var entry = [cpu][count]Entry{}
 
 func Init(idx int) {
 	clock[idx] = TmClock(ms)
-	
-	for i:=0; i<count; i++ {
+
+	for i := 0; i < count; i++ {
 		entry[idx][i].number = i
-		
+
 		entry[idx][i].timer, _ =
 			clock[idx].Insert(&entry[idx][i], 0, ms*uint(i)/timeout, EntryCallback, true)
 	}
@@ -58,10 +58,10 @@ func Init(idx int) {
 
 func run(idx int) {
 	Init(idx)
-	
-	for i:=0;i<times;i++ {
-		time.Sleep(ms*1000*1000)
-		
+
+	for i := 0; i < times; i++ {
+		time.Sleep(ms * 1000 * 1000)
+
 		fmt.Printf("%.10d:", i+1)
 		clock[idx].Trigger(1)
 		fmt.Printf("\n")
@@ -69,9 +69,9 @@ func run(idx int) {
 }
 
 func TestTimer(t *testing.T) {
-	for i:=cpu-1; i>0; i-- {
+	for i := cpu - 1; i > 0; i-- {
 		go run(i)
 	}
-	
+
 	run(0)
 }

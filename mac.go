@@ -3,6 +3,7 @@ package asdf
 import (
 	"encoding/hex"
 	"fmt"
+	"unsafe"
 )
 
 const (
@@ -13,29 +14,63 @@ const (
 
 	MacSepWindows = '-'
 	MacSepUnix    = ':'
+
+	MAC_F_MULTICASE   = 0x01
+	MAC_F_LOCAL_ADMIN = 0x02
+
+	_uptr_4 = uintptr(4)
 )
 
-type MAC [MacSize]byte
+var ZERO_MAC = Mac{0, 0, 0, 0, 0, 0}
+var FULL_MAC = Mac{0xff, 0xff, 0xff, 0xff, 0xff, 0xff}
+
 type Mac []byte
 
-func (me MAC) Mac() Mac {
-	return Mac(me[:])
+func (me Mac) IsUnicast() bool {
+	return 0 == (me[0] & MAC_F_MULTICASE)
 }
 
-func (me MAC) String() string {
-	return me.Mac().String()
+func (me Mac) IsMulticast() bool {
+	return MAC_F_MULTICASE == (me[0] & MAC_F_MULTICASE)
+}
+
+func (me Mac) IsUniversal() bool {
+	return 0 == (me[0] & MAC_F_LOCAL_ADMIN)
+}
+
+func (me Mac) IsLocalAdmin() bool {
+	return MAC_F_LOCAL_ADMIN == (me[0] & MAC_F_LOCAL_ADMIN)
+}
+
+func (me Mac) isSame(a uint32, b uint16) bool {
+	p := SliceAddress(me)
+
+	return *(*uint32)(unsafe.Pointer(p)) == a &&
+		*(*uint16)(unsafe.Pointer(p + _uptr_4)) == b
+}
+
+func (me Mac) IsBroadcast() bool {
+	return me.isSame(0xffffffff, 0xffff)
+}
+
+func (me Mac) IsZero() bool {
+	return me.isSame(0, 0)
 }
 
 func (me Mac) IsGood() bool {
-	return MacSize == len(me) && !Slice(me).IsZero() && !Slice(me).IsFull()
+	return MacSize == len(me) && !me.IsZero()
 }
 
-func (me Mac) Slice() []byte {
-	return me
+func (me Mac) IsGoodUnicast() bool {
+	return me.IsGood() && me.IsUnicast()
 }
 
-func (me Mac) Eq(it interface{}) bool {
-	return Slice(me).Eq(it)
+func (me Mac) Eq(mac Mac) bool {
+	p := SliceAddress(mac)
+
+	return MacSize == len(me) &&
+		me.isSame(*(*uint32)(unsafe.Pointer(p)),
+			*(*uint16)(unsafe.Pointer(p + _uptr_4)))
 }
 
 func (me Mac) ToStringL(ifs byte) string {
@@ -135,7 +170,7 @@ func (me Mac) FromString(s string) error {
 type MacString string
 
 func (me MacString) IsGood() bool {
-	mac := MAC{}
+	mac := [MacSize]byte{}
 
 	if err := Mac(mac[:]).FromString(string(me)); nil != err {
 		return false
@@ -144,12 +179,12 @@ func (me MacString) IsGood() bool {
 	return true
 }
 
-func (me MacString) ToBinary() MAC {
-	mac := MAC{}
+func (me MacString) ToBinary() Mac {
+	mac := [MacSize]byte{}
 
 	Mac(mac[:]).FromString(string(me))
 
-	return mac
+	return mac[:]
 }
 
 func (me MacString) ToString() string {
