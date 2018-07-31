@@ -36,6 +36,12 @@ func (me *Timespec) Zero() {
 	me.Nano = 0
 }
 
+func (me *Timespec) String() string {
+	t := time.Unix(int64(me.Second), int64(me.Nano))
+
+	return t.String()
+}
+
 func (me *Timespec) MakeTimespec() uint64 {
 	return MakeTimespec(me.Second, me.Nano)
 }
