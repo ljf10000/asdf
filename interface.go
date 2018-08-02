@@ -289,3 +289,12 @@ func ToBinary(obj IBinary) ([]byte, error) {
 		return bin, nil
 	}
 }
+
+const (
+	OpCompareEq  OpCompare = 0
+	OpCompareGe  OpCompare = 1
+	OpCompareLe  OpCompare = 2
+	OpCompareEnd OpCompare = 3
+)
+
+type OpCompare int

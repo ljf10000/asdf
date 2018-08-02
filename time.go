@@ -6,10 +6,19 @@ import (
 
 const TimeFormat = "2006-01-02 15:04:05"
 
+/******************************************************************************/
+
 type Time32 uint32
 
 func (me Time32) Unix() time.Time {
 	return time.Unix(int64(me), 0)
+}
+
+func (me Time32) Timespec() Timespec {
+	return Timespec{
+		Second: Time32(me),
+		Nano:   0,
+	}
 }
 
 func (me *Time32) Read(s string) error {
@@ -26,14 +35,70 @@ func NowTime32() Time32 {
 	return Time32(time.Now().Unix())
 }
 
+/******************************************************************************/
+
+type Timens = Time32
+type Time64 uint64
+
+func MakeTime64(second Time32, nano Timens) Time64 {
+	return Time64(second)*1e9 + Time64(nano)
+}
+
+func (me Time64) Eq(v Time64) bool {
+	return me == v
+}
+
+func (me Time64) Le(v Time64) bool {
+	return me < v
+}
+
+func (me Time64) Ge(v Time64) bool {
+	return me > v
+}
+
+func (me Time64) Compare(v Time64) (int, Time64 /*diff*/) {
+	switch {
+	case me > v:
+		return 1, me - v
+	case me == v:
+		return 0, 0
+	default: // case me < v:
+		return -1, v - me
+	}
+}
+
+func (me Time64) Split() (Time32, Timens) {
+	return Time32(me / 1e9), Timens(me % 1e9)
+}
+
+func (me Time64) Timespec() Timespec {
+	return Timespec{
+		Second: Time32(me / 1e9),
+		Nano:   Timens(me % 1e9),
+	}
+}
+
+/******************************************************************************/
+
 type Timespec struct {
-	Second uint32
-	Nano   uint32
+	Second Time32
+	Nano   Timens
+}
+
+func MakeTimespec(second Time32, nano Timens) Timespec {
+	return Timespec{
+		Second: second,
+		Nano:   nano,
+	}
 }
 
 func (me *Timespec) Zero() {
 	me.Second = 0
 	me.Nano = 0
+}
+
+func (me *Timespec) Time64() Time64 {
+	return MakeTime64(me.Second, me.Nano)
 }
 
 func (me *Timespec) String() string {
@@ -42,26 +107,37 @@ func (me *Timespec) String() string {
 	return t.String()
 }
 
-func (me *Timespec) MakeTimespec() uint64 {
-	return MakeTimespec(me.Second, me.Nano)
+func (me *Timespec) Load(t Time64) {
+	me.Second, me.Nano = t.Split()
 }
 
-func (me *Timespec) LoadTimespec(timespec uint64) {
-	me.Second, me.Nano = SplitTimespec(timespec)
+func (me *Timespec) Compare(v Timespec) (int, Timespec /*diff*/) {
+	a := me.Time64()
+	b := me.Time64()
+
+	cmp, diff := a.Compare(b)
+
+	return cmp, diff.Timespec()
 }
 
-func DiffTimespec(newer, older uint64) uint64 {
-	if newer > older {
-		return newer - older
-	} else {
-		return 0
-	}
+func (me *Timespec) Eq(v Timespec) bool {
+	return *me == v
 }
 
-func MakeTimespec(second, nano uint32) uint64 {
-	return (uint64(second) << 32) | uint64(nano)
+func (me *Timespec) Le(v Timespec) bool {
+	cmp, _ := me.Compare(v)
+
+	return cmp < 0
 }
 
-func SplitTimespec(timespec uint64) (uint32, uint32) {
-	return uint32(timespec >> 32), uint32(timespec & 0xffffffff)
+func (me *Timespec) Ge(v Timespec) bool {
+	cmp, _ := me.Compare(v)
+
+	return cmp > 0
+}
+
+func (me *Timespec) Add(v Timespec) Timespec {
+	t := me.Time64() + v.Time64()
+
+	return t.Timespec()
 }
