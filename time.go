@@ -93,6 +93,10 @@ func MakeTimespec(second Time32, nano Timens) Timespec {
 	}
 }
 
+func (me *Timespec) IsGood() bool {
+	return me.Second > 0 || me.Nano > 0
+}
+
 func (me *Timespec) Zero() {
 	me.Second = 0
 	me.Nano = 0
@@ -121,12 +125,7 @@ func (me *Timespec) Compare(v Timespec) (int, Timespec /*diff*/) {
 	return cmp, diff.Timespec()
 }
 
-func (me *Timespec) InZone(a, b Timespec) bool {
-	// get zone [a, b]
-	if cmp, _ := a.Compare(b); cmp > 0 { // a > b
-		a, b = b, a
-	}
-
+func (me *Timespec) inZone(a, b Timespec) bool {
 	if cmp, _ := me.Compare(a); cmp < 0 { // me < a
 		return false
 	}
@@ -136,6 +135,17 @@ func (me *Timespec) InZone(a, b Timespec) bool {
 	}
 
 	return true
+}
+
+func (me *Timespec) InZone(a, b Timespec) bool {
+	cmp, _ := a.Compare(b)
+	if cmp < 0 {
+		// a < b
+		return me.inZone(a, b)
+	} else {
+		// a >= b
+		return me.inZone(b, a)
+	}
 }
 
 func (me *Timespec) Eq(v Timespec) bool {
@@ -169,7 +179,50 @@ func (me *Timezone) String() string {
 	return fmt.Sprintf("begin(%s) end(%s)", me.Begin, me.End)
 }
 
+func (me *Timezone) IsGood() bool {
+	return me.Begin.IsGood() && me.End.IsGood()
+}
+
 func (me *Timezone) Zero() {
 	me.Begin.Zero()
 	me.End.Zero()
+}
+
+func (me *Timezone) InZone(v Timespec) bool {
+	return v.inZone(me.Begin, me.End)
+}
+
+func (me *Timezone) Match(v *Timezone) bool {
+	return me.InZone(v.Begin) || me.InZone(v.End)
+}
+
+func (me *Timezone) Intersect(v *Timezone) Timezone {
+	if me.InZone(v.Begin) {
+		if me.InZone(v.End) {
+			// |--------- me ---------|
+			//     |----- v -----|
+			return *v
+		} else {
+			// |--------- me ---------|
+			//               |----- v -----|
+			return Timezone{
+				Begin: v.Begin,
+				End:   me.End,
+			}
+		}
+	} else {
+		if me.InZone(v.End) {
+			//     |--------- me ---------|
+			// |----- v -----|
+			return Timezone{
+				Begin: me.Begin,
+				End:   v.End,
+			}
+
+		} else {
+			//                  |--------- me ---------|
+			// |----- v -----|              or              |----- v -----|
+			return Timezone{}
+		}
+	}
 }
