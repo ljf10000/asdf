@@ -9,10 +9,18 @@ const TimeFormat = "2006-01-02 15:04:05"
 
 /******************************************************************************/
 
+func NowTime32() Time32 {
+	return Time32(time.Now().Unix())
+}
+
 type Time32 uint32
 
 func (me Time32) Unix() time.Time {
 	return time.Unix(int64(me), 0)
+}
+
+func (me Time32) IsGood() bool {
+	return me > 0
 }
 
 func (me Time32) Timespec() Timespec {
@@ -32,8 +40,35 @@ func (me *Time32) Read(s string) error {
 	return nil
 }
 
-func NowTime32() Time32 {
-	return Time32(time.Now().Unix())
+func (me Time32) inZone(a, b Time32) bool {
+	return a <= me && me <= b
+}
+
+func (me Time32) InZone(a, b Time32) bool {
+	if a < b {
+		return me.inZone(a, b)
+	} else {
+		return me.inZone(b, a)
+	}
+}
+
+/******************************************************************************/
+type Timezone32 struct {
+	Begin Time32
+	End   Time32
+}
+
+func (me *Timezone32) String() string {
+	return fmt.Sprintf("begin(%s) end(%s)", me.Begin, me.End)
+}
+
+func (me *Timezone32) IsGood() bool {
+	return me.Begin.IsGood() && me.End.IsGood()
+}
+
+func (me *Timezone32) Zero() {
+	me.Begin = 0
+	me.End = 0
 }
 
 /******************************************************************************/
@@ -170,6 +205,8 @@ func (me *Timespec) Add(v Timespec) Timespec {
 	return t.Timespec()
 }
 
+/******************************************************************************/
+
 type Timezone struct {
 	Begin Timespec
 	End   Timespec
@@ -183,17 +220,63 @@ func (me *Timezone) IsGood() bool {
 	return me.Begin.IsGood() && me.End.IsGood()
 }
 
+func (me *Timezone) Timezone32() Timezone32 {
+	return Timezone32{
+		Begin: me.Begin.Second,
+		End:   me.End.Second,
+	}
+}
+
 func (me *Timezone) Zero() {
 	me.Begin.Zero()
 	me.End.Zero()
+}
+
+func (me *Timezone) InZone32(v Time32) bool {
+	return v.inZone(me.Begin.Second, me.End.Second)
 }
 
 func (me *Timezone) InZone(v Timespec) bool {
 	return v.inZone(me.Begin, me.End)
 }
 
+func (me *Timezone) Match32(v *Timezone32) bool {
+	return me.InZone32(v.Begin) || me.InZone32(v.End)
+}
+
 func (me *Timezone) Match(v *Timezone) bool {
 	return me.InZone(v.Begin) || me.InZone(v.End)
+}
+
+func (me *Timezone) Intersect32(v *Timezone32) Timezone32 {
+	if me.InZone32(v.Begin) {
+		if me.InZone32(v.End) {
+			// |--------- me ---------|
+			//     |----- v -----|
+			return *v
+		} else {
+			// |--------- me ---------|
+			//               |----- v -----|
+			return Timezone32{
+				Begin: v.Begin,
+				End:   me.End.Second,
+			}
+		}
+	} else {
+		if me.InZone32(v.End) {
+			//     |--------- me ---------|
+			// |----- v -----|
+			return Timezone32{
+				Begin: me.Begin.Second,
+				End:   v.End,
+			}
+
+		} else {
+			//                  |--------- me ---------|
+			// |----- v -----|              or              |----- v -----|
+			return Timezone32{}
+		}
+	}
 }
 
 func (me *Timezone) Intersect(v *Timezone) Timezone {
