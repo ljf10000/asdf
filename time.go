@@ -1,6 +1,7 @@
 package asdf
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -157,4 +158,18 @@ func (me *Timespec) Add(v Timespec) Timespec {
 	t := me.Time64() + v.Time64()
 
 	return t.Timespec()
+}
+
+type Timezone struct {
+	Begin Timespec
+	End   Timespec
+}
+
+func (me *Timezone) String() string {
+	return fmt.Sprintf("begin(%s) end(%s)", me.Begin, me.End)
+}
+
+func (me *Timezone) Zero() {
+	me.Begin.Zero()
+	me.End.Zero()
 }
