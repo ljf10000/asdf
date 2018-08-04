@@ -120,6 +120,23 @@ func (me *Timespec) Compare(v Timespec) (int, Timespec /*diff*/) {
 	return cmp, diff.Timespec()
 }
 
+func (me *Timespec) InZone(a, b Timespec) bool {
+	// get zone [a, b]
+	if cmp, _ := a.Compare(b); cmp > 0 { // a > b
+		a, b = b, a
+	}
+
+	if cmp, _ := me.Compare(a); cmp < 0 { // me < a
+		return false
+	}
+
+	if cmp, _ := me.Compare(b); cmp > 0 { // me > b
+		return false
+	}
+
+	return true
+}
+
 func (me *Timespec) Eq(v Timespec) bool {
 	return *me == v
 }
