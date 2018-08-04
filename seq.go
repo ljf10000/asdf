@@ -28,41 +28,41 @@ func Seq64Before(a, b uint64) bool {
 	return (uint64)(a-b) < 0
 }
 
-type SeqZone struct {
+type Seqzone struct {
 	Begin uint64
 	End   uint64
 }
 
-func (me *SeqZone) String() string {
+func (me *Seqzone) String() string {
 	return fmt.Sprintf("begin(%d) end(%d)", me.Begin, me.End)
 }
 
-func (me *SeqZone) Zero() {
+func (me *Seqzone) Zero() {
 	me.Begin = 0
 	me.End = 0
 }
 
-func (me *SeqZone) IsGood() bool {
+func (me *Seqzone) IsGood() bool {
 	return me.Begin > 0 && me.End > 0
 }
 
-func (me *SeqZone) Diff() uint64 {
+func (me *Seqzone) Diff() uint64 {
 	return me.End - me.Begin
 }
 
-func (me *SeqZone) Seq(idx uint64) uint64 {
+func (me *Seqzone) Seq(idx uint64) uint64 {
 	return me.Begin + idx
 }
 
-func (me *SeqZone) InZone(seq uint64) bool {
+func (me *Seqzone) InZone(seq uint64) bool {
 	return me.Begin <= seq && seq <= me.End
 }
 
-func (me *SeqZone) Match(v *SeqZone) bool {
+func (me *Seqzone) Match(v *Seqzone) bool {
 	return me.InZone(v.Begin) || me.InZone(v.End)
 }
 
-func (me *SeqZone) Intersect(v *SeqZone) SeqZone {
+func (me *Seqzone) Intersect(v *Seqzone) Seqzone {
 	if me.InZone(v.Begin) {
 		if me.InZone(v.End) {
 			// |--------- me ---------|
@@ -71,7 +71,7 @@ func (me *SeqZone) Intersect(v *SeqZone) SeqZone {
 		} else {
 			// |--------- me ---------|
 			//               |----- v -----|
-			return SeqZone{
+			return Seqzone{
 				Begin: v.Begin,
 				End:   me.End,
 			}
@@ -80,7 +80,7 @@ func (me *SeqZone) Intersect(v *SeqZone) SeqZone {
 		if me.InZone(v.End) {
 			//     |--------- me ---------|
 			// |----- v -----|
-			return SeqZone{
+			return Seqzone{
 				Begin: me.Begin,
 				End:   v.End,
 			}
@@ -88,7 +88,7 @@ func (me *SeqZone) Intersect(v *SeqZone) SeqZone {
 		} else {
 			//                  |--------- me ---------|
 			// |----- v -----|              or              |----- v -----|
-			return SeqZone{}
+			return Seqzone{}
 		}
 	}
 }
