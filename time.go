@@ -71,6 +71,10 @@ func (me *Timezone32) Zero() {
 	me.End = 0
 }
 
+func (me *Timezone32) InZone(v Time32) bool {
+	return v.inZone(me.Begin, me.End)
+}
+
 /******************************************************************************/
 
 type Timens = Time32
@@ -240,7 +244,7 @@ func (me *Timezone) InZone(v Timespec) bool {
 	return v.inZone(me.Begin, me.End)
 }
 
-func (me *Timezone) Match32(v *Timezone32) bool {
+func (me *Timezone) Match32(v Timezone32) bool {
 	return me.InZone32(v.Begin) || me.InZone32(v.End)
 }
 
@@ -248,12 +252,12 @@ func (me *Timezone) Match(v *Timezone) bool {
 	return me.InZone(v.Begin) || me.InZone(v.End)
 }
 
-func (me *Timezone) Intersect32(v *Timezone32) Timezone32 {
+func (me *Timezone) Intersect32(v Timezone32) Timezone32 {
 	if me.InZone32(v.Begin) {
 		if me.InZone32(v.End) {
 			// |--------- me ---------|
 			//     |----- v -----|
-			return *v
+			return v
 		} else {
 			// |--------- me ---------|
 			//               |----- v -----|
