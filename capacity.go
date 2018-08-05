@@ -40,6 +40,11 @@ func (me *Capacity32) IsFull() bool {
 	return me.Size == me.Cap
 }
 
+func (me *Capacity32) AddAlign(v uint32, align uint32) {
+	me.Size += v
+	me.Cap += Align32(v, align)
+}
+
 type Capacity64 struct {
 	Size uint64
 	Cap  uint64
