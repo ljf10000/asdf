@@ -39,3 +39,29 @@ func ByteReverse(bin []byte) {
 		}
 	}
 }
+
+type Byte byte
+
+func MakeByte(high, low int) Byte {
+	return Byte((high << 4) | low)
+}
+
+func (me Byte) SetHigh(high int) Byte {
+	low := me.Low()
+
+	return MakeByte(high, low)
+}
+
+func (me Byte) SetLow(low int) Byte {
+	high := me.High()
+
+	return MakeByte(high, low)
+}
+
+func (me Byte) High() int {
+	return int(me >> 4)
+}
+
+func (me Byte) Low() int {
+	return int(me & 0xf)
+}

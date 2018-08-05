@@ -50,10 +50,6 @@ func (me *Seqzone) Diff() uint64 {
 	return me.End - me.Begin
 }
 
-func (me *Seqzone) Seq(idx uint64) uint64 {
-	return me.Begin + idx
-}
-
 func (me *Seqzone) InZone(seq uint64) bool {
 	return me.Begin <= seq && seq <= me.End
 }
