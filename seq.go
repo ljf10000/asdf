@@ -46,6 +46,10 @@ func (me *Seqzone) IsGood() bool {
 	return me.Begin > 0 && me.End > 0
 }
 
+func (me *Seqzone) Count() uint64 {
+	return me.End - me.Begin + 1
+}
+
 func (me *Seqzone) Diff() uint64 {
 	return me.End - me.Begin
 }
@@ -54,16 +58,16 @@ func (me *Seqzone) InZone(seq uint64) bool {
 	return me.Begin <= seq && seq <= me.End
 }
 
-func (me *Seqzone) Match(v *Seqzone) bool {
+func (me *Seqzone) Match(v Seqzone) bool {
 	return me.InZone(v.Begin) || me.InZone(v.End)
 }
 
-func (me *Seqzone) Intersect(v *Seqzone) Seqzone {
+func (me *Seqzone) Intersect(v Seqzone) Seqzone {
 	if me.InZone(v.Begin) {
 		if me.InZone(v.End) {
 			// |--------- me ---------|
 			//     |----- v -----|
-			return *v
+			return v
 		} else {
 			// |--------- me ---------|
 			//               |----- v -----|
