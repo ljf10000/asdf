@@ -71,7 +71,7 @@ func (me *Timezone32) Zero() {
 	me.End = 0
 }
 
-func (me *Timezone32) InZone(v Time32) bool {
+func (me *Timezone32) Include(v Time32) bool {
 	return v.inZone(me.Begin, me.End)
 }
 
@@ -83,8 +83,8 @@ func (me *Timezone32) Timezone64() Timezone {
 }
 
 func (me *Timezone32) Intersect(v Timezone32) Timezone32 {
-	if me.InZone(v.Begin) {
-		if me.InZone(v.End) {
+	if me.Include(v.Begin) {
+		if me.Include(v.End) {
 			// |--------- me ---------|
 			//     |----- v -----|
 			return v
@@ -97,7 +97,7 @@ func (me *Timezone32) Intersect(v Timezone32) Timezone32 {
 			}
 		}
 	} else {
-		if me.InZone(v.End) {
+		if me.Include(v.End) {
 			//     |--------- me ---------|
 			// |----- v -----|
 			return Timezone32{
@@ -279,20 +279,20 @@ func (me *Timezone) Zero() {
 	me.End.Zero()
 }
 
-func (me *Timezone) InZone32(v Time32) bool {
+func (me *Timezone) Include32(v Time32) bool {
 	return v.inZone(me.Begin.Second, me.End.Second)
 }
 
-func (me *Timezone) InZone(v Timespec) bool {
+func (me *Timezone) Include(v Timespec) bool {
 	return v.inZone(me.Begin, me.End)
 }
 
 func (me *Timezone) Match32(v Timezone32) bool {
-	return me.InZone32(v.Begin) || me.InZone32(v.End)
+	return me.Include32(v.Begin) || me.Include32(v.End)
 }
 
 func (me *Timezone) Match(v Timezone) bool {
-	return me.InZone(v.Begin) || me.InZone(v.End)
+	return me.Include(v.Begin) || me.Include(v.End)
 }
 
 func (me *Timezone) Intersect32(v Timezone32) Timezone32 {
@@ -300,8 +300,8 @@ func (me *Timezone) Intersect32(v Timezone32) Timezone32 {
 }
 
 func (me *Timezone) Intersect(v Timezone) Timezone {
-	if me.InZone(v.Begin) {
-		if me.InZone(v.End) {
+	if me.Include(v.Begin) {
+		if me.Include(v.End) {
 			// |--------- me ---------|
 			//     |----- v -----|
 			return v
@@ -314,7 +314,7 @@ func (me *Timezone) Intersect(v Timezone) Timezone {
 			}
 		}
 	} else {
-		if me.InZone(v.End) {
+		if me.Include(v.End) {
 			//     |--------- me ---------|
 			// |----- v -----|
 			return Timezone{

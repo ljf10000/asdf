@@ -4,41 +4,41 @@ import (
 	"fmt"
 )
 
-type IdxZone struct {
+type Idxzone struct {
 	Begin uint32
 	End   uint32
 }
 
-func (me *IdxZone) String() string {
+func (me *Idxzone) String() string {
 	return fmt.Sprintf("begin(%d) end(%d)", me.Begin, me.End)
 }
 
-func (me *IdxZone) Zero() {
+func (me *Idxzone) Zero() {
 	me.Begin = 0
 	me.End = 0
 }
 
-func (me *IdxZone) IsGood() bool {
+func (me *Idxzone) IsGood() bool {
 	return me.Begin > 0 && me.End > 0
 }
 
-func (me *IdxZone) Count() uint32 {
+func (me *Idxzone) Count() uint32 {
 	return me.End - me.Begin + 1
 }
 
-func (me *IdxZone) Diff() uint32 {
+func (me *Idxzone) Diff() uint32 {
 	return me.End - me.Begin
 }
 
-func (me *IdxZone) InZone(idx uint32) bool {
+func (me *Idxzone) InZone(idx uint32) bool {
 	return me.Begin <= idx && idx <= me.End
 }
 
-func (me *IdxZone) Match(v *IdxZone) bool {
+func (me *Idxzone) Match(v *Idxzone) bool {
 	return me.InZone(v.Begin) || me.InZone(v.End)
 }
 
-func (me *IdxZone) Intersect(v *IdxZone) IdxZone {
+func (me *Idxzone) Intersect(v *Idxzone) Idxzone {
 	if me.InZone(v.Begin) {
 		if me.InZone(v.End) {
 			// |--------- me ---------|
@@ -47,7 +47,7 @@ func (me *IdxZone) Intersect(v *IdxZone) IdxZone {
 		} else {
 			// |--------- me ---------|
 			//               |----- v -----|
-			return IdxZone{
+			return Idxzone{
 				Begin: v.Begin,
 				End:   me.End,
 			}
@@ -56,7 +56,7 @@ func (me *IdxZone) Intersect(v *IdxZone) IdxZone {
 		if me.InZone(v.End) {
 			//     |--------- me ---------|
 			// |----- v -----|
-			return IdxZone{
+			return Idxzone{
 				Begin: me.Begin,
 				End:   v.End,
 			}
@@ -64,7 +64,7 @@ func (me *IdxZone) Intersect(v *IdxZone) IdxZone {
 		} else {
 			//                  |--------- me ---------|
 			// |----- v -----|              or              |----- v -----|
-			return IdxZone{}
+			return Idxzone{}
 		}
 	}
 }

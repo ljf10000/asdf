@@ -54,17 +54,17 @@ func (me *Seqzone) Diff() uint64 {
 	return me.End - me.Begin
 }
 
-func (me *Seqzone) InZone(seq uint64) bool {
+func (me *Seqzone) Include(seq uint64) bool {
 	return me.Begin <= seq && seq <= me.End
 }
 
 func (me *Seqzone) Match(v Seqzone) bool {
-	return me.InZone(v.Begin) || me.InZone(v.End)
+	return me.Include(v.Begin) || me.Include(v.End)
 }
 
 func (me *Seqzone) Intersect(v Seqzone) Seqzone {
-	if me.InZone(v.Begin) {
-		if me.InZone(v.End) {
+	if me.Include(v.Begin) {
+		if me.Include(v.End) {
 			// |--------- me ---------|
 			//     |----- v -----|
 			return v
@@ -77,7 +77,7 @@ func (me *Seqzone) Intersect(v Seqzone) Seqzone {
 			}
 		}
 	} else {
-		if me.InZone(v.End) {
+		if me.Include(v.End) {
 			//     |--------- me ---------|
 			// |----- v -----|
 			return Seqzone{
