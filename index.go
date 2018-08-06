@@ -22,25 +22,25 @@ func (me *Idxzone) IsGood() bool {
 	return me.Begin > 0 && me.End > 0
 }
 
-func (me *Idxzone) Count() uint32 {
-	return me.End - me.Begin + 1
+func (me *Idxzone) Count() int {
+	return int(me.End-me.Begin) + 1
 }
 
-func (me *Idxzone) Diff() uint32 {
-	return me.End - me.Begin
+func (me *Idxzone) Diff() int {
+	return int(me.End - me.Begin)
 }
 
-func (me *Idxzone) InZone(idx uint32) bool {
-	return me.Begin <= idx && idx <= me.End
+func (me *Idxzone) InZone(idx int) bool {
+	return me.Begin <= uint32(idx) && uint32(idx) <= me.End
 }
 
 func (me *Idxzone) Match(v *Idxzone) bool {
-	return me.InZone(v.Begin) || me.InZone(v.End)
+	return me.InZone(int(v.Begin)) || me.InZone(int(v.End))
 }
 
 func (me *Idxzone) Intersect(v *Idxzone) Idxzone {
-	if me.InZone(v.Begin) {
-		if me.InZone(v.End) {
+	if me.InZone(int(v.Begin)) {
+		if me.InZone(int(v.End)) {
 			// |--------- me ---------|
 			//     |----- v -----|
 			return *v
@@ -53,7 +53,7 @@ func (me *Idxzone) Intersect(v *Idxzone) Idxzone {
 			}
 		}
 	} else {
-		if me.InZone(v.End) {
+		if me.InZone(int(v.End)) {
 			//     |--------- me ---------|
 			// |----- v -----|
 			return Idxzone{
