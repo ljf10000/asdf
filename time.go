@@ -119,6 +119,9 @@ func (me *Timezone32) Intersect64(v Timezone) Timezone {
 /******************************************************************************/
 
 type Timens = Time32
+type Timeus = Time32
+type Timems = Time32
+
 type Time64 uint64
 
 func MakeTime64(second Time32, nano Timens) Time64 {
@@ -159,6 +162,13 @@ func (me Time64) Timespec() Timespec {
 	}
 }
 
+func (me Time64) Timeval() Timeval {
+	return Timeval{
+		Second: Time32(me / 1e9),
+		Micro:  1000 * Timens(me%1e9),
+	}
+}
+
 /******************************************************************************/
 
 type Timespec struct {
@@ -184,6 +194,13 @@ func (me *Timespec) Zero() {
 
 func (me *Timespec) Time64() Time64 {
 	return MakeTime64(me.Second, me.Nano)
+}
+
+func (me *Timespec) Timeval() Timeval {
+	return Timeval{
+		Second: me.Second,
+		Micro:  me.Nano / 1000,
+	}
 }
 
 func (me *Timespec) String() string {
@@ -248,6 +265,106 @@ func (me *Timespec) Add(v Timespec) Timespec {
 	t := me.Time64() + v.Time64()
 
 	return t.Timespec()
+}
+
+/******************************************************************************/
+
+type Timeval struct {
+	Second Time32
+	Micro  Timeus
+}
+
+func MakeTimeval(second Time32, micro Timeus) Timeval {
+	return Timeval{
+		Second: second,
+		Micro:  micro,
+	}
+}
+
+func (me *Timeval) IsGood() bool {
+	return me.Second > 0 || me.Micro > 0
+}
+
+func (me *Timeval) Zero() {
+	me.Second = 0
+	me.Micro = 0
+}
+
+func (me *Timeval) Time64() Time64 {
+	return MakeTime64(me.Second, 1000*me.Micro)
+}
+
+func (me *Timeval) Timespec() Timespec {
+	return Timespec{
+		Second: me.Second,
+		Nano:   1000 * me.Micro,
+	}
+}
+
+func (me *Timeval) String() string {
+	t := time.Unix(int64(me.Second), int64(1000*me.Micro))
+
+	return t.String()
+}
+
+func (me *Timeval) Load(t Time64) {
+	me.Second, me.Micro = t.Split()
+
+	me.Micro /= 1000
+}
+
+func (me *Timeval) Compare(v Timeval) (int, Timeval /*diff*/) {
+	a := me.Time64()
+	b := me.Time64()
+
+	cmp, diff := a.Compare(b)
+
+	return cmp, diff.Timeval()
+}
+
+func (me *Timeval) inZone(a, b Timeval) bool {
+	if cmp, _ := me.Compare(a); cmp < 0 { // me < a
+		return false
+	}
+
+	if cmp, _ := me.Compare(b); cmp > 0 { // me > b
+		return false
+	}
+
+	return true
+}
+
+func (me *Timeval) InZone(a, b Timeval) bool {
+	cmp, _ := a.Compare(b)
+	if cmp < 0 {
+		// a < b
+		return me.inZone(a, b)
+	} else {
+		// a >= b
+		return me.inZone(b, a)
+	}
+}
+
+func (me *Timeval) Eq(v Timeval) bool {
+	return *me == v
+}
+
+func (me *Timeval) Le(v Timeval) bool {
+	cmp, _ := me.Compare(v)
+
+	return cmp < 0
+}
+
+func (me *Timeval) Ge(v Timeval) bool {
+	cmp, _ := me.Compare(v)
+
+	return cmp > 0
+}
+
+func (me *Timeval) Add(v Timeval) Timeval {
+	t := me.Time64() + v.Time64()
+
+	return t.Timeval()
 }
 
 /******************************************************************************/
