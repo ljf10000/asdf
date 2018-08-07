@@ -124,8 +124,16 @@ type Timems = Time32
 
 type Time64 uint64
 
+func NowTime64() Time64 {
+	return Time64(time.Now().UnixNano())
+}
+
 func MakeTime64(second Time32, nano Timens) Time64 {
 	return Time64(second)*1e9 + Time64(nano)
+}
+
+func (me Time64) Unix() time.Time {
+	return time.Unix(int64(me), 0)
 }
 
 func (me Time64) Eq(v Time64) bool {
