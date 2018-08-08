@@ -92,3 +92,21 @@ func (me *Seqzone) Intersect(v Seqzone) Seqzone {
 		}
 	}
 }
+
+func (me *Seqzone) Compare(v Seqzone) int {
+	if me.End < v.Begin {
+		// |--------- me ---------|
+		//                            |----- v -----|
+		return -1
+	} else if me.Begin > v.End {
+		//                  |--------- me ---------|
+		// |----- v -----|
+		return 1
+	} else {
+		//            |--------- me ---------|
+		// |----- v -----|
+		//                 |----- v -----|
+		//                                 |----- v -----|
+		return 0
+	}
+}

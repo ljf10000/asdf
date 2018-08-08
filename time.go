@@ -116,6 +116,24 @@ func (me *Timezone32) Intersect64(v Timezone) Timezone {
 	return v.Intersect(me.Timezone64())
 }
 
+func (me *Timezone32) Compare(v Timezone32) int {
+	if me.End < v.Begin {
+		// |--------- me ---------|
+		//                            |----- v -----|
+		return -1
+	} else if me.Begin > v.End {
+		//                  |--------- me ---------|
+		// |----- v -----|
+		return 1
+	} else {
+		//            |--------- me ---------|
+		// |----- v -----|
+		//                 |----- v -----|
+		//                                 |----- v -----|
+		return 0
+	}
+}
+
 /******************************************************************************/
 
 type Timens = Time32
@@ -446,11 +464,28 @@ func (me *Timezone) Intersect(v Timezone) Timezone {
 				Begin: me.Begin,
 				End:   v.End,
 			}
-
 		} else {
 			//                  |--------- me ---------|
 			// |----- v -----|              or              |----- v -----|
 			return Timezone{}
 		}
+	}
+}
+
+func (me *Timezone) Compare(v Timezone) int {
+	if cmp, _ := me.End.Compare(v.Begin); cmp < 0 {
+		// |--------- me ---------|
+		//                            |----- v -----|
+		return -1
+	} else if cmp, _ := me.Begin.Compare(v.End); cmp > 0 {
+		//                  |--------- me ---------|
+		// |----- v -----|
+		return 1
+	} else {
+		//            |--------- me ---------|
+		// |----- v -----|
+		//                 |----- v -----|
+		//                                 |----- v -----|
+		return 0
 	}
 }
