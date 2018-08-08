@@ -54,8 +54,8 @@ func (me Time32) InZone(a, b Time32) bool {
 
 /******************************************************************************/
 type Timezone32 struct {
-	Begin Time32
-	End   Time32
+	Begin Time32 `json:"begin"`
+	End   Time32 `json:"end"`
 }
 
 func (me *Timezone32) String() string {
@@ -180,8 +180,8 @@ func (me Time64) Timeval() Timeval {
 /******************************************************************************/
 
 type Timespec struct {
-	Second Time32
-	Nano   Timens
+	Second Time32 `json:"second"`
+	Nano   Timens `json:"nano"`
 }
 
 func MakeTimespec(second Time32, nano Timens) Timespec {
@@ -278,8 +278,8 @@ func (me *Timespec) Add(v Timespec) Timespec {
 /******************************************************************************/
 
 type Timeval struct {
-	Second Time32
-	Micro  Timeus
+	Second Time32 `json:"second"`
+	Micro  Timeus `json:"micro"`
 }
 
 func MakeTimeval(second Time32, micro Timeus) Timeval {
@@ -380,8 +380,8 @@ func (me *Timeval) Add(v Timeval) Timeval {
 type Timezone64 = Timezone
 
 type Timezone struct {
-	Begin Timespec
-	End   Timespec
+	Begin Timespec `json:"begin"`
+	End   Timespec `json:"end"`
 }
 
 func (me *Timezone) String() string {
