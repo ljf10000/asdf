@@ -40,16 +40,20 @@ func (me *Time32) Read(s string) error {
 	return nil
 }
 
-func (me Time32) inZone(a, b Time32) bool {
+func (me Time32) inRange(a, b Time32) bool {
 	return a <= me && me <= b
 }
 
-func (me Time32) InZone(a, b Time32) bool {
+func (me Time32) InRange(a, b Time32) bool {
 	if a < b {
-		return me.inZone(a, b)
+		return me.inRange(a, b)
 	} else {
-		return me.inZone(b, a)
+		return me.inRange(b, a)
 	}
+}
+
+func (me Time32) InZone(z Timezone32) bool {
+	return me.inRange(z.Begin, z.End)
 }
 
 /******************************************************************************/
@@ -115,51 +119,51 @@ func MakeTimespec(second Time32, nano Timens) Timespec {
 	}
 }
 
-func (me *Timespec) IsGood() bool {
+func (me Timespec) IsGood() bool {
 	return me.Second > 0 || me.Nano > 0
 }
 
-func (me *Timespec) Zero() {
+func (me Timespec) Zero() {
 	me.Second = 0
 	me.Nano = 0
 }
 
-func (me *Timespec) Up() Timespec {
+func (me Timespec) Up() Timespec {
 	return Timespec{
 		Second: me.Second + 1,
 		Nano:   0,
 	}
 }
 
-func (me *Timespec) Down() Timespec {
+func (me Timespec) Down() Timespec {
 	return Timespec{
 		Second: me.Second,
 		Nano:   0,
 	}
 }
 
-func (me *Timespec) Time64() Time64 {
+func (me Timespec) Time64() Time64 {
 	return MakeTime64(me.Second, me.Nano)
 }
 
-func (me *Timespec) Timeval() Timeval {
+func (me Timespec) Timeval() Timeval {
 	return Timeval{
 		Second: me.Second,
 		Micro:  me.Nano / 1000,
 	}
 }
 
-func (me *Timespec) String() string {
+func (me Timespec) String() string {
 	t := time.Unix(int64(me.Second), int64(me.Nano))
 
 	return t.String()
 }
 
-func (me *Timespec) Load(t Time64) {
+func (me Timespec) Load(t Time64) {
 	me.Second, me.Nano = t.Split()
 }
 
-func (me *Timespec) Compare(v Timespec) (int, Timespec /*diff*/) {
+func (me Timespec) Compare(v Timespec) (int, Timespec /*diff*/) {
 	a := me.Time64()
 	b := me.Time64()
 
@@ -168,7 +172,7 @@ func (me *Timespec) Compare(v Timespec) (int, Timespec /*diff*/) {
 	return cmp, diff.Timespec()
 }
 
-func (me *Timespec) inZone(a, b Timespec) bool {
+func (me Timespec) inRange(a, b Timespec) bool {
 	if cmp, _ := me.Compare(a); cmp < 0 { // me < a
 		return false
 	}
@@ -180,18 +184,22 @@ func (me *Timespec) inZone(a, b Timespec) bool {
 	return true
 }
 
-func (me *Timespec) InZone(a, b Timespec) bool {
+func (me Timespec) InRange(a, b Timespec) bool {
 	cmp, _ := a.Compare(b)
 	if cmp < 0 {
 		// a < b
-		return me.inZone(a, b)
+		return me.inRange(a, b)
 	} else {
 		// a >= b
-		return me.inZone(b, a)
+		return me.inRange(b, a)
 	}
 }
 
-func (me *Timespec) Add(v Timespec) Timespec {
+func (me Timespec) InZone(z Timezone) bool {
+	return me.inRange(z.Begin, z.End)
+}
+
+func (me Timespec) Add(v Timespec) Timespec {
 	t := me.Time64() + v.Time64()
 
 	return t.Timespec()
@@ -211,7 +219,7 @@ func MakeTimeval(second Time32, micro Timeus) Timeval {
 	}
 }
 
-func (me *Timeval) IsGood() bool {
+func (me Timeval) IsGood() bool {
 	return me.Second > 0 || me.Micro > 0
 }
 
@@ -220,25 +228,25 @@ func (me *Timeval) Zero() {
 	me.Micro = 0
 }
 
-func (me *Timeval) Up() Timeval {
+func (me Timeval) Up() Timeval {
 	return Timeval{
 		Second: me.Second + 1,
 		Micro:  0,
 	}
 }
 
-func (me *Timeval) Down() Timeval {
+func (me Timeval) Down() Timeval {
 	return Timeval{
 		Second: me.Second,
 		Micro:  0,
 	}
 }
 
-func (me *Timeval) Time64() Time64 {
+func (me Timeval) Time64() Time64 {
 	return MakeTime64(me.Second, 1000*me.Micro)
 }
 
-func (me *Timeval) Timespec() Timespec {
+func (me Timeval) Timespec() Timespec {
 	return Timespec{
 		Second: me.Second,
 		Nano:   1000 * me.Micro,
@@ -257,7 +265,7 @@ func (me *Timeval) Load(t Time64) {
 	me.Micro /= 1000
 }
 
-func (me *Timeval) Compare(v Timeval) (int, Timeval /*diff*/) {
+func (me Timeval) Compare(v Timeval) (int, Timeval /*diff*/) {
 	a := me.Time64()
 	b := me.Time64()
 
@@ -266,7 +274,7 @@ func (me *Timeval) Compare(v Timeval) (int, Timeval /*diff*/) {
 	return cmp, diff.Timeval()
 }
 
-func (me *Timeval) inZone(a, b Timeval) bool {
+func (me Timeval) inRange(a, b Timeval) bool {
 	if cmp, _ := me.Compare(a); cmp < 0 { // me < a
 		return false
 	}
@@ -278,18 +286,22 @@ func (me *Timeval) inZone(a, b Timeval) bool {
 	return true
 }
 
-func (me *Timeval) InZone(a, b Timeval) bool {
+func (me Timeval) InRange(a, b Timeval) bool {
 	cmp, _ := a.Compare(b)
 	if cmp < 0 {
 		// a < b
-		return me.inZone(a, b)
+		return me.inRange(a, b)
 	} else {
 		// a >= b
-		return me.inZone(b, a)
+		return me.inRange(b, a)
 	}
 }
 
-func (me *Timeval) Add(v Timeval) Timeval {
+func (me Timeval) InZone(z Timezone) bool {
+	return me.inRange(z.Begin.Timeval(), z.End.Timeval())
+}
+
+func (me Timeval) Add(v Timeval) Timeval {
 	t := me.Time64() + v.Time64()
 
 	return t.Timeval()
@@ -301,11 +313,11 @@ type Timezone32 struct {
 	End   Time32 `json:"end"`
 }
 
-func (me *Timezone32) String() string {
+func (me Timezone32) String() string {
 	return fmt.Sprintf("begin(%s) end(%s)", me.Begin, me.End)
 }
 
-func (me *Timezone32) IsGood() bool {
+func (me Timezone32) IsGood() bool {
 	return me.Begin.IsGood() || me.End.IsGood()
 }
 
@@ -314,20 +326,22 @@ func (me *Timezone32) Zero() {
 	me.End = 0
 }
 
-func (me *Timezone32) Include(v Time32) bool {
-	return v.inZone(me.Begin, me.End)
-}
-
-func (me *Timezone32) Timezone() Timezone {
+func (me Timezone32) Timezone() Timezone {
 	return Timezone{
 		Begin: Timespec{Second: me.Begin},
 		End:   Timespec{Second: me.End},
 	}
 }
 
-func (me *Timezone32) Intersect(v Timezone32) Timezone32 {
-	if me.Include(v.Begin) {
-		if me.Include(v.End) {
+func (me Timezone32) Include(z Timezone32) bool {
+	// |--------- me ---------|
+	//      |----- z -----|
+	return me.Begin <= z.Begin && me.End >= z.End
+}
+
+func (me Timezone32) Intersect(v Timezone32) Timezone32 {
+	if v.Begin.InZone(me) {
+		if v.End.InZone(me) {
 			// |--------- me ---------|
 			//     |----- v -----|
 			return v
@@ -340,7 +354,7 @@ func (me *Timezone32) Intersect(v Timezone32) Timezone32 {
 			}
 		}
 	} else {
-		if me.Include(v.End) {
+		if v.End.InZone(me) {
 			//     |--------- me ---------|
 			// |----- v -----|
 			return Timezone32{
@@ -355,13 +369,7 @@ func (me *Timezone32) Intersect(v Timezone32) Timezone32 {
 	}
 }
 
-func (me *Timezone32) Intersect64(v Timezone) Timezone {
-	z := me.Intersect(v.Timezone32())
-
-	return z.Timezone()
-}
-
-func (me *Timezone32) Compare(v Timezone32) int {
+func (me Timezone32) Compare(v Timezone32) int {
 	if me.End < v.Begin {
 		// |--------- me ---------|
 		//                            |----- v -----|
@@ -388,15 +396,15 @@ type Timezone struct {
 	End   Timespec `json:"end"`
 }
 
-func (me *Timezone) String() string {
+func (me Timezone) String() string {
 	return fmt.Sprintf("begin(%s) end(%s)", me.Begin, me.End)
 }
 
-func (me *Timezone) IsGood() bool {
+func (me Timezone) IsGood() bool {
 	return me.Begin.IsGood() && me.End.IsGood()
 }
 
-func (me *Timezone) Timezone32() Timezone32 {
+func (me Timezone) Timezone32() Timezone32 {
 	return Timezone32{
 		Begin: me.Begin.Second,
 		End:   me.End.Second,
@@ -408,31 +416,22 @@ func (me *Timezone) Zero() {
 	me.End.Zero()
 }
 
-func (me *Timezone) Include32(v Time32) bool {
-	return v.inZone(me.Begin.Second, me.End.Second)
+func (me Timezone) Include(z Timezone) bool {
+	// |--------- me ---------|
+	//      |----- z -----|
+	a, _ := me.Begin.Compare(z.Begin)
+	b, _ := me.End.Compare(z.End)
+
+	return a <= 0 && b >= 0
 }
 
-func (me *Timezone) Include(v Timespec) bool {
-	return v.inZone(me.Begin, me.End)
+func (me Timezone) Match(v Timezone) bool {
+	return v.Begin.InZone(me) || v.End.InZone(me)
 }
 
-func (me *Timezone) Match32(v Timezone32) bool {
-	return me.Include32(v.Begin) || me.Include32(v.End)
-}
-
-func (me *Timezone) Match(v Timezone) bool {
-	return me.Include(v.Begin) || me.Include(v.End)
-}
-
-func (me *Timezone) Intersect32(v Timezone32) Timezone32 {
-	z := me.Intersect(v.Timezone())
-
-	return z.Timezone32()
-}
-
-func (me *Timezone) Intersect(v Timezone) Timezone {
-	if me.Include(v.Begin) {
-		if me.Include(v.End) {
+func (me Timezone) Intersect(v Timezone) Timezone {
+	if v.Begin.InZone(me) {
+		if v.End.InZone(me) {
 			// |--------- me ---------|
 			//     |----- v -----|
 			return v
@@ -445,7 +444,7 @@ func (me *Timezone) Intersect(v Timezone) Timezone {
 			}
 		}
 	} else {
-		if me.Include(v.End) {
+		if v.End.InZone(me) {
 			//     |--------- me ---------|
 			// |----- v -----|
 			return Timezone{
@@ -460,7 +459,7 @@ func (me *Timezone) Intersect(v Timezone) Timezone {
 	}
 }
 
-func (me *Timezone) Compare(v Timezone) int {
+func (me Timezone) Compare(v Timezone) int {
 	if cmp, _ := me.End.Compare(v.Begin); cmp < 0 {
 		// |--------- me ---------|
 		//                            |----- v -----|
