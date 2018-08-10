@@ -15,7 +15,15 @@ func NowTime32() Time32 {
 
 type Time32 uint32
 
+func (me Time32) String() string {
+	return me.Unix().Format(TimeFormat)
+}
+
 func (me Time32) Unix() time.Time {
+	return time.Unix(int64(me), 0)
+}
+
+func (me Time32) ToUnix() time.Time {
 	return time.Unix(int64(me), 0)
 }
 
@@ -72,8 +80,14 @@ func MakeTime64(second Time32, nano Timens) Time64 {
 	return Time64(second)*1e9 + Time64(nano)
 }
 
+func (me Time64) String() string {
+	return me.Unix().Format(TimeFormat)
+}
+
 func (me Time64) Unix() time.Time {
-	return time.Unix(int64(me), 0)
+	s, n := me.Split()
+
+	return time.Unix(int64(s), int64(n))
 }
 
 func (me Time64) Compare(v Time64) (int, Time64 /*diff*/) {
@@ -96,6 +110,17 @@ func (me Time64) Timespec() Timespec {
 		Second: Time32(me / 1e9),
 		Nano:   Timens(me % 1e9),
 	}
+}
+
+func (me *Time64) Read(s string) error {
+	tm, err := time.Parse(TimeFormat, s)
+	if nil != err {
+		return err
+	}
+
+	*me = Time64(tm.UnixNano())
+
+	return nil
 }
 
 func (me Time64) Timeval() Timeval {
