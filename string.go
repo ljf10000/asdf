@@ -1,6 +1,7 @@
 package asdf
 
 import (
+	"fmt"
 	"strings"
 	"unicode/utf8"
 )
@@ -82,4 +83,22 @@ func FirstRune(line string) (rune, string) {
 	} else {
 		return 0, Empty
 	}
+}
+
+type IField interface {
+	Name() string
+	String() string
+}
+
+func MakeFieldListString(fields ...IField) string {
+	first := fields[0]
+	fields = fields[1:]
+
+	s := fmt.Sprintf("%s:%s", first.Name(), first.String())
+
+	for _, field := range fields {
+		s += fmt.Sprintf(", %s:%s", field.Name(), field.String())
+	}
+
+	return s
 }

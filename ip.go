@@ -22,6 +22,10 @@ func (me IpAddress) Eq(it interface{}) bool {
 	return true
 }
 
+func (me IpAddress) String() string {
+	return me.ToString()
+}
+
 func (me IpAddress) ToString() string {
 	bin := [4]byte{}
 
