@@ -51,8 +51,8 @@ func (me FileName) ShortName() string {
 	return FileShortName(me.String())
 }
 
-func (me FileName) Create(size int) error {
-	f, err := os.OpenFile(string(me), os.O_RDWR|os.O_CREATE|os.O_EXCL|os.O_TRUNC, 0666)
+func (me FileName) create(size, flag int) error {
+	f, err := os.OpenFile(string(me), os.O_RDWR|os.O_CREATE|os.O_TRUNC|flag, 0666)
 	if nil != err {
 		Log.Error("create %s error: %s", me, err)
 
@@ -69,6 +69,14 @@ func (me FileName) Create(size int) error {
 	f.Close()
 
 	return nil
+}
+
+func (me FileName) CreateEx(size int) error {
+	return me.create(size, 0)
+}
+
+func (me FileName) Create(size int) error {
+	return me.create(size, os.O_EXCL)
 }
 
 func (me FileName) Append(buf []byte) error {
