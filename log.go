@@ -2,7 +2,6 @@ package asdf
 
 import (
 	"fmt"
-	"os"
 	"time"
 )
 
@@ -18,17 +17,14 @@ const (
 
 type LogType int
 
-var arrLogType = [LogTypeEnd]string{
-	LogTypeInvalid: "invalid",
-	LogTypeConsole: "console",
-	LogTypeFile:    "file",
-	LogTypeCo:      "co",
-}
-var mapLogType = map[string]LogType{
-	"invalid": LogTypeInvalid,
-	"console": LogTypeConsole,
-	"file":    LogTypeFile,
-	"co":      LogTypeCo,
+var logTypes = EnumMapper{
+	Enum: "LogType",
+	Names: []string{
+		LogTypeInvalid: "invalid",
+		LogTypeConsole: "console",
+		LogTypeFile:    "file",
+		LogTypeCo:      "co",
+	},
 }
 
 func (me LogType) IsGood() bool {
@@ -37,16 +33,18 @@ func (me LogType) IsGood() bool {
 
 func (me LogType) String() string {
 	if me.IsGood() {
-		return arrLogType[me]
+		return logTypes.Name(int(me))
 	} else {
 		return Unknow
 	}
 }
 
-func (me *LogType) FromString(s string) {
-	if level, ok := mapLogType[s]; ok {
-		*me = level
-	}
+func (me *LogType) FromString(s string) error {
+	idx, err := logTypes.Index(s)
+
+	*me = LogType(idx)
+
+	return err
 }
 
 const (
@@ -56,6 +54,7 @@ const (
 	LogLevelCrit    LogLevel = 3
 	LogLevelError   LogLevel = 4
 	LogLevelWarning LogLevel = 5
+	LogLevelWarn    LogLevel = LogLevelWarning
 	LogLevelNotice  LogLevel = 6
 	LogLevelInfo    LogLevel = 7
 	LogLevelDebug   LogLevel = 8
@@ -66,16 +65,44 @@ const (
 
 type LogLevel int
 
-var arrLogLevel = [LogLevelEnd]string{
-	LogLevelInvalid: "invalid",
-	LogLevelEmerg:   "emerg",
-	LogLevelAlert:   "alert",
-	LogLevelCrit:    "crit",
-	LogLevelError:   "error",
-	LogLevelWarning: "warning",
-	LogLevelNotice:  "notice",
-	LogLevelInfo:    "info",
-	LogLevelDebug:   "debug",
+type LogLevelMapper struct {
+	Name  string
+	Short string
+}
+
+var logLevels = [LogLevelEnd]LogLevelMapper{
+	LogLevelEmerg: LogLevelMapper{
+		Name:  "emerg",
+		Short: "M",
+	},
+	LogLevelAlert: LogLevelMapper{
+		Name:  "alert",
+		Short: "A",
+	},
+	LogLevelCrit: LogLevelMapper{
+		Name:  "crit",
+		Short: "C",
+	},
+	LogLevelError: LogLevelMapper{
+		Name:  "error",
+		Short: "E",
+	},
+	LogLevelWarning: LogLevelMapper{
+		Name:  "warning",
+		Short: "W",
+	},
+	LogLevelNotice: LogLevelMapper{
+		Name:  "notice",
+		Short: "N",
+	},
+	LogLevelInfo: LogLevelMapper{
+		Name:  "info",
+		Short: "I",
+	},
+	LogLevelDebug: LogLevelMapper{
+		Name:  "debug",
+		Short: "D",
+	},
 }
 
 var mapLogLevel = map[string]LogLevel{
@@ -84,6 +111,7 @@ var mapLogLevel = map[string]LogLevel{
 	"crit":    LogLevelCrit,
 	"error":   LogLevelError,
 	"warning": LogLevelWarning,
+	"warn":    LogLevelWarning,
 	"notice":  LogLevelNotice,
 	"info":    LogLevelInfo,
 	"debug":   LogLevelDebug,
@@ -95,263 +123,38 @@ func (me LogLevel) IsGood() bool {
 
 func (me LogLevel) String() string {
 	if me.IsGood() {
-		return arrLogLevel[me]
+		return logLevels[me].Name
 	} else {
 		return Unknow
+	}
+}
+
+func (me LogLevel) Short() string {
+	if me.IsGood() {
+		return logLevels[me].Short
+	} else {
+		return "U"
 	}
 }
 
 func (me *LogLevel) FromString(s string) {
 	if level, ok := mapLogLevel[s]; ok {
 		*me = level
+	} else {
+		*me = LogLevelInfo
 	}
 }
 
-func addLogPrefix(msg string) string {
-	return "(" + time.Now().Format("2006-01-02 15:04:05") + "): " + msg
-}
-
-//==============================================================================
-
-type ConsoleLogger struct {
+type LogMsg struct {
+	s     string
 	level LogLevel
 }
 
-var Console = &ConsoleLogger{
-	level: LogLevelDeft,
+func (me *LogMsg) String() string {
+	return fmt.Sprintf("[%s] %s %s",
+		me.level.Short(),
+		time.Now().Format("2006-01-02@15:04:05"),
+		me.s)
 }
 
-func (me *ConsoleLogger) GetLevel() LogLevel {
-	return me.level
-}
-
-func (me *ConsoleLogger) SetLevel(level LogLevel) {
-	me.level = level
-}
-
-func (me *ConsoleLogger) Log(level LogLevel, format string, v ...interface{}) {
-	if level <= me.level {
-		fmt.Printf(format, v...)
-	}
-}
-
-func (me *ConsoleLogger) Emerg(format string, v ...interface{}) {
-	me.Log(LogLevelEmerg, format+Crlf, v...)
-}
-
-func (me *ConsoleLogger) Alert(format string, v ...interface{}) {
-	me.Log(LogLevelAlert, format+Crlf, v...)
-}
-
-func (me *ConsoleLogger) Crit(format string, v ...interface{}) {
-	me.Log(LogLevelCrit, format+Crlf, v...)
-}
-
-func (me *ConsoleLogger) Error(format string, v ...interface{}) {
-	me.Log(LogLevelError, format+Crlf, v...)
-}
-
-func (me *ConsoleLogger) Warning(format string, v ...interface{}) {
-	me.Log(LogLevelWarning, format+Crlf, v...)
-}
-
-func (me *ConsoleLogger) Notice(format string, v ...interface{}) {
-	me.Log(LogLevelNotice, format+Crlf, v...)
-}
-
-func (me *ConsoleLogger) Info(format string, v ...interface{}) {
-	me.Log(LogLevelInfo, format+Crlf, v...)
-}
-
-func (me *ConsoleLogger) Debug(format string, v ...interface{}) {
-	me.Log(LogLevelDebug, format+Crlf, v...)
-}
-
-func (me *ConsoleLogger) Close() error {
-	return nil
-}
-
-//==============================================================================
-
-type FileLogger struct {
-	level LogLevel
-
-	file string
-	lock *AccessLock
-	fd   *os.File
-}
-
-func OpenFileLogger(file string) error {
-	fd, err := os.OpenFile(file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	if nil != err {
-		return err
-	}
-
-	logger := &FileLogger{
-		level: LogLevelDeft,
-		file:  file,
-		fd:    fd,
-		lock:  NewAccessLock("file-logger", false),
-	}
-	Log = logger
-
-	return nil
-}
-
-func (me *FileLogger) GetLevel() LogLevel {
-	return me.level
-}
-
-func (me *FileLogger) SetLevel(level LogLevel) {
-	me.level = level
-}
-
-func (me *FileLogger) Log(level LogLevel, format string, v ...interface{}) {
-	if level <= me.level {
-		me.lock.Handle(func() {
-			msg := addLogPrefix(fmt.Sprintf(format, v...))
-
-			me.fd.WriteString(msg)
-		})
-	}
-}
-
-func (me *FileLogger) Emerg(format string, v ...interface{}) {
-	me.Log(LogLevelEmerg, format+Crlf, v...)
-}
-
-func (me *FileLogger) Alert(format string, v ...interface{}) {
-	me.Log(LogLevelAlert, format+Crlf, v...)
-}
-
-func (me *FileLogger) Crit(format string, v ...interface{}) {
-	me.Log(LogLevelCrit, format+Crlf, v...)
-}
-
-func (me *FileLogger) Error(format string, v ...interface{}) {
-	me.Log(LogLevelError, format+Crlf, v...)
-}
-
-func (me *FileLogger) Warning(format string, v ...interface{}) {
-	me.Log(LogLevelWarning, format+Crlf, v...)
-}
-
-func (me *FileLogger) Notice(format string, v ...interface{}) {
-	me.Log(LogLevelNotice, format+Crlf, v...)
-}
-
-func (me *FileLogger) Info(format string, v ...interface{}) {
-	me.Log(LogLevelInfo, format+Crlf, v...)
-}
-
-func (me *FileLogger) Debug(format string, v ...interface{}) {
-	me.Log(LogLevelDebug, format+Crlf, v...)
-}
-
-func (me *FileLogger) Close() error {
-	return me.fd.Close()
-}
-
-//==============================================================================
-
-type CoLogger struct {
-	level LogLevel
-	file  string
-	fd    *os.File
-	ch    chan string
-}
-
-func OpenCoLogger(file string, size int) error {
-	fd, err := os.OpenFile(file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
-	if nil != err {
-		return err
-	}
-
-	ch := make(chan string, size)
-
-	logger := &CoLogger{
-		level: LogLevelDeft,
-		file:  file,
-		fd:    fd,
-		ch:    ch,
-	}
-	Log = logger
-
-	go logger.run(ch)
-
-	return nil
-}
-
-func (me *CoLogger) run(ch chan string) {
-	fmt.Printf("cologger running...\n")
-
-	for {
-		msg, ok := <-ch
-		if !ok {
-			me.fd.Close()
-
-			return
-		}
-
-		msg = addLogPrefix(msg)
-		me.fd.WriteString(msg)
-		fmt.Print(msg)
-	}
-}
-
-func (me *CoLogger) GetLevel() LogLevel {
-	return me.level
-}
-
-func (me *CoLogger) SetLevel(level LogLevel) {
-	me.level = level
-}
-
-func (me *CoLogger) Log(level LogLevel, format string, v ...interface{}) {
-	if level <= me.level {
-		me.ch <- fmt.Sprintf(format, v...)
-	}
-}
-
-func (me *CoLogger) Emerg(format string, v ...interface{}) {
-	me.Log(LogLevelEmerg, format+Crlf, v...)
-}
-
-func (me *CoLogger) Alert(format string, v ...interface{}) {
-	me.Log(LogLevelAlert, format+Crlf, v...)
-}
-
-func (me *CoLogger) Crit(format string, v ...interface{}) {
-	me.Log(LogLevelCrit, format+Crlf, v...)
-}
-
-func (me *CoLogger) Error(format string, v ...interface{}) {
-	me.Log(LogLevelError, format+Crlf, v...)
-}
-
-func (me *CoLogger) Warning(format string, v ...interface{}) {
-	me.Log(LogLevelWarning, format+Crlf, v...)
-}
-
-func (me *CoLogger) Notice(format string, v ...interface{}) {
-	me.Log(LogLevelNotice, format+Crlf, v...)
-}
-
-func (me *CoLogger) Info(format string, v ...interface{}) {
-	me.Log(LogLevelInfo, format+Crlf, v...)
-}
-
-func (me *CoLogger) Debug(format string, v ...interface{}) {
-	me.Log(LogLevelDebug, format+Crlf, v...)
-}
-
-func (me *CoLogger) Close() error {
-	ch := me.ch
-	me.ch = make(chan string)
-	close(ch)
-
-	return nil
-}
-
-//==============================================================================
 var Log ILogger = Console
