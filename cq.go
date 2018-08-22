@@ -8,7 +8,7 @@ type Cq struct {
 }
 
 func (me *Cq) align(idx uint) uint {
-	return Align(idx, me.size)
+	return AlignU(idx, me.size)
 }
 
 func (me *Cq) Count() uint {

@@ -19,7 +19,7 @@ func PageAlign(size int) int {
 	return ((size + PAGEMASK) / PAGESIZE) * PAGESIZE
 }
 
-func Align(x, align uint) uint {
+func AlignU(x, align uint) uint {
 	return ((x + align - 1) / align) * align
 }
 

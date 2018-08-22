@@ -187,6 +187,14 @@ func ErrSprintf(format string, v ...interface{}) error {
 	return errors.New(fmt.Sprintf(format, v...))
 }
 
+func ErrLog(format string, v ...interface{}) error {
+	s := fmt.Sprintf(format, v...)
+
+	Log.Error("%s", s)
+
+	return errors.New(s)
+}
+
 type StdError struct {
 	Error       int    `json:"error"`
 	ErrorString string `json:"errors"`
