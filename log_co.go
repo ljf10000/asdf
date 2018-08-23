@@ -8,7 +8,7 @@ import (
 
 type CoLogChan chan LogMsg
 
-func OpenCoLogger(prefix string, size int) error {
+func OpenCoLogger(prefix string, size int, show bool) error {
 	ch := make(CoLogChan, size)
 
 	logger := &CoLogger{
@@ -19,7 +19,7 @@ func OpenCoLogger(prefix string, size int) error {
 
 	Log = logger
 
-	go logger.run(ch)
+	go logger.run(ch, show)
 
 	return nil
 }
@@ -65,7 +65,7 @@ func (me *CoLogger) tryCut() error {
 	return nil
 }
 
-func (me *CoLogger) run(ch CoLogChan) {
+func (me *CoLogger) run(ch CoLogChan, show bool) {
 	fmt.Printf("cologger running...\n")
 
 	for {
@@ -78,7 +78,10 @@ func (me *CoLogger) run(ch CoLogChan) {
 
 		s := msg.String()
 		me.fd.WriteString(s)
-		fmt.Print(s)
+
+		if show {
+			fmt.Print(s)
+		}
 
 		err := me.tryCut()
 		if nil != err {
