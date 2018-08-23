@@ -179,9 +179,7 @@ func (me Timespec) Timeval() Timeval {
 }
 
 func (me Timespec) String() string {
-	t := time.Unix(int64(me.Second), int64(me.Nano))
-
-	return t.String()
+	return time.Unix(int64(me.Second), int64(me.Nano)).Format(TimeFormat)
 }
 
 func (me Timespec) Load(t Time64) {
@@ -279,9 +277,7 @@ func (me Timeval) Timespec() Timespec {
 }
 
 func (me *Timeval) String() string {
-	t := time.Unix(int64(me.Second), int64(1000*me.Micro))
-
-	return t.String()
+	return time.Unix(int64(me.Second), int64(1000*me.Micro)).Format(TimeFormat)
 }
 
 func (me *Timeval) Load(t Time64) {
