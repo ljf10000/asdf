@@ -4,28 +4,25 @@ import (
 	"fmt"
 )
 
-type Cmd struct {
-	Options []string
-	Handler func(args []string) error
-}
+type CmdOptions []string
 
-func (me *Cmd) Help() string {
+func (me CmdOptions) Help() string {
 	s := Tab
 
-	for _, opt := range me.Options {
+	for _, opt := range me {
 		s += opt + Space
 	}
 
 	return s[:len(s)-1]
 }
 
-func (me *Cmd) match(args []string) bool {
+func (me CmdOptions) match(args []string) bool {
 	count := len(args)
-	if len(me.Options) != count {
+	if len(me) != count {
 		return false
 	}
 
-	for idx, opt := range me.Options {
+	for idx, opt := range me {
 		switch opt[0] {
 		case '{', '[':
 		default:
@@ -36,6 +33,19 @@ func (me *Cmd) match(args []string) bool {
 	}
 
 	return true
+}
+
+type Cmd struct {
+	Options CmdOptions
+	Handler func(args []string) error
+}
+
+func (me *Cmd) Help() string {
+	return me.Options.Help()
+}
+
+func (me *Cmd) match(args []string) bool {
+	return me.Options.match(args)
 }
 
 type Command struct {
