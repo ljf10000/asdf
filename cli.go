@@ -82,6 +82,8 @@ func (me *CliServer) Run() {
 		Panic("cli server listen error:%s", err)
 	}
 
+	Log.Info("OK: cli server ...")
+
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
