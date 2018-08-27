@@ -84,6 +84,10 @@ func MakeSlice(Data uintptr, Len, Cap int) []byte {
 	return s
 }
 
+func StructSlice(data uintptr, size int) []byte {
+	return MakeSlice(data, size, size)
+}
+
 func SliceAddress(buf []byte) uintptr {
 	return ((*reflect.SliceHeader)(unsafe.Pointer(&buf))).Data
 }
