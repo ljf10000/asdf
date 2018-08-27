@@ -106,9 +106,14 @@ func (me *CliServer) handle(conn net.Conn, line string) {
 
 	args := strings.Split(line, " ")
 
+	var errs string
 	s, err := me.Command.exec(args)
+	if nil != err {
+		errs = err.Error()
+	}
+
 	r := &CliResponse{
-		Err:  err.Error(),
+		Err:  errs,
 		Info: s,
 	}
 
