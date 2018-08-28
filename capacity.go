@@ -18,6 +18,10 @@ func (me *Capacity) Zero() {
 	me.Cap = 0
 }
 
+func (me *Capacity) IsZero() bool {
+	return 0 == me.Count || 0 == me.Cap
+}
+
 func (me *Capacity) IsFull() bool {
 	return me.Count == me.Cap
 }
@@ -65,6 +69,10 @@ func (me *BlockCap64) Zero() {
 
 func (me *BlockCap64) IsFull() bool {
 	return me.Size == me.Cap
+}
+
+func (me *BlockCap64) IsZero() bool {
+	return 0 == me.Size || 0 == me.Cap
 }
 
 func (me *BlockCap64) Add32(v BlockCap32) {
