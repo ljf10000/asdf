@@ -40,6 +40,10 @@ func (me *BlockCap32) IsFull() bool {
 	return me.Size == me.Cap
 }
 
+func (me *BlockCap32) IsZero() bool {
+	return 0 == me.Size || 0 == me.Cap
+}
+
 func (me *BlockCap32) AddAlign(v uint32, align uint32) {
 	me.Size += v
 	me.Cap += Align32(v, align)
