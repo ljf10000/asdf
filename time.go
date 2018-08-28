@@ -418,7 +418,9 @@ type Timezone struct {
 }
 
 func (me Timezone) String() string {
-	return fmt.Sprintf("begin(%s) end(%s)", me.Begin, me.End)
+	return fmt.Sprintf("begin(%s %d) end(%s %d)",
+		me.Begin, me.Begin.Nano,
+		me.End, me.End.Nano)
 }
 
 func (me Timezone) IsGood() bool {
