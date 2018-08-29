@@ -188,7 +188,7 @@ func (me Timespec) Load(t Time64) {
 
 func (me Timespec) Compare(v Timespec) (int, Timespec /*diff*/) {
 	a := me.Time64()
-	b := me.Time64()
+	b := v.Time64()
 
 	cmp, diff := a.Compare(b)
 
