@@ -79,6 +79,25 @@ func (me FileName) Create(size int) error {
 	return me.create(size, os.O_EXCL)
 }
 
+func (me FileName) Truncate(size int) error {
+	f, err := os.OpenFile(string(me), os.O_RDWR, 0666)
+	if nil != err {
+		Log.Error("open %s error:%s", me, err)
+
+		return err
+	}
+	defer f.Close()
+
+	err = f.Truncate(int64(size))
+	if nil != err {
+		Log.Error("truncate %s size:%d error:%s", me, size, err)
+
+		return err
+	}
+
+	return nil
+}
+
 func (me FileName) Append(buf []byte) error {
 	f, err := os.OpenFile(string(me), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if nil != err {
