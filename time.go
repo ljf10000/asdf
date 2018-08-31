@@ -145,7 +145,7 @@ func MakeTimespec(second Time32, nano Timens) Timespec {
 }
 
 func (me Timespec) IsGood() bool {
-	return me.Second > 0 || me.Nano > 0
+	return me.Second > 0
 }
 
 func (me Timespec) Zero() {
