@@ -101,11 +101,11 @@ func HttpBody(rBody io.ReadCloser, iBody interface{}, codec ICodec) error {
 	} else if body, err = httpDecode(body, codec); nil != err {
 		return err
 	} else if err = json.Unmarshal(body, iBody); nil != err {
-		Log.Debug("body:%s to json error:%s", string(body), err.Error())
+		Log.Debug("body[%s] to json error:%s", string(body), err.Error())
 
 		return err
 	} else {
-		Log.Debug("http body to obj: %+v", iBody)
+		Log.Debug("http body[%s] to obj[%+v]", string(body), iBody)
 
 		return nil
 	}
