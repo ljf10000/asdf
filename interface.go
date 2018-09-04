@@ -35,34 +35,6 @@ type ILt interface {
 	Lt(interface{}) bool
 }
 
-type IFirst interface {
-	First() interface{}
-}
-
-type ILast interface {
-	Last() interface{}
-}
-
-type ITails interface {
-	Tail() []interface{}
-}
-
-type IHead interface {
-	Head() []interface{}
-}
-
-type IPrev interface {
-	Prev() interface{}
-}
-
-type INext interface {
-	Next() interface{}
-}
-
-type IReverse interface {
-	Reverse() []interface{}
-}
-
 type IRepeat interface {
 	Repeat(int) []interface{}
 }
@@ -220,21 +192,6 @@ type INumber interface {
 type ICompare interface {
 	IEq
 	IGt
-}
-
-type IList interface {
-	IFirst
-	ILast
-
-	ITails
-	IHead
-
-	IReverse
-}
-
-type IListNode interface {
-	IPrev
-	INext
 }
 
 type IStorage interface {
