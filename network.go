@@ -16,7 +16,7 @@ var isLittleEndian = !IsBigEndian()
 
 func IsBigEndian() bool {
 	p := 0x11223344
-	bin := MakeSlice(uintptr(unsafe.Pointer(&p)), 4, 4)
+	bin := MakeSlice(unsafe.Pointer(&p), 4, 4)
 
 	return 0x11 == bin[0]
 }

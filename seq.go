@@ -136,8 +136,25 @@ func (me Seqzone32) Compare(v Seqzone32) int {
 }
 
 /******************************************************************************/
+type SeqWraper struct {
+	High uint32
+	Low  uint32
+}
+
+func (me *SeqWraper) Seq64() Seq64 {
+	return Seq64(me.High)<<32 | Seq64(me.Low)
+}
+
+/******************************************************************************/
 
 type Seq64 uint64
+
+func (me Seq64) SeqWraper() SeqWraper {
+	return SeqWraper{
+		High: uint32(me >> 32),
+		Low:  uint32(me & 0xffffffff),
+	}
+}
 
 func (me Seq64) inRange(a, b Seq64) bool {
 	return a <= me && me <= b

@@ -26,8 +26,7 @@ func (me IpAddress) String() string {
 }
 
 func (me IpAddress) ToString() string {
-	address := uintptr(unsafe.Pointer(&me))
-	ip := MakeSlice(address, 4, 4)
+	ip := MakeSlice(unsafe.Pointer(&me), 4, 4)
 
 	return fmt.Sprintf("%d.%d.%d.%d", ip[0], ip[1], ip[2], ip[3])
 }

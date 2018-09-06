@@ -73,7 +73,7 @@ func MemberToSlice(obj unsafe.Pointer, offset, size uintptr) []byte {
 	return ObjToSlice(member, int(size))
 }
 
-func MakeSlice(Data uintptr, Len, Cap int) []byte {
+func MakeSliceEx(Data uintptr, Len, Cap int) []byte {
 	s := Slice{}
 	h := s.Header()
 
@@ -84,8 +84,16 @@ func MakeSlice(Data uintptr, Len, Cap int) []byte {
 	return s
 }
 
-func StructSlice(data uintptr, size int) []byte {
-	return MakeSlice(data, size, size)
+func MakeSlice(obj unsafe.Pointer, Len, Cap int) []byte {
+	return MakeSliceEx(uintptr(obj), Len, Cap)
+}
+
+func StructSliceEx(Data uintptr, size int) []byte {
+	return MakeSliceEx(Data, size, size)
+}
+
+func StructSlice(obj unsafe.Pointer, size int) []byte {
+	return MakeSliceEx(uintptr(obj), size, size)
 }
 
 func SliceAddress(buf []byte) uintptr {
