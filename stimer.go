@@ -17,9 +17,10 @@ type IStimerNode interface {
 }
 
 /******************************************************************************/
-func NewStimer(name string, count int) *Stimer {
+func NewStimer(name string, count int, data interface{}) *Stimer {
 	timer := &Stimer{
 		name:  name,
+		data:  data,
 		slots: make([]list.List, count),
 	}
 
@@ -36,6 +37,7 @@ type Stimer struct {
 	ticks uint64
 	cur   int
 	count int
+	data  interface{}
 
 	slots []list.List
 }
@@ -46,6 +48,10 @@ func (me *Stimer) index(idx int) int {
 
 func (me *Stimer) slot(idx int) *list.List {
 	return &me.slots[me.index(idx)]
+}
+
+func (me *Stimer) Data() interface{} {
+	return me.data
 }
 
 func (me *Stimer) Window() int {
