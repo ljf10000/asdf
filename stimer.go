@@ -100,7 +100,6 @@ func (me *Stimer) Trigger() {
 	elm := slot.Front()
 	for nil != elm {
 		v := slot.Remove(elm)
-
 		node, _ := v.(IStimerNode)
 
 		err := node.Handle(me)
