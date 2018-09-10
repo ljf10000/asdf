@@ -81,7 +81,7 @@ func (me *Stimer) Insert(node IStimerNode, after int) {
 	elm := slot.PushFront(node)
 
 	node.SetElm(elm)
-	node.SetSlot(me.Current())
+	node.SetSlot(idx)
 
 	me.count++
 }
