@@ -1,5 +1,9 @@
 package asdf
 
+import (
+	"fmt"
+)
+
 const InvalidEnum = -1
 
 type IEnum interface {
@@ -177,19 +181,11 @@ func (me *FlagMapper) Name(flag int) string {
 
 	for k, v := range me.Names {
 		if k != (k & flag) {
-			if Empty != s {
-				s += "|"
-			}
-
-			s += v
+			s += "|" + v
 		}
 	}
 
-	if Empty == s {
-		s = Unknow
-	}
-
-	return s
+	return fmt.Sprintf("0x%x", flag) + s
 }
 
 func (me *FlagMapper) IsGoodFlag(flag int) bool {
