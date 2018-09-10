@@ -6,6 +6,7 @@ const (
 	SizeofG = 1024 * SizeofM
 	SizeofT = 1024 * SizeofG
 	SizeofP = 1024 * SizeofT
+	SizeofE = 1024 * SizeofP
 
 	SizeofByte    = 1
 	SizeofInt8    = 1
