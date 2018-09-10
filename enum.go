@@ -19,6 +19,8 @@ func IsGoodEnum(idx interface{}) bool {
 	return v >= n.Begin() && v < n.End()
 }
 
+/******************************************************************************/
+
 type EnumBinding []string
 
 // todo: reutrn string and error
@@ -38,6 +40,8 @@ func (me EnumBinding) EntryShow(idx interface{}) string {
 
 	return me[e.Int()]
 }
+
+/******************************************************************************/
 
 type EnumManager struct {
 	iMap map[int]string
@@ -98,6 +102,8 @@ func (me *EnumManager) IsGoodIndex(idx int) bool {
 	return ok
 }
 
+/******************************************************************************/
+
 type EnumMapper struct {
 	Enum   string
 	Names  []string
@@ -139,4 +145,59 @@ func (me *EnumMapper) NameEx(idx int) (string, bool) {
 
 func (me *EnumMapper) IsGoodIndex(idx int) bool {
 	return idx >= 0 && idx < len(me.Names)
+}
+
+/******************************************************************************/
+
+type FlagMapper struct {
+	Type   string
+	Names  map[int]string
+	values map[string]int
+}
+
+func (me *FlagMapper) Init() {
+	me.values = map[string]int{}
+
+	for k, v := range me.Names {
+		me.values[v] = k
+	}
+}
+
+func (me *FlagMapper) Flag(name string) (int, error) {
+	flag, ok := me.values[name]
+	if ok {
+		return flag, nil
+	} else {
+		return 0, ErrSprintf("invalid %s: %s", me.Type, name)
+	}
+}
+
+func (me *FlagMapper) Name(flag int) string {
+	s := Empty
+
+	for k, v := range me.Names {
+		if k != (k & flag) {
+			if Empty != s {
+				s += "|"
+			}
+
+			s += v
+		}
+	}
+
+	if Empty == s {
+		s = Unknow
+	}
+
+	return s
+}
+
+func (me *FlagMapper) IsGoodFlag(flag int) bool {
+	for k, _ := range me.Names {
+		if k != (k & flag) {
+			return false
+		}
+	}
+
+	return true
 }
