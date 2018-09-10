@@ -180,7 +180,7 @@ func (me *FlagMapper) Name(flag int) string {
 	s := Empty
 
 	for k, v := range me.Names {
-		if k != (k & flag) {
+		if k == (k & flag) {
 			s += "|" + v
 		}
 	}
