@@ -75,23 +75,29 @@ func (me *Stimer) Current() int {
 }
 
 func (me *Stimer) Insert(node IStimerNode, after int) {
-	idx := me.index(me.cur + after)
-	slot := me.slot(idx)
+	if nil == node.GetElm() {
+		idx := me.index(me.cur + after)
+		slot := me.slot(idx)
 
-	elm := slot.PushFront(node)
+		elm := slot.PushFront(node)
 
-	node.SetElm(elm)
-	node.SetSlot(idx)
+		node.SetElm(elm)
+		node.SetSlot(idx)
 
-	me.count++
+		me.count++
+	}
 }
 
 func (me *Stimer) Remove(node IStimerNode) {
-	slot := me.slot(node.GetSlot())
+	elm := node.GetElm()
+	if nil != elm {
+		slot := me.slot(node.GetSlot())
+		slot.Remove(elm)
 
-	slot.Remove(node.GetElm())
+		node.SetElm(nil)
 
-	me.count--
+		me.count--
+	}
 }
 
 func (me *Stimer) Trigger() {
@@ -99,14 +105,14 @@ func (me *Stimer) Trigger() {
 
 	elm := slot.Front()
 	for nil != elm {
-		v := slot.Remove(elm)
-		node, _ := v.(IStimerNode)
+		node, _ := elm.Value.(IStimerNode)
 
 		err := node.Handle(me)
 		if nil != err {
 			Log.Error("timer[%s] handle node[%s] error:%s", me.name, node, err)
 		}
 
+		me.Remove(node)
 		elm = slot.Front()
 	}
 
