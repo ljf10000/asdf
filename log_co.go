@@ -3,16 +3,25 @@ package asdf
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"time"
 )
 
 type CoLogChan chan LogMsg
 
-func OpenCoLogger(prefix string, size int, show bool) error {
+func OpenCoLogger(dir, prefix string, size int, show bool) error {
 	ch := make(CoLogChan, size)
+
+	abs, err := filepath.Abs(dir)
+	if nil != err {
+		return err
+	} else if err := os.MkdirAll(abs, FilePermDir); nil != err {
+		return err
+	}
 
 	logger := &CoLogger{
 		level:  LogLevelDeft,
+		dir:    abs,
 		prefix: prefix,
 		ch:     ch,
 	}
@@ -26,6 +35,7 @@ func OpenCoLogger(prefix string, size int, show bool) error {
 
 type CoLogger struct {
 	level  LogLevel
+	dir    string
 	prefix string
 	fd     *os.File
 	ch     CoLogChan
@@ -43,7 +53,10 @@ func (me *CoLogger) open() error {
 		me.month,
 		me.day)
 
-	me.fd, err = os.OpenFile(file, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	me.fd, err = os.OpenFile(
+		filepath.Join(me.dir, file),
+		os.O_RDWR|os.O_CREATE|os.O_APPEND,
+		0666)
 	if nil != err {
 		return err
 	}

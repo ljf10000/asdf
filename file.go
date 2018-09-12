@@ -16,6 +16,7 @@ import (
 const (
 	FilePermExec   = 0755
 	FilePermNormal = 0644
+	FilePermDir    = os.ModeDir | FilePermExec
 )
 
 func FileSize(f *os.File) int64 {
@@ -292,6 +293,12 @@ func (me FileName) FileSize() (int64, error) {
 	} else {
 		return info.Size(), nil
 	}
+}
+
+func (me FileName) Mkdir() error {
+	dir := filepath.Dir(string(me))
+
+	return os.MkdirAll(dir, FilePermDir)
 }
 
 func (me FileName) DirExist() bool {

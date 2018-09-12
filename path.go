@@ -3,7 +3,6 @@ package asdf
 import (
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 func CurrentDirectory() string {
@@ -12,7 +11,11 @@ func CurrentDirectory() string {
 		return "."
 	}
 
-	return strings.Replace(dir, "\\", "/", -1)
+	return dir
+}
+
+func MakeDirectory(dir string) {
+	// dirs := filepath.SplitList(dir)
 }
 
 func CurrentDirFile(file string) string {
