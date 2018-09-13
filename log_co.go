@@ -114,48 +114,64 @@ func (me *CoLogger) SetLevel(level LogLevel) {
 }
 
 func (me *CoLogger) Log(level LogLevel, format string, v ...interface{}) {
-	if level <= me.level {
-		me.ch <- LogMsg{
-			s:     fmt.Sprintf(format, v...),
-			level: level,
-		}
+	me.ch <- LogMsg{
+		s:     fmt.Sprintf(format+Crlf, v...),
+		level: level,
 	}
 }
 
 func (me *CoLogger) Emerg(format string, v ...interface{}) {
-	me.Log(LogLevelEmerg, format+Crlf, v...)
+	if LogLevelEmerg <= me.level {
+		me.Log(LogLevelEmerg, format, v...)
+	}
 }
 
 func (me *CoLogger) Alert(format string, v ...interface{}) {
-	me.Log(LogLevelAlert, format+Crlf, v...)
+	if LogLevelAlert <= me.level {
+		me.Log(LogLevelAlert, format, v...)
+	}
 }
 
 func (me *CoLogger) Crit(format string, v ...interface{}) {
-	me.Log(LogLevelCrit, format+Crlf, v...)
+	if LogLevelCrit <= me.level {
+		me.Log(LogLevelCrit, format, v...)
+	}
 }
 
 func (me *CoLogger) Error(format string, v ...interface{}) {
-	me.Log(LogLevelError, format+Crlf, v...)
+	if LogLevelError <= me.level {
+		me.Log(LogLevelError, format, v...)
+	}
 }
 
 func (me *CoLogger) Warning(format string, v ...interface{}) {
-	me.Log(LogLevelWarning, format+Crlf, v...)
+	if LogLevelWarning <= me.level {
+		me.Log(LogLevelWarning, format, v...)
+	}
 }
 
 func (me *CoLogger) Warn(format string, v ...interface{}) {
-	me.Log(LogLevelWarn, format+Crlf, v...)
+	if LogLevelWarn <= me.level {
+		me.Log(LogLevelWarn, format, v...)
+	}
 }
 
 func (me *CoLogger) Notice(format string, v ...interface{}) {
-	me.Log(LogLevelNotice, format+Crlf, v...)
+	if LogLevelNotice <= me.level {
+		me.Log(LogLevelNotice, format, v...)
+	}
 }
 
 func (me *CoLogger) Info(format string, v ...interface{}) {
-	me.Log(LogLevelInfo, format+Crlf, v...)
+	if LogLevelInfo <= me.level {
+		me.Log(LogLevelInfo, format, v...)
+	}
 }
 
 func (me *CoLogger) Debug(format string, v ...interface{}) {
-	me.Log(LogLevelDebug, format+Crlf, v...)
+	if LogLevelDebug <= me.level {
+		me.Log(LogLevelDebug, format, v...)
+	}
 }
 
 func (me *CoLogger) Close() error {

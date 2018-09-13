@@ -5,6 +5,72 @@ import (
 	"time"
 )
 
+type ILogGetLevel interface {
+	GetLevel() LogLevel
+}
+
+type ILogSetLevel interface {
+	SetLevel(level LogLevel)
+}
+
+type ILogLog interface {
+	Log(level LogLevel, format string, v ...interface{})
+}
+
+type ILogEmerg interface {
+	Emerg(format string, v ...interface{})
+}
+
+type ILogAlert interface {
+	Alert(format string, v ...interface{})
+}
+
+type ILogCrit interface {
+	Crit(format string, v ...interface{})
+}
+
+type ILogError interface {
+	Error(format string, v ...interface{})
+}
+
+type ILogWarning interface {
+	Warning(format string, v ...interface{})
+}
+
+type ILogWarn interface {
+	Warn(format string, v ...interface{})
+}
+
+type ILogNotice interface {
+	Notice(format string, v ...interface{})
+}
+
+type ILogInfo interface {
+	Info(format string, v ...interface{})
+}
+
+type ILogDebug interface {
+	Debug(format string, v ...interface{})
+}
+
+type ILogger interface {
+	ILogEmerg
+	ILogAlert
+	ILogCrit
+	ILogError
+	ILogWarning
+	ILogWarn
+	ILogNotice
+	ILogInfo
+	ILogDebug
+
+	ILogLog
+	ILogGetLevel
+	ILogSetLevel
+
+	IClose
+}
+
 const (
 	LogTypeInvalid LogType = 0
 	LogTypeConsole LogType = 1

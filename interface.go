@@ -91,50 +91,6 @@ type IFromBinary interface {
 	FromBinary(bin []byte) error
 }
 
-type ILogGetLevel interface {
-	GetLevel() LogLevel
-}
-
-type ILogSetLevel interface {
-	SetLevel(level LogLevel)
-}
-
-type ILogLog interface {
-	Log(level LogLevel, format string, v ...interface{})
-}
-
-type ILogEmerg interface {
-	Emerg(format string, v ...interface{})
-}
-
-type ILogAlert interface {
-	Alert(format string, v ...interface{})
-}
-
-type ILogCrit interface {
-	Crit(format string, v ...interface{})
-}
-
-type ILogError interface {
-	Error(format string, v ...interface{})
-}
-
-type ILogWarning interface {
-	Warning(format string, v ...interface{})
-}
-
-type ILogNotice interface {
-	Notice(format string, v ...interface{})
-}
-
-type ILogInfo interface {
-	Info(format string, v ...interface{})
-}
-
-type ILogDebug interface {
-	Debug(format string, v ...interface{})
-}
-
 type IClose interface {
 	Close() error
 }
@@ -199,23 +155,6 @@ type IStorage interface {
 	IFind
 	ISave
 	IUnSave
-}
-
-type ILogger interface {
-	ILogEmerg
-	ILogAlert
-	ILogCrit
-	ILogError
-	ILogWarning
-	ILogNotice
-	ILogInfo
-	ILogDebug
-
-	ILogLog
-	ILogGetLevel
-	ILogSetLevel
-
-	IClose
 }
 
 type IObj interface {

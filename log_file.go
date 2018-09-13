@@ -42,7 +42,7 @@ func (me *FileLogger) Log(level LogLevel, format string, v ...interface{}) {
 	if level <= me.level {
 		me.lock.Handle(func() {
 			msg := LogMsg{
-				s:     fmt.Sprintf(format, v...),
+				s:     fmt.Sprintf(format+Crlf, v...),
 				level: level,
 			}
 
@@ -52,35 +52,57 @@ func (me *FileLogger) Log(level LogLevel, format string, v ...interface{}) {
 }
 
 func (me *FileLogger) Emerg(format string, v ...interface{}) {
-	me.Log(LogLevelEmerg, format+Crlf, v...)
+	if LogLevelEmerg <= me.level {
+		me.Log(LogLevelEmerg, format, v...)
+	}
 }
 
 func (me *FileLogger) Alert(format string, v ...interface{}) {
-	me.Log(LogLevelAlert, format+Crlf, v...)
+	if LogLevelAlert <= me.level {
+		me.Log(LogLevelAlert, format, v...)
+	}
 }
 
 func (me *FileLogger) Crit(format string, v ...interface{}) {
-	me.Log(LogLevelCrit, format+Crlf, v...)
+	if LogLevelCrit <= me.level {
+		me.Log(LogLevelCrit, format, v...)
+	}
 }
 
 func (me *FileLogger) Error(format string, v ...interface{}) {
-	me.Log(LogLevelError, format+Crlf, v...)
+	if LogLevelError <= me.level {
+		me.Log(LogLevelError, format, v...)
+	}
 }
 
 func (me *FileLogger) Warning(format string, v ...interface{}) {
-	me.Log(LogLevelWarning, format+Crlf, v...)
+	if LogLevelWarning <= me.level {
+		me.Log(LogLevelWarning, format, v...)
+	}
+}
+
+func (me *FileLogger) Warn(format string, v ...interface{}) {
+	if LogLevelWarn <= me.level {
+		me.Log(LogLevelWarn, format, v...)
+	}
 }
 
 func (me *FileLogger) Notice(format string, v ...interface{}) {
-	me.Log(LogLevelNotice, format+Crlf, v...)
+	if LogLevelNotice <= me.level {
+		me.Log(LogLevelNotice, format, v...)
+	}
 }
 
 func (me *FileLogger) Info(format string, v ...interface{}) {
-	me.Log(LogLevelInfo, format+Crlf, v...)
+	if LogLevelInfo <= me.level {
+		me.Log(LogLevelInfo, format, v...)
+	}
 }
 
 func (me *FileLogger) Debug(format string, v ...interface{}) {
-	me.Log(LogLevelDebug, format+Crlf, v...)
+	if LogLevelDebug <= me.level {
+		me.Log(LogLevelDebug, format, v...)
+	}
 }
 
 func (me *FileLogger) Close() error {
