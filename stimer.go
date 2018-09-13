@@ -119,3 +119,19 @@ func (me *Stimer) Trigger() {
 	me.cur++
 	me.ticks++
 }
+
+func (me *Stimer) Stop() {
+	count := len(me.slots)
+
+	for i := 0; i < count; i++ {
+		slot := me.slot(i)
+
+		elm := slot.Front()
+		for nil != elm {
+			node, _ := elm.Value.(IStimerNode)
+
+			me.Remove(node)
+			elm = slot.Front()
+		}
+	}
+}
