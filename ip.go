@@ -18,7 +18,16 @@ func (me IpAddress) Int() int {
 }
 
 func (me IpAddress) Eq(it interface{}) bool {
-	return true
+	obj, ok := it.(IpAddress)
+	if ok {
+		return me == obj
+	} else {
+		return false
+	}
+}
+
+func (me IpAddress) Compare(obj IpAddress) int {
+	return CompareUint32(uint32(me), uint32(obj))
 }
 
 func (me IpAddress) String() string {
