@@ -127,6 +127,14 @@ type IUnserialize interface {
 	Unserialize() error
 }
 
+type IMarshal interface {
+	Marshal() ([]byte, error)
+}
+
+type IUnmarshal interface {
+	Unmarshal(data []byte) error
+}
+
 type IFileName interface {
 	FileName() FileName
 }
