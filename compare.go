@@ -1,5 +1,23 @@
 package asdf
 
+import (
+	"bytes"
+)
+
+func CompareBytes(a, b []byte) int {
+	return bytes.Compare(a, b)
+}
+
+func CompareString(a, b string) int {
+	if a == b {
+		return 0
+	} else if a > b {
+		return 1
+	} else {
+		return -1
+	}
+}
+
 func CompareByte(a, b byte) int {
 	if a == b {
 		return 0
