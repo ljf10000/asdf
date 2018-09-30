@@ -1,5 +1,19 @@
 package asdf
 
+type IntZone struct {
+	Min  int
+	Max  int
+	Deft int
+}
+
+func (me *IntZone) Repair(pv *int) {
+	v := *pv
+
+	if me.Min < v || v > me.Max {
+		*pv = me.Deft
+	}
+}
+
 func RepairInt(pv *int, begin, end, deft int) {
 	v := *pv
 
