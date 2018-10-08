@@ -120,6 +120,14 @@ func (me *Stimer) Trigger() {
 	me.ticks++
 }
 
+func (me *Stimer) TriggerAll() {
+	count := len(me.slots)
+
+	for i := 0; i < count; i++ {
+		me.Trigger()
+	}
+}
+
 func (me *Stimer) Stop() {
 	count := len(me.slots)
 

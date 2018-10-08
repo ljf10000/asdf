@@ -136,6 +136,8 @@ func (me Seqzone32) Compare(v Seqzone32) int {
 }
 
 /******************************************************************************/
+const SizeofSeqWraper = 8
+
 type SeqWraper struct {
 	High uint32
 	Low  uint32

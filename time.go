@@ -131,6 +131,7 @@ func (me Time64) Timeval() Timeval {
 }
 
 /******************************************************************************/
+const SizeofTimespec = 8
 
 type Timespec struct {
 	Second Time32 `json:"second"`
