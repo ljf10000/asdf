@@ -15,4 +15,5 @@ const (
 	SizeofInt64   = 8
 	SizeofFloat32 = 4
 	SizeofFloat64 = 8
+	SizeofPointer = 8
 )
