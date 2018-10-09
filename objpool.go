@@ -45,15 +45,22 @@ func objPool_obj2node(obj unsafe.Pointer) *objPoolNode {
 	return (*objPoolNode)(unsafe.Pointer(uintptr(obj) - SizeofListNode))
 }
 
-type ObjPool struct {
+type ObjPoolOp struct {
 	Create func(file string, size int) ([]byte, error)
 	Close  func(mem []byte) error
+}
 
+type ObjPoolConf struct {
 	Dev        string
 	Name       string
 	ObjSize    int // obj size
 	BlockSize  int // block size
 	BlockLimit int // block limit
+}
+
+type ObjPool struct {
+	*ObjPoolOp
+	ObjPoolConf
 
 	blockCount int // block count
 	blocks     []objBlock
@@ -62,7 +69,10 @@ type ObjPool struct {
 	free  List
 }
 
-func (me *ObjPool) Init() error {
+func (me *ObjPool) Init(conf *ObjPoolConf, op *ObjPoolOp) error {
+	me.ObjPoolOp = op
+	me.ObjPoolConf = *conf
+
 	me.mkdir()
 
 	me.blocks = make([]objBlock, 0, me.BlockLimit)

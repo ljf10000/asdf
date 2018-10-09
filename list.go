@@ -13,6 +13,10 @@ func (me *ListNode) Init() {
 	me.next = nil
 }
 
+func (me *ListNode) InList() bool {
+	return nil != me.next || nil != me.prev
+}
+
 func (me *ListNode) add(prev *ListNode, next *ListNode) {
 	next.prev = me
 	me.next = next
@@ -23,6 +27,8 @@ func (me *ListNode) add(prev *ListNode, next *ListNode) {
 func (me *ListNode) del(prev *ListNode, next *ListNode) {
 	next.prev = prev
 	prev.next = next
+
+	me.Init()
 }
 
 /******************************************************************************/
@@ -43,39 +49,52 @@ func (me *List) Count() int {
 	return me.count
 }
 
-func (me *List) Add(obj *ListNode) {
-	obj.add(&me.list, me.list.next)
+func (me *List) Add(node *ListNode) {
+	if !node.InList() {
+		node.add(&me.list, me.list.next)
 
-	me.count++
+		me.count++
+	}
 }
 
-func (me *List) AddTail(obj *ListNode) {
-	obj.add(me.list.prev, &me.list)
+func (me *List) AddTail(node *ListNode) {
+	if !node.InList() {
+		node.add(me.list.prev, &me.list)
 
-	me.count++
+		me.count++
+	}
 }
 
-func (me *List) Del(obj *ListNode) {
-	obj.del(obj.prev, obj.next)
-	obj.Init()
+func (me *List) Del(node *ListNode) {
+	if me.count > 0 && node.InList() {
+		node.del(node.prev, node.next)
 
-	me.count--
+		me.count--
+	}
 }
 
 func (me *List) First() *ListNode {
-	return me.list.next
+	if 0 == me.count {
+		return nil
+	} else {
+		return me.list.next
+	}
 }
 
 func (me *List) Tail() *ListNode {
-	return me.list.prev
+	if 0 == me.count {
+		return nil
+	} else {
+		return me.list.prev
+	}
 }
 
-func (me *List) IsLast(obj *ListNode) bool {
-	return obj.next == &me.list
+func (me *List) IsLast(node *ListNode) bool {
+	return me.count > 0 && node.next == &me.list
 }
 
-func (me *List) IsFirst(obj *ListNode) bool {
-	return obj.prev == &me.list
+func (me *List) IsFirst(node *ListNode) bool {
+	return me.count > 0 && node.prev == &me.list
 }
 
 func (me *List) IsEmpty() bool {
@@ -83,10 +102,12 @@ func (me *List) IsEmpty() bool {
 }
 
 func (me *List) Foreach(handle func(node *ListNode) error) error {
-	for node := me.list.next; node != &me.list; node = node.next {
-		err := handle(node)
-		if nil != err {
-			return err
+	if me.count > 0 {
+		for node := me.list.next; node != &me.list; node = node.next {
+			err := handle(node)
+			if nil != err {
+				return err
+			}
 		}
 	}
 
@@ -94,10 +115,12 @@ func (me *List) Foreach(handle func(node *ListNode) error) error {
 }
 
 func (me *List) ForeachR(handle func(node *ListNode) error) error {
-	for node := me.list.prev; node != &me.list; node = node.prev {
-		err := handle(node)
-		if nil != err {
-			return err
+	if me.count > 0 {
+		for node := me.list.prev; node != &me.list; node = node.prev {
+			err := handle(node)
+			if nil != err {
+				return err
+			}
 		}
 	}
 
@@ -116,16 +139,16 @@ func (me *HListNode) Init() {
 	me.next = nil
 }
 
-func (me *HListNode) IsHashed() bool {
+func (me *HListNode) InHash() bool {
 	return nil != me.pprev
 }
 
 func (me *HListNode) del() {
-	if !me.IsHashed() {
+	if me.InHash() {
 		next := me.next
 		pprev := me.pprev
-		*pprev = next
 
+		*pprev = next
 		if nil != next {
 			next.pprev = pprev
 		}
@@ -146,6 +169,7 @@ func (me *hlistBucket) isEmpty() bool {
 
 func (me *hlistBucket) add(node *HListNode) {
 	first := me.first
+
 	node.next = first
 	if nil != first {
 		first.pprev = &node.next
@@ -156,6 +180,10 @@ func (me *hlistBucket) add(node *HListNode) {
 
 func (me *hlistBucket) del(node *HListNode) {
 	node.del()
+}
+
+func (me *hlistBucket) clean() {
+
 }
 
 func (me *hlistBucket) foreach(handle func(node *HListNode) error) error {
@@ -169,14 +197,18 @@ func (me *hlistBucket) foreach(handle func(node *HListNode) error) error {
 	return nil
 }
 
-func (me *hlistBucket) find(eq HListEq) (*HListNode, bool) {
+func (me *hlistBucket) find(eq HListEq) *HListNode {
+	if me.isEmpty() {
+		return nil
+	}
+
 	for node := me.first; nil != node; node = node.next {
 		if eq(node) {
-			return node, true
+			return node
 		}
 	}
 
-	return nil, false
+	return nil
 }
 
 /******************************************************************************/
@@ -193,13 +225,22 @@ func (me *HList) Count() int {
 	return me.count
 }
 
-func (me *HList) Add(node *HListNode, index HListIndex, eq HListEq) (*HListNode, bool) {
+func (me *HList) Init(count int) {
+	me.buckets = make([]hlistBucket, count)
+}
+
+func (me *HList) bucket(index HListIndex) *hlistBucket {
 	count := len(me.buckets)
 	idx := index() % count
-	bucket := &me.buckets[idx]
 
-	obj, ok := bucket.find(eq)
-	if ok {
+	return &me.buckets[idx]
+}
+
+func (me *HList) Add(node *HListNode, index HListIndex, eq HListEq) (*HListNode, bool) {
+	bucket := me.bucket(index)
+
+	obj := bucket.find(eq)
+	if nil != obj {
 		return obj, true
 	}
 
@@ -210,13 +251,17 @@ func (me *HList) Add(node *HListNode, index HListIndex, eq HListEq) (*HListNode,
 }
 
 func (me *HList) Del(node *HListNode, index HListIndex) {
-	count := len(me.buckets)
-	idx := index() % count
-	bucket := &me.buckets[idx]
+	bucket := me.bucket(index)
 
 	if !bucket.isEmpty() {
 		bucket.del(node)
 
 		me.count--
 	}
+}
+
+func (me *HList) Get(index HListIndex, eq HListEq) *HListNode {
+	bucket := me.bucket(index)
+
+	return bucket.find(eq)
 }
