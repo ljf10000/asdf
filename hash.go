@@ -1,116 +1,221 @@
 package asdf
 
-import (
-	"container/list"
+/******************************************************************************/
+
+const (
+	SizeofHListNode    = 4 * SizeofPointer
+	invalidHListBucket = -1
 )
 
-type IHashData interface {
-	HashCode() int
-	CreateNode() (IHashNode, error)
+type HashNode struct {
+	iBucket int
+	hash    *Hash
+	next    *HashNode
+	pprev   **HashNode
 }
 
-type IHashNode interface {
-	HashCode() int
-	Eq(data IHashData) bool
-	Fini()
-
-	GetElm() *list.Element
-	SetElm(elm *list.Element)
-
-	SetHashCode(code int)
-	GetHashCode() int
+func (me *HashNode) Init() {
+	me.iBucket = invalidHListBucket
+	me.hash = nil
+	me.pprev = nil
+	me.next = nil
 }
 
-type Hash struct {
-	buckets []list.List
+func (me *HashNode) InHash() bool {
+	return invalidHListBucket != me.iBucket && nil != me.pprev
 }
 
-func NewHash(count int) *Hash {
-	obj := &Hash{
-		buckets: make([]list.List, count),
+func (me *HashNode) inTheHash(hash *Hash) bool {
+	return me.hash == hash
+}
+
+func (me *HashNode) InTheHash(hash *Hash) bool {
+	return me.InHash() && me.inTheHash(hash)
+}
+
+func (me *HashNode) del() {
+	next := me.next
+	pprev := me.pprev
+
+	*pprev = next
+	if nil != next {
+		next.pprev = pprev
+	}
+}
+
+/******************************************************************************/
+
+type hashBucket struct {
+	first *HashNode
+}
+
+func (me *hashBucket) isEmpty() bool {
+	return nil == me.first
+}
+
+func (me *hashBucket) add(node *HashNode) {
+	first := me.first
+
+	node.next = first
+	if nil != first {
+		first.pprev = &node.next
+	}
+	me.first = node
+	node.pprev = &me.first
+}
+
+func (me *hashBucket) del(node *HashNode) {
+	node.del()
+	node.Init()
+}
+
+type HListForeach func(node *HashNode) (error, bool)
+
+func (me *hashBucket) foreach(handle HListForeach) (error, bool) {
+	if !me.isEmpty() {
+		for node := me.first; nil != node; node = node.next {
+			if err, br := handle(node); br {
+				return err, true
+			}
+		}
 	}
 
-	for i := 0; i < count; i++ {
-		obj.buckets[i].Init()
+	return nil, false
+}
+
+func (me *hashBucket) unsafeForeach(handle HListForeach) (error, bool) {
+	if !me.isEmpty() {
+		node := me.first
+		next := node.next
+		for nil != node {
+			if err, br := handle(node); br {
+				return err, true
+			}
+
+			node = next
+			next = node.next
+		}
 	}
 
-	return obj
+	return nil, false
 }
 
-func (me *Hash) bucket(code int) *list.List {
-	return &me.buckets[code%len(me.buckets)]
-}
-
-func (me *Hash) find(code int, data IHashData) IHashNode {
-	lst := me.bucket(code)
-
-	for elm := lst.Front(); nil != elm; elm = elm.Next() {
-		node, _ := elm.Value.(IHashNode)
-
-		if node.Eq(data) {
-			return node
+func (me *hashBucket) find(eq HListEq) *HashNode {
+	if !me.isEmpty() {
+		for node := me.first; nil != node; node = node.next {
+			if eq(node) {
+				return node
+			}
 		}
 	}
 
 	return nil
 }
 
-func (me *Hash) Find(data IHashData) IHashNode {
-	return me.find(data.HashCode(), data)
+func (me *hashBucket) clean(handle HListForeach) {
+	me.unsafeForeach(func(node *HashNode) (error, bool) {
+		if nil != handle {
+			handle(node)
+		}
+
+		me.del(node)
+
+		return nil, false
+	})
 }
 
-func (me *Hash) Remove(node IHashNode) {
-	elm := node.GetElm()
-	if nil != elm {
-		lst := me.bucket(node.GetHashCode())
+/******************************************************************************/
 
-		lst.Remove(elm)
-		node.SetElm(nil)
-		node.SetHashCode(0)
-	}
+type HListIndex func() int
+type HListEq func(node *HashNode) bool
+
+type Hash struct {
+	buckets []hashBucket
+	count   int // all node count
 }
 
-func (me *Hash) Insert(data IHashData) IHashNode {
-	code := data.HashCode()
+func (me *Hash) Init(count int) {
+	me.buckets = make([]hashBucket, count)
+}
 
-	if node := me.find(code, data); nil != node {
-		return node
-	}
+func (me *Hash) Count() int {
+	return me.count
+}
 
-	node, err := data.CreateNode()
-	if nil != err {
+func (me *Hash) Window() int {
+	return len(me.buckets)
+}
+
+func (me *Hash) bucket(iBucket int) *hashBucket {
+	return &me.buckets[iBucket]
+}
+
+func (me *Hash) Insert(node *HashNode, index HListIndex) error {
+	if node.InHash() {
+		Log.Error("insert node:%p into hash:%p error: have in hash:%p", node, me, node.hash)
+
+		return ErrExist
+	} else {
+		idx := index() % me.Window()
+		bucket := me.bucket(idx)
+		bucket.add(node)
+
+		node.iBucket = idx
+		node.hash = me
+
+		me.count++
+
 		return nil
 	}
-
-	lst := me.bucket(code)
-	elm := lst.PushFront(node)
-	node.SetElm(elm)
-	node.SetHashCode(code)
-
-	return node
 }
 
-func (me *Hash) Clean() {
-	count := len(me.buckets)
+func (me *Hash) Remove(node *HashNode, index HListIndex) error {
+	if me.count > 0 {
+		if node.InHash() {
+			if node.inTheHash(me) {
+
+				idx := index() % me.Window()
+				bucket := me.bucket(idx)
+
+				if !bucket.isEmpty() {
+					bucket.del(node)
+
+					me.count--
+				}
+
+				return nil
+			} else {
+				Log.Error("remove node:%p from hash:%p error: but in the hash:%p",
+					node,
+					me,
+					node.hash)
+			}
+		} else {
+			Log.Error("remove node:%p from hash:%p error: not in the hash", node, me)
+		}
+	} else {
+		Log.Error("remove node:%p from hash:%p error: empty hash", node, me)
+	}
+
+	return ErrNoExist
+}
+
+func (me *Hash) Get(index HListIndex, eq HListEq) *HashNode {
+	idx := index() % me.Window()
+	bucket := me.bucket(idx)
+
+	return bucket.find(eq)
+}
+
+func (me *Hash) Clean(handle HListForeach) {
+	count := me.Window()
 
 	for i := 0; i < count; i++ {
-		lst := me.bucket(i)
-		elm := lst.Front()
+		bucket := me.bucket(i)
 
-		for nil != elm {
-			v := lst.Remove(elm)
-
-			node, _ := v.(IHashNode)
-
-			node.Fini()
-			node.SetElm(nil)
-			node.SetHashCode(0)
-
-			elm = lst.Front()
-		}
+		bucket.clean(handle)
 	}
-}
 
-func (me *Hash) Fini() {
 	me.buckets = nil
+	me.count = 0
 }
