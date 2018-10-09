@@ -4,7 +4,11 @@ import (
 	"unsafe"
 )
 
-const INVALID_STIMER_SLOT uint32 = 0xffffffff
+const (
+	INVALID_STIMER_SLOT uint32 = 0xffffffff
+
+	SizeofUnsafeStimerNode = SizeofListNode + SizeofPointer + 2*SizeofInt32
+)
 
 type UnsafeStimerNode struct {
 	Handle func(node *UnsafeStimerNode) error

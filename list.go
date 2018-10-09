@@ -2,7 +2,7 @@ package asdf
 
 /******************************************************************************/
 
-const SizeofListNode = 2 * SizeofPointer
+const SizeofListNode = 3 * SizeofPointer
 
 type ListNode struct {
 	list *List
@@ -42,6 +42,8 @@ func (me *ListNode) del(prev *ListNode, next *ListNode) {
 }
 
 /******************************************************************************/
+
+const SizeofList = SizeofListNode + SizeofInt64
 
 type List struct {
 	count int
@@ -257,7 +259,7 @@ func (me *List) SafeForeachR(handle ListForeach) (error, bool) {
 /******************************************************************************/
 
 const (
-	SizeofHListNode    = 8
+	SizeofHListNode    = 4 * SizeofPointer
 	invalidHListBucket = -1
 )
 
@@ -368,6 +370,10 @@ func (me *hlistBucket) find(eq HListEq) *HListNode {
 
 func (me *hlistBucket) clean(handle HListForeach) {
 	me.unsafeForeach(func(node *HListNode) (error, bool) {
+		if nil != handle {
+			handle(node)
+		}
+
 		me.del(node)
 
 		return nil, false
@@ -384,16 +390,16 @@ type HList struct {
 	count   int // all node count
 }
 
+func (me *HList) Init(count int) {
+	me.buckets = make([]hlistBucket, count)
+}
+
 func (me *HList) Count() int {
 	return me.count
 }
 
 func (me *HList) Window() int {
 	return len(me.buckets)
-}
-
-func (me *HList) Init(count int) {
-	me.buckets = make([]hlistBucket, count)
 }
 
 func (me *HList) bucket(iBucket int) *hlistBucket {
@@ -466,5 +472,6 @@ func (me *HList) Clean(handle HListForeach) {
 		bucket.clean(handle)
 	}
 
+	me.buckets = nil
 	me.count = 0
 }
