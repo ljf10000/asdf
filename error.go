@@ -13,6 +13,7 @@ const (
 	StdErrEmpty
 	StdErrFull
 	StdErrExist
+	StdErrExistSame
 	StdErrHolding
 	StdErrPending
 	StdErrTimeout
@@ -69,15 +70,16 @@ const (
 var stdErrMap = map[int]string{
 	StdErrOk: "ok",
 
-	StdErrError:   "error",
-	StdErrEmpty:   "empty",
-	StdErrFull:    "full",
-	StdErrExist:   "exist",
-	StdErrHolding: "holding",
-	StdErrPending: "pending",
-	StdErrTimeout: "timeout",
-	StdErrListen:  "listen",
-	StdErrStop:    "stop",
+	StdErrError:     "error",
+	StdErrEmpty:     "empty",
+	StdErrFull:      "full",
+	StdErrExist:     "exist",
+	StdErrExistSame: "exist same",
+	StdErrHolding:   "holding",
+	StdErrPending:   "pending",
+	StdErrTimeout:   "timeout",
+	StdErrListen:    "listen",
+	StdErrStop:      "stop",
 
 	StdErrNoEnv:       "no env",
 	StdErrNoPending:   "no pending",
@@ -127,15 +129,16 @@ var stdErrMap = map[int]string{
 var (
 	Error = errors.New(Empty)
 
-	ErrError   = NewError(StdErrError)
-	ErrEmpty   = NewError(StdErrEmpty)
-	ErrFull    = NewError(StdErrFull)
-	ErrExist   = NewError(StdErrExist)
-	ErrHolding = NewError(StdErrHolding)
-	ErrPending = NewError(StdErrPending)
-	ErrTimeout = NewError(StdErrTimeout)
-	ErrListen  = NewError(StdErrListen)
-	ErrStop    = NewError(StdErrStop)
+	ErrError     = NewError(StdErrError)
+	ErrEmpty     = NewError(StdErrEmpty)
+	ErrFull      = NewError(StdErrFull)
+	ErrExist     = NewError(StdErrExist)
+	ErrExistSame = NewError(StdErrExistSame)
+	ErrHolding   = NewError(StdErrHolding)
+	ErrPending   = NewError(StdErrPending)
+	ErrTimeout   = NewError(StdErrTimeout)
+	ErrListen    = NewError(StdErrListen)
+	ErrStop      = NewError(StdErrStop)
 
 	ErrNoEnv       = NewError(StdErrNoEnv)
 	ErrNoPending   = NewError(StdErrNoPending)

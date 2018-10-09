@@ -14,8 +14,16 @@ type UnsafeStimerNode struct {
 	expire uint32
 }
 
+func (me *UnsafeStimerNode) Init() {
+	me.node.Init()
+}
+
+func (me *UnsafeStimerNode) Expire() int {
+	return int(me.expire)
+}
+
 /******************************************************************************/
-func NewUnsafeStimer(name string, count int, data interface{}) *UnsafeStimer {
+func NewUnsafeStimer(name string, count int) *UnsafeStimer {
 	timer := &UnsafeStimer{
 		name:  name,
 		slots: make([]List, count),
@@ -64,19 +72,20 @@ func (me *UnsafeStimer) Current() int {
 }
 
 func (me *UnsafeStimer) Insert(node *UnsafeStimerNode, after int) {
-	idx := me.index(me.cur + after)
+	expire := me.cur + after
+	idx := me.index(expire)
 	slot := me.slot(idx)
 
-	slot.Add(&node.node)
+	slot.InsertHead(&node.node)
 	node.slot = uint32(idx)
-
+	node.expire = uint32(expire)
 	me.count++
 }
 
 func (me *UnsafeStimer) Remove(node *UnsafeStimerNode) {
 	idx := int(node.slot)
 	slot := me.slot(idx)
-	slot.Del(&node.node)
+	slot.Remove(&node.node)
 	node.slot = INVALID_STIMER_SLOT
 
 	me.count--

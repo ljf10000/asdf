@@ -1,20 +1,32 @@
 package asdf
 
 /******************************************************************************/
+
 const SizeofListNode = 2 * SizeofPointer
 
 type ListNode struct {
+	list *List
+
 	prev *ListNode
 	next *ListNode
 }
 
 func (me *ListNode) Init() {
+	me.list = nil
 	me.prev = nil
 	me.next = nil
 }
 
 func (me *ListNode) InList() bool {
 	return nil != me.next || nil != me.prev
+}
+
+func (me *ListNode) inTheList(list *List) bool {
+	return me.list == list
+}
+
+func (me *ListNode) InTheList(list *List) bool {
+	return me.InList() && me.inTheList(list)
 }
 
 func (me *ListNode) add(prev *ListNode, next *ListNode) {
@@ -27,8 +39,6 @@ func (me *ListNode) add(prev *ListNode, next *ListNode) {
 func (me *ListNode) del(prev *ListNode, next *ListNode) {
 	next.prev = prev
 	prev.next = next
-
-	me.Init()
 }
 
 /******************************************************************************/
@@ -49,28 +59,90 @@ func (me *List) Count() int {
 	return me.count
 }
 
-func (me *List) Add(node *ListNode) {
-	if !node.InList() {
+func (me *List) InsertAfter(node *ListNode, obj *ListNode) error {
+	if node.InList() {
+		Log.Error("insert node:%p into list:%p error: have in list:%p", node, me, node.list)
+
+		return ErrExist
+	} else {
+		node.add(obj, obj.next)
+		node.list = me
+
+		me.count++
+
+		return nil
+	}
+}
+
+func (me *List) InsertBefore(node *ListNode, obj *ListNode) error {
+	if node.InList() {
+		Log.Error("insert node:%p into list:%p error: have in list:%p", node, me, node.list)
+
+		return ErrExist
+	} else {
+		node.add(obj.prev, obj)
+		node.list = me
+
+		me.count++
+
+		return nil
+	}
+}
+
+func (me *List) InsertHead(node *ListNode) error {
+	if node.InList() {
+		Log.Error("insert node:%p into list:%p error: have in list:%p", node, me, node.list)
+
+		return ErrExist
+	} else {
 		node.add(&me.list, me.list.next)
+		node.list = me
 
 		me.count++
+
+		return nil
 	}
 }
 
-func (me *List) AddTail(node *ListNode) {
-	if !node.InList() {
+func (me *List) InsertTail(node *ListNode) error {
+	if node.InList() {
+		Log.Error("insert node:%p into list:%p error: have in list:%p", node, me, node.list)
+
+		return ErrExist
+	} else {
 		node.add(me.list.prev, &me.list)
+		node.list = me
 
 		me.count++
+
+		return nil
 	}
 }
 
-func (me *List) Del(node *ListNode) {
-	if me.count > 0 && node.InList() {
-		node.del(node.prev, node.next)
+func (me *List) Remove(node *ListNode) error {
+	if me.count > 0 {
+		if node.InList() {
+			if node.inTheList(me) {
+				node.del(node.prev, node.next)
+				node.Init()
 
-		me.count--
+				me.count--
+
+				return nil
+			} else {
+				Log.Error("remove node:%p from list:%p error: but in the list:%p",
+					node,
+					me,
+					node.list)
+			}
+		} else {
+			Log.Error("remove node:%p from list:%p error: not in list", node, me)
+		}
+	} else {
+		Log.Error("remove node:%p from list:%p error: empty list", node, me)
 	}
+
+	return ErrNoExist
 }
 
 func (me *List) First() *ListNode {
@@ -81,7 +153,7 @@ func (me *List) First() *ListNode {
 	}
 }
 
-func (me *List) Tail() *ListNode {
+func (me *List) Last() *ListNode {
 	if 0 == me.count {
 		return nil
 	} else {
@@ -101,59 +173,127 @@ func (me *List) IsEmpty() bool {
 	return 0 == me.count
 }
 
-func (me *List) Foreach(handle func(node *ListNode) error) error {
+type ListForeach func(node *ListNode) (error, bool)
+type ListForeach2 func(a *ListNode, b *ListNode) (error, bool)
+
+func (me *List) Foreach(handle ListForeach) (error, bool) {
 	if me.count > 0 {
 		for node := me.list.next; node != &me.list; node = node.next {
-			err := handle(node)
-			if nil != err {
-				return err
+			if err, br := handle(node); br {
+				return err, true
 			}
 		}
 	}
 
-	return nil
+	return nil, false
 }
 
-func (me *List) ForeachR(handle func(node *ListNode) error) error {
+func (me *List) Foreach2(handle ListForeach2) (error, bool) {
+	if me.count >= 2 {
+		a := me.list.next
+		b := a.next
+
+		for b != &me.list {
+			if err, br := handle(a, b); br {
+				return err, true
+			}
+
+			a = b
+			b = a.next
+		}
+	}
+
+	return nil, false
+}
+
+func (me *List) SafeForeach(handle ListForeach) (error, bool) {
+	if me.count > 0 {
+		node := me.list.next
+		next := node.next
+
+		for node != &me.list {
+			if err, br := handle(node); br {
+				return err, true
+			}
+
+			node = next
+			next = node.next
+		}
+	}
+
+	return nil, false
+}
+
+func (me *List) ForeachR(handle ListForeach) (error, bool) {
 	if me.count > 0 {
 		for node := me.list.prev; node != &me.list; node = node.prev {
-			err := handle(node)
-			if nil != err {
-				return err
+			if err, br := handle(node); br {
+				return err, true
 			}
 		}
 	}
 
-	return nil
+	return nil, false
+}
+
+func (me *List) SafeForeachR(handle ListForeach) (error, bool) {
+	if me.count > 0 {
+		node := me.list.prev
+		prev := node.prev
+
+		for node != &me.list {
+			if err, br := handle(node); br {
+				return err, true
+			}
+
+			node = prev
+			prev = node.prev
+		}
+	}
+
+	return nil, false
 }
 
 /******************************************************************************/
 
+const (
+	SizeofHListNode    = 8
+	invalidHListBucket = -1
+)
+
 type HListNode struct {
-	next  *HListNode
-	pprev **HListNode
+	iBucket int
+	hash    *HList
+	next    *HListNode
+	pprev   **HListNode
 }
 
 func (me *HListNode) Init() {
+	me.iBucket = invalidHListBucket
+	me.hash = nil
 	me.pprev = nil
 	me.next = nil
 }
 
 func (me *HListNode) InHash() bool {
-	return nil != me.pprev
+	return invalidHListBucket != me.iBucket && nil != me.pprev
+}
+
+func (me *HListNode) inTheHash(hash *HList) bool {
+	return me.hash == hash
+}
+
+func (me *HListNode) InTheHash(hash *HList) bool {
+	return me.InHash() && me.inTheHash(hash)
 }
 
 func (me *HListNode) del() {
-	if me.InHash() {
-		next := me.next
-		pprev := me.pprev
+	next := me.next
+	pprev := me.pprev
 
-		*pprev = next
-		if nil != next {
-			next.pprev = pprev
-		}
-
-		me.Init()
+	*pprev = next
+	if nil != next {
+		next.pprev = pprev
 	}
 }
 
@@ -180,35 +320,58 @@ func (me *hlistBucket) add(node *HListNode) {
 
 func (me *hlistBucket) del(node *HListNode) {
 	node.del()
+	node.Init()
 }
 
-func (me *hlistBucket) clean() {
+type HListForeach func(node *HListNode) (error, bool)
 
-}
-
-func (me *hlistBucket) foreach(handle func(node *HListNode) error) error {
-	for node := me.first; nil != node; node = node.next {
-		err := handle(node)
-		if nil != err {
-			return err
+func (me *hlistBucket) foreach(handle HListForeach) (error, bool) {
+	if !me.isEmpty() {
+		for node := me.first; nil != node; node = node.next {
+			if err, br := handle(node); br {
+				return err, true
+			}
 		}
 	}
 
-	return nil
+	return nil, false
+}
+
+func (me *hlistBucket) unsafeForeach(handle HListForeach) (error, bool) {
+	if !me.isEmpty() {
+		node := me.first
+		next := node.next
+		for nil != node {
+			if err, br := handle(node); br {
+				return err, true
+			}
+
+			node = next
+			next = node.next
+		}
+	}
+
+	return nil, false
 }
 
 func (me *hlistBucket) find(eq HListEq) *HListNode {
-	if me.isEmpty() {
-		return nil
-	}
-
-	for node := me.first; nil != node; node = node.next {
-		if eq(node) {
-			return node
+	if !me.isEmpty() {
+		for node := me.first; nil != node; node = node.next {
+			if eq(node) {
+				return node
+			}
 		}
 	}
 
 	return nil
+}
+
+func (me *hlistBucket) clean(handle HListForeach) {
+	me.unsafeForeach(func(node *HListNode) (error, bool) {
+		me.del(node)
+
+		return nil, false
+	})
 }
 
 /******************************************************************************/
@@ -225,43 +388,83 @@ func (me *HList) Count() int {
 	return me.count
 }
 
+func (me *HList) Window() int {
+	return len(me.buckets)
+}
+
 func (me *HList) Init(count int) {
 	me.buckets = make([]hlistBucket, count)
 }
 
-func (me *HList) bucket(index HListIndex) *hlistBucket {
-	count := len(me.buckets)
-	idx := index() % count
-
-	return &me.buckets[idx]
+func (me *HList) bucket(iBucket int) *hlistBucket {
+	return &me.buckets[iBucket]
 }
 
-func (me *HList) Add(node *HListNode, index HListIndex, eq HListEq) (*HListNode, bool) {
-	bucket := me.bucket(index)
+func (me *HList) Insert(node *HListNode, index HListIndex) error {
+	if node.InHash() {
+		Log.Error("insert node:%p into hash:%p error: have in hash:%p", node, me, node.hash)
 
-	obj := bucket.find(eq)
-	if nil != obj {
-		return obj, true
+		return ErrExist
+	} else {
+		idx := index() % me.Window()
+		bucket := me.bucket(idx)
+		bucket.add(node)
+
+		node.iBucket = idx
+		node.hash = me
+
+		me.count++
+
+		return nil
 	}
-
-	bucket.add(node)
-	me.count++
-
-	return node, false
 }
 
-func (me *HList) Del(node *HListNode, index HListIndex) {
-	bucket := me.bucket(index)
+func (me *HList) Remove(node *HListNode, index HListIndex) error {
+	if me.count > 0 {
+		if node.InHash() {
+			if node.inTheHash(me) {
 
-	if !bucket.isEmpty() {
-		bucket.del(node)
+				idx := index() % me.Window()
+				bucket := me.bucket(idx)
 
-		me.count--
+				if !bucket.isEmpty() {
+					bucket.del(node)
+
+					me.count--
+				}
+
+				return nil
+			} else {
+				Log.Error("remove node:%p from hash:%p error: but in the hash:%p",
+					node,
+					me,
+					node.hash)
+			}
+		} else {
+			Log.Error("remove node:%p from hash:%p error: not in the hash", node, me)
+		}
+	} else {
+		Log.Error("remove node:%p from hash:%p error: empty hash", node, me)
 	}
+
+	return ErrNoExist
 }
 
 func (me *HList) Get(index HListIndex, eq HListEq) *HListNode {
-	bucket := me.bucket(index)
+	idx := index() % me.Window()
+	bucket := me.bucket(idx)
 
 	return bucket.find(eq)
+}
+
+func (me *HList) Clean(handle HListForeach) {
+	count := me.Window()
+
+	for i := 0; i < count; i++ {
+		bucket := me.bucket(i)
+
+		bucket.clean(handle)
+	}
+
+	me.count = 0
 }

@@ -106,8 +106,8 @@ func (me *ObjPool) Malloc() (unsafe.Pointer, error) {
 	}
 
 	node := me.free.First()
-	me.free.Del(node)
-	me.using.Add(node)
+	me.free.Remove(node)
+	me.using.InsertHead(node)
 
 	obj := (*objPoolNode)(unsafe.Pointer(node))
 
@@ -117,8 +117,8 @@ func (me *ObjPool) Malloc() (unsafe.Pointer, error) {
 func (me *ObjPool) Free(obj unsafe.Pointer) {
 	node := objPool_obj2node(obj)
 
-	me.using.Del(&node.ListNode)
-	me.free.Add(&node.ListNode)
+	me.using.Remove(&node.ListNode)
+	me.free.InsertHead(&node.ListNode)
 }
 
 func (me *ObjPool) dir() string {
@@ -176,7 +176,7 @@ func (me *ObjPool) addPool() error {
 
 	block := me.block(iBlock)
 	block.foreach(me.objSize(), func(obj *ListNode) {
-		me.free.Add(obj)
+		me.free.InsertHead(obj)
 	})
 
 	return nil
