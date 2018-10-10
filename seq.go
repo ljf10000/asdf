@@ -176,6 +176,8 @@ func (me Seq64) InZone(z Seqzone) bool {
 
 /******************************************************************************/
 
+type IZone interface{}
+
 type Seqzone struct {
 	Begin Seq64
 	End   Seq64
