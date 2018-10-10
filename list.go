@@ -1,8 +1,14 @@
 package asdf
 
+import (
+	"unsafe"
+)
+
 /******************************************************************************/
 
 const SizeofListNode = 3 * SizeofPointer
+
+var scListNode = NewSizeChecker("ListNode", unsafe.Sizeof(ListNode{}), SizeofListNode)
 
 type ListNode struct {
 	list *List
@@ -45,6 +51,8 @@ func (me *ListNode) del(prev *ListNode, next *ListNode) {
 
 const SizeofList = SizeofListNode + SizeofInt64
 
+var scList = NewSizeChecker("List", unsafe.Sizeof(List{}), SizeofList)
+
 type List struct {
 	count int
 	list  ListNode
@@ -61,6 +69,7 @@ func (me *List) Count() int {
 	return me.count
 }
 
+// node after obj
 func (me *List) InsertAfter(node *ListNode, obj *ListNode) error {
 	if node.InList() {
 		Log.Error("insert node:%p into list:%p error: have in list:%p", node, me, node.list)
@@ -76,6 +85,7 @@ func (me *List) InsertAfter(node *ListNode, obj *ListNode) error {
 	}
 }
 
+// node before obj
 func (me *List) InsertBefore(node *ListNode, obj *ListNode) error {
 	if node.InList() {
 		Log.Error("insert node:%p into list:%p error: have in list:%p", node, me, node.list)

@@ -7,45 +7,48 @@ import (
 	"unsafe"
 )
 
-type objBlock struct {
+func GetObjField(obj unsafe.Pointer, offset uintptr) unsafe.Pointer {
+	return unsafe.Pointer(uintptr(obj) + offset)
+}
+
+func GetObjByField(field unsafe.Pointer, offset uintptr) unsafe.Pointer {
+	return unsafe.Pointer(uintptr(field) - offset)
+}
+
+/******************************************************************************/
+
+type ObjPoolBlock struct {
 	file string
 	mem  []byte
 }
 
-func (me *objBlock) count(size int) int {
-	return len(me.mem) / size
+func (me *ObjPoolBlock) count(objSize int) int {
+	return len(me.mem) / objSize
 }
 
-func (me *objBlock) foreach(size int, handle func(obj *ListNode)) {
+func (me *ObjPoolBlock) foreach(objSize int, handle func(obj *ListNode)) {
 	address := SliceAddress(me.mem)
 
-	count := me.count(size)
+	count := me.count(objSize)
 	for i := 0; i < count; i++ {
-		obj := unsafe.Pointer(address + uintptr(i*size))
+		obj := (*ListNode)(unsafe.Pointer(address + uintptr(i*objSize)))
 
-		handle((*ListNode)(obj))
+		handle(obj)
 	}
 }
 
-func (me *objBlock) rm() {
+func (me *ObjPoolBlock) fini(ops *ObjPoolOps) {
+	ops.Close(me.mem)
+	me.mem = nil
+
 	os.Remove(me.file)
 }
 
 /******************************************************************************/
 
-type objPoolNode struct {
-	ListNode
-}
+type objPoolNode = ListNode
 
-func (me *objPoolNode) Pointer() unsafe.Pointer {
-	return unsafe.Pointer(uintptr(unsafe.Pointer(me)) + SizeofListNode)
-}
-
-func objPool_obj2node(obj unsafe.Pointer) *objPoolNode {
-	return (*objPoolNode)(unsafe.Pointer(uintptr(obj) - SizeofListNode))
-}
-
-type ObjPoolOp struct {
+type ObjPoolOps struct {
 	Create func(file string, size int) ([]byte, error)
 	Close  func(mem []byte) error
 }
@@ -58,38 +61,42 @@ type ObjPoolConf struct {
 	BlockLimit int // block limit
 }
 
-type ObjPool struct {
-	*ObjPoolOp
-	ObjPoolConf
-
-	blockCount int // block count
-	blocks     []objBlock
-
-	using List
-	free  List
+type objPoolList struct {
+	times uint64
+	list  List
 }
 
-func (me *ObjPool) Init(conf *ObjPoolConf, op *ObjPoolOp) error {
-	me.ObjPoolOp = op
-	me.ObjPoolConf = *conf
+type ObjPool struct {
+	*ObjPoolOps
+	*ObjPoolConf
+
+	blockCount int // block count
+	blocks     []ObjPoolBlock
+
+	using objPoolList
+	freed objPoolList
+}
+
+func (me *ObjPool) Init(conf *ObjPoolConf, ops *ObjPoolOps) error {
+	me.ObjPoolOps = ops
+	me.ObjPoolConf = conf
+
+	me.blocks = make([]ObjPoolBlock, me.BlockLimit)
 
 	me.mkdir()
-
-	me.blocks = make([]objBlock, 0, me.BlockLimit)
 
 	return nil
 }
 
 func (me *ObjPool) Fini() error {
-	me.using.Init()
-	me.free.Init()
+	me.using.list.Init()
+	me.freed.list.Init()
 
 	count := me.blockCount
 	for i := 0; i < count; i++ {
 		block := me.block(i)
 
-		me.Close(block.mem)
-		block.rm()
+		block.fini(me.ObjPoolOps)
 	}
 
 	me.rmdir()
@@ -98,27 +105,51 @@ func (me *ObjPool) Fini() error {
 }
 
 func (me *ObjPool) Malloc() (unsafe.Pointer, error) {
-	if me.free.IsEmpty() {
-		err := me.addPool()
-		if nil != err {
-			return nil, err
-		}
+	err := me.preMalloc()
+	if nil != err {
+		return nil, err
 	}
 
-	node := me.free.First()
-	me.free.Remove(node)
-	me.using.InsertHead(node)
+	obj := me.malloc()
 
-	obj := (*objPoolNode)(unsafe.Pointer(node))
-
-	return obj.Pointer(), nil
+	return GetObjField(obj, SizeofListNode), nil
 }
 
 func (me *ObjPool) Free(obj unsafe.Pointer) {
-	node := objPool_obj2node(obj)
+	node := GetObjByField(obj, SizeofListNode)
 
-	me.using.Remove(&node.ListNode)
-	me.free.InsertHead(&node.ListNode)
+	me.free(node)
+}
+
+/******************************************************************************/
+
+func (me *ObjPool) preMalloc() error {
+	if me.freed.list.IsEmpty() {
+		err := me.addPool()
+		if nil != err {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (me *ObjPool) malloc() unsafe.Pointer {
+	node := me.freed.list.First()
+
+	me.freed.list.Remove(node)
+	me.using.list.InsertHead(node)
+	me.using.times++
+
+	return unsafe.Pointer(node)
+}
+
+func (me *ObjPool) free(obj unsafe.Pointer) {
+	node := (*objPoolNode)(obj)
+
+	me.using.list.Remove(node)
+	me.freed.list.InsertHead(node)
+	me.freed.times++
 }
 
 func (me *ObjPool) dir() string {
@@ -126,58 +157,71 @@ func (me *ObjPool) dir() string {
 }
 
 func (me *ObjPool) mkdir() {
-	FileName(me.dir()).Mkdir()
+	dir := me.dir()
+
+	FileName(dir).Mkdir()
 }
 
 func (me *ObjPool) rmdir() {
-	os.RemoveAll(me.dir())
+	dir := me.dir()
+
+	os.RemoveAll(dir)
 }
 
 func (me *ObjPool) file(iBlock int) string {
+	dir := me.dir()
 	file := fmt.Sprintf("04x", iBlock)
 
-	return filepath.Join(me.dir(), file)
+	return filepath.Join(dir, file)
 }
 
 func (me *ObjPool) objSize() int {
 	return me.ObjSize + SizeofListNode
 }
 
-func (me *ObjPool) block(iBlock int) *objBlock {
+func (me *ObjPool) block(iBlock int) *ObjPoolBlock {
 	return &me.blocks[iBlock]
 }
 
-func (me *ObjPool) newBlock(iBlock int) error {
+func (me *ObjPool) newBlock() (*ObjPoolBlock, error) {
+	iBlock := me.blockCount
 	file := me.file(iBlock)
 
 	mem, err := me.Create(file, me.BlockSize)
 	if nil != err {
-		return err
+		return nil, err
 	}
 
 	block := me.block(iBlock)
 	block.file = file
 	block.mem = mem
 
-	return nil
+	me.blockCount++
+
+	return block, nil
 }
 
 func (me *ObjPool) addPool() error {
-	iBlock := me.blockCount
-	if iBlock == me.BlockLimit {
-		return ErrNoSpace
+	if me.isFullBlock() {
+		return ErrLimit
 	}
 
-	err := me.newBlock(iBlock)
+	block, err := me.newBlock()
 	if nil != err {
 		return err
 	}
-	me.blockCount++
 
-	block := me.block(iBlock)
-	block.foreach(me.objSize(), func(obj *ListNode) {
-		me.free.InsertHead(obj)
-	})
+	me.addBlock(block)
 
 	return nil
+}
+
+func (me *ObjPool) addBlock(block *ObjPoolBlock) {
+	block.foreach(me.objSize(), func(obj *ListNode) {
+		me.freed.list.InsertHead(obj)
+	})
+}
+
+func (me *ObjPool) isFullBlock() bool {
+	return me.blockCount == me.BlockLimit
 }

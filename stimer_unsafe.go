@@ -10,6 +10,8 @@ const (
 	SizeofUnsafeStimerNode = SizeofListNode + SizeofPointer + 2*SizeofInt32
 )
 
+var scUnsafeStimerNode = NewSizeChecker("UnsafeStimerNode", unsafe.Sizeof(UnsafeStimerNode{}), SizeofUnsafeStimerNode)
+
 type UnsafeStimerNode struct {
 	Handle func(node *UnsafeStimerNode) error
 

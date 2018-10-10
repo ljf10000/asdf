@@ -1,11 +1,17 @@
 package asdf
 
+import (
+	"unsafe"
+)
+
 /******************************************************************************/
 
 const (
-	SizeofHListNode    = 4 * SizeofPointer
-	invalidHListBucket = -1
+	SizeofHashNode   = 4 * SizeofPointer
+	invalidHashBucket = -1
 )
+
+var scHashNode = NewSizeChecker("HashNode", unsafe.Sizeof(HashNode{}), SizeofHashNode)
 
 type HashNode struct {
 	iBucket int
@@ -15,14 +21,14 @@ type HashNode struct {
 }
 
 func (me *HashNode) Init() {
-	me.iBucket = invalidHListBucket
+	me.iBucket = invalidHashBucket
 	me.hash = nil
 	me.pprev = nil
 	me.next = nil
 }
 
 func (me *HashNode) InHash() bool {
-	return invalidHListBucket != me.iBucket && nil != me.pprev
+	return invalidHashBucket != me.iBucket && nil != me.pprev
 }
 
 func (me *HashNode) inTheHash(hash *Hash) bool {
