@@ -84,6 +84,25 @@ func (me *RwLock) Write(handler func() error) error {
 	return err
 }
 
+type RwLockOperator func(handler func())
+type RwLockOperatorE func(handler func() error) error
+
+func (me *RwLock) Operator(readonly bool) RwLockOperator {
+	if readonly {
+		return me.RHandle
+	} else {
+		return me.WHandle
+	}
+}
+
+func (me *RwLock) OperatorE(readonly bool) RwLockOperatorE {
+	if readonly {
+		return me.Read
+	} else {
+		return me.Write
+	}
+}
+
 type AccessLock struct {
 	Debug bool
 	Name  string
