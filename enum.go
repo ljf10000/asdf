@@ -133,18 +133,24 @@ func (me *EnumMapper) Index(name string) (int, error) {
 
 func (me *EnumMapper) Name(idx int) string {
 	if me.IsGoodIndex(idx) {
-		return me.Names[idx]
-	} else {
-		return Unknow
+		name := me.Names[idx]
+		if Empty != name {
+			return name
+		}
 	}
+
+	return Unknow
 }
 
 func (me *EnumMapper) NameEx(idx int) (string, bool) {
 	if me.IsGoodIndex(idx) {
-		return me.Names[idx], true
-	} else {
-		return Unknow, false
+		name := me.Names[idx]
+		if Empty != name {
+			return name, true
+		}
 	}
+
+	return Unknow, false
 }
 
 func (me *EnumMapper) IsGoodIndex(idx int) bool {
