@@ -177,6 +177,8 @@ func (me *CoLogger) Debug(format string, v ...interface{}) {
 func (me *CoLogger) Close() error {
 	// me.ch = nil
 
+	me.fd.Sync()
+
 	err := me.fd.Close()
 
 	me.fd = nil
