@@ -6,7 +6,7 @@ import (
 )
 
 func Panic(format string, v ...interface{}) {
-	Log.Emerg(format, v...)
+	Log.Emerg("Panic: "+format, v...)
 	time.Sleep(3 * time.Second)
 	Log.Close()
 
