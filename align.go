@@ -7,6 +7,9 @@ import (
 var (
 	PAGESIZE = os.Getpagesize()
 	PAGEMASK = PAGESIZE - 1
+
+	HUGEPAGESIZE = 2 * SizeofM
+	HUGEPAGEMASK = HUGEPAGESIZE - 1
 )
 
 func PageAlign64(size int64) int64 {
@@ -17,6 +20,16 @@ func PageAlign64(size int64) int64 {
 
 func PageAlign(size int) int {
 	return ((size + PAGEMASK) / PAGESIZE) * PAGESIZE
+}
+
+func HugePageAlign64(size int64) int64 {
+	page := int64(HUGEPAGESIZE)
+
+	return ((size + page - 1) / page) * page
+}
+
+func HugePageAlign(size int) int {
+	return ((size + HUGEPAGEMASK) / HUGEPAGESIZE) * HUGEPAGESIZE
 }
 
 func AlignU(x, align uint) uint {
