@@ -5,11 +5,14 @@ import (
 	"unsafe"
 )
 
-const SizeofStatCounter = 64
+const (
+	SizeofStatCounter   = SizeofCacheLine
+	CountofStatCouonter = SizeofStatCounter/SizeofInt64 - 1
+)
 
 type StatCounter struct {
 	v uint64
-	_ [7]uint64
+	_ [CountofStatCouonter]uint64
 }
 
 func (me *StatCounter) Add(v int) uint64 {
