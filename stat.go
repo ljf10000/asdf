@@ -10,6 +10,7 @@ const (
 	CountofStatCouonter = SizeofStatCounter/SizeofInt64 - 1
 )
 
+// align of cache line
 type StatCounter struct {
 	v uint64
 	_ [CountofStatCouonter]uint64
