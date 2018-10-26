@@ -45,7 +45,7 @@ func (me *BlockCap32) IsFull() bool {
 }
 
 func (me *BlockCap32) IsZero() bool {
-	return 0 == me.Size || 0 == me.Cap
+	return 0 == me.Size && 0 == me.Cap
 }
 
 func (me *BlockCap32) AddAlign(v uint32, align uint32) {
@@ -72,7 +72,7 @@ func (me *BlockCap64) IsFull() bool {
 }
 
 func (me *BlockCap64) IsZero() bool {
-	return 0 == me.Size || 0 == me.Cap
+	return 0 == me.Size && 0 == me.Cap
 }
 
 func (me *BlockCap64) Add32(v BlockCap32) {
