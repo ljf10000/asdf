@@ -63,7 +63,7 @@ type ObjPoolConf struct {
 
 func (me *ObjPoolConf) file(iBlock int) string {
 	dir := me.dir()
-	file := fmt.Sprintf("04x", iBlock)
+	file := fmt.Sprintf("%04x", iBlock)
 
 	return filepath.Join(dir, file)
 }
