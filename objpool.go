@@ -62,40 +62,9 @@ type ObjPoolConf struct {
 }
 
 func (me *ObjPoolConf) file(iBlock int) string {
-	dir := me.dir()
-	file := fmt.Sprintf("%04x", iBlock)
+	file := fmt.Sprintf("%s-%04x", me.Name, iBlock)
 
-	return filepath.Join(dir, file)
-}
-
-func (me *ObjPoolConf) dir() string {
-	return filepath.Join(me.Dev, me.Name)
-}
-
-func (me *ObjPoolConf) mkdir() error {
-	dir := me.dir()
-
-	err := FileName(dir).Mkdir()
-	if nil != err {
-		Log.Error("obj pool(%s) mkdir(%s) error:%s", me.Name, dir, err)
-
-		return err
-	}
-
-	return nil
-}
-
-func (me *ObjPoolConf) rmdir() error {
-	dir := me.dir()
-
-	err := os.RemoveAll(dir)
-	if nil != err {
-		Log.Error("obj pool(%s) rmdir(%s) error:%s", me.Name, dir, err)
-
-		return err
-	}
-
-	return nil
+	return filepath.Join(me.Dev, file)
 }
 
 /******************************************************************************/
@@ -122,7 +91,7 @@ func (me *ObjPool) Init(conf *ObjPoolConf, ops *ObjPoolOps) error {
 
 	me.blocks = make([]ObjPoolBlock, me.BlockLimit)
 
-	return me.mkdir()
+	return nil
 }
 
 func (me *ObjPool) Fini() error {
@@ -136,7 +105,7 @@ func (me *ObjPool) Fini() error {
 		block.fini(me.ObjPoolOps)
 	}
 
-	return me.rmdir()
+	return nil
 }
 
 func (me *ObjPool) Malloc() (unsafe.Pointer, error) {
