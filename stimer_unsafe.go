@@ -12,16 +12,19 @@ const (
 
 var scUnsafeStimerNode = NewSizeChecker("UnsafeStimerNode", unsafe.Sizeof(UnsafeStimerNode{}), SizeofUnsafeStimerNode)
 
+type UnsafeStimerHandle func(node *UnsafeStimerNode) error
+
 type UnsafeStimerNode struct {
-	Handle func(node *UnsafeStimerNode) error
+	handle UnsafeStimerHandle
 
 	node   ListNode
 	slot   uint32
 	expire uint32
 }
 
-func (me *UnsafeStimerNode) Init() {
+func (me *UnsafeStimerNode) Init(handle UnsafeStimerHandle) {
 	me.node.Init()
+	me.handle = handle
 }
 
 func (me *UnsafeStimerNode) Expire() int {
@@ -97,7 +100,7 @@ func (me *UnsafeStimer) Remove(node *UnsafeStimerNode) {
 	me.count--
 }
 
-func _ListNode_to_UnsafeStimerNode(node *ListNode) *UnsafeStimerNode {
+func unsafeStimerNode_from_listnode(node *ListNode) *UnsafeStimerNode {
 	return (*UnsafeStimerNode)(unsafe.Pointer(node))
 }
 
@@ -106,11 +109,13 @@ func (me *UnsafeStimer) Trigger() {
 
 	pos := slot.First()
 	for nil != pos {
-		node := _ListNode_to_UnsafeStimerNode(pos)
+		node := unsafeStimerNode_from_listnode(pos)
 
-		err := node.Handle(node)
+		Log.Debug("stimer[%s] trigger node[%p] pos[%p]", me.name, node, pos)
+
+		err := node.handle(node)
 		if nil != err {
-			Log.Error("timer[%s] handle node[%s] error:%s", me.name, node, err)
+			Log.Error("timer[%s] handle node[%p] error:%s", me.name, node, err)
 		}
 
 		me.Remove(node)
@@ -137,7 +142,7 @@ func (me *UnsafeStimer) Stop() {
 
 		pos := slot.First()
 		for nil != pos {
-			node := _ListNode_to_UnsafeStimerNode(pos)
+			node := unsafeStimerNode_from_listnode(pos)
 
 			me.Remove(node)
 			pos = slot.First()
