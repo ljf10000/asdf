@@ -89,21 +89,28 @@ func (me *ObjPool) Init(conf *ObjPoolConf, ops *ObjPoolOps) error {
 	me.ObjPoolOps = ops
 	me.ObjPoolConf = conf
 
+	me.using.list.Init()
+	me.freed.list.Init()
+
 	me.blocks = make([]ObjPoolBlock, me.BlockLimit)
+
+	Log.Debug("objpool %s init", me.Name)
 
 	return nil
 }
 
 func (me *ObjPool) Fini() error {
-	me.using.list.Init()
-	me.freed.list.Init()
-
 	count := me.blockCount
 	for i := 0; i < count; i++ {
 		block := me.block(i)
 
 		block.fini(me.ObjPoolOps)
 	}
+
+	me.using.list.Init()
+	me.freed.list.Init()
+
+	Log.Debug("objpool %s fini", me.Name)
 
 	return nil
 }
