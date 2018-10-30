@@ -10,16 +10,31 @@ const (
 	SizeofUnsafeStimerNode = SizeofListNode + SizeofPointer + 2*SizeofInt32
 )
 
-var scUnsafeStimerNode = NewSizeChecker("UnsafeStimerNode", unsafe.Sizeof(UnsafeStimerNode{}), SizeofUnsafeStimerNode)
+var (
+	zUnsafeStimerNode  = UnsafeStimerNode{}
+	scUnsafeStimerNode = NewSizeChecker("UnsafeStimerNode", unsafe.Sizeof(UnsafeStimerNode{}), SizeofUnsafeStimerNode)
+)
+
+func unsafe_stimer_node_from(node unsafe.Pointer, offset uintptr) *UnsafeStimerNode {
+	if nil != node {
+		return (*UnsafeStimerNode)(GetObjByField(node, offset))
+	} else {
+		return nil
+	}
+}
+
+func unsafe_stimer_node_from_listnode(node *ListNode) *UnsafeStimerNode {
+	return unsafe_stimer_node_from(unsafe.Pointer(node), unsafe.Offsetof(zUnsafeStimerNode.node))
+}
 
 type UnsafeStimerHandle func(node *UnsafeStimerNode) error
 
 type UnsafeStimerNode struct {
-	handle UnsafeStimerHandle
-
 	node   ListNode
 	slot   uint32
 	expire uint32
+
+	handle UnsafeStimerHandle
 }
 
 func (me *UnsafeStimerNode) Init(handle UnsafeStimerHandle) {
@@ -100,16 +115,12 @@ func (me *UnsafeStimer) Remove(node *UnsafeStimerNode) {
 	me.count--
 }
 
-func unsafeStimerNode_from_listnode(node *ListNode) *UnsafeStimerNode {
-	return (*UnsafeStimerNode)(unsafe.Pointer(node))
-}
-
 func (me *UnsafeStimer) Trigger() {
 	slot := me.slot(me.Current())
 
 	pos := slot.First()
 	for nil != pos {
-		node := unsafeStimerNode_from_listnode(pos)
+		node := unsafe_stimer_node_from_listnode(pos)
 
 		Log.Debug("stimer[%s] trigger node[%p] pos[%p]", me.name, node, pos)
 
@@ -142,7 +153,7 @@ func (me *UnsafeStimer) Stop() {
 
 		pos := slot.First()
 		for nil != pos {
-			node := unsafeStimerNode_from_listnode(pos)
+			node := unsafe_stimer_node_from_listnode(pos)
 
 			me.Remove(node)
 			pos = slot.First()
