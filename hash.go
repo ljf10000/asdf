@@ -7,7 +7,7 @@ import (
 /******************************************************************************/
 
 const (
-	SizeofHashNode   = 4 * SizeofPointer
+	SizeofHashNode    = 4 * SizeofPointer
 	invalidHashBucket = -1
 )
 
@@ -135,13 +135,26 @@ func (me *hashBucket) clean(handle HListForeach) {
 type HListIndex func() int
 type HListEq func(node *HashNode) bool
 
+type HashConf struct {
+	Name  string
+	Count int
+}
+
 type Hash struct {
+	name    string
 	buckets []hashBucket
 	count   int // all node count
 }
 
-func (me *Hash) Init(count int) {
-	me.buckets = make([]hashBucket, count)
+func (me *Hash) Init(conf *HashConf) {
+	me.name = conf.Name
+	me.buckets = make([]hashBucket, conf.Count)
+
+	Log.Debug("hash %s init", me)
+}
+
+func (me *Hash) String() string {
+	return me.name
 }
 
 func (me *Hash) Count() int {
@@ -224,4 +237,6 @@ func (me *Hash) Clean(handle HListForeach) {
 
 	me.buckets = nil
 	me.count = 0
+
+	Log.Debug("hash %s clean", me)
 }
