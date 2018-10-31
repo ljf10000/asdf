@@ -11,7 +11,7 @@ func TestIp(t *testing.T) {
 	bin := [4]byte{}
 
 	ipstring := "192.168.0.1"
-	(&ip).FromString(ipstring)
+	ip.FromString(ipstring)
 
 	binary.BigEndian.PutUint32(bin[:], uint32(ip))
 

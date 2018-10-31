@@ -41,17 +41,27 @@ func (me IpAddress) ToString() string {
 }
 
 func (me *IpAddress) FromString(s string) error {
-	*me = IpAddressFromString(s)
+	ip, err := IpAddressFromString(s)
+	if nil != err {
+		return err
+	}
+
+	*me = ip
 
 	return nil
 }
 
-func IpAddressFromString(s string) IpAddress {
+func IpAddressFromString(s string) (IpAddress, error) {
 	ip := [4]byte{}
 
-	fmt.Sscanf(s, "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3])
+	n, err := fmt.Sscanf(s, "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3])
+	if nil != err {
+		return 0, err
+	} else if 4 != n {
+		return 0, ErrBadIpAddress
+	}
 
-	return *(*IpAddress)(SlicePointer(ip[:]))
+	return *(*IpAddress)(SlicePointer(ip[:])), nil
 }
 
 func GetLocalAddress() []string {
