@@ -54,6 +54,7 @@ const (
 	StdErrBadPktLen
 	StdErrBadPktDir
 	StdErrBadVersion
+	StdErrBadIpAddress
 
 	StdErrBadHttpClientPost
 
@@ -98,24 +99,25 @@ var stdErrMap = map[int]string{
 	StdErrNoIpAddress: "no ipaddress",
 	StdErrNoConnected: "no connected",
 
-	StdErrBadID:      "bad ID",
-	StdErrBadObj:     "bad obj",
-	StdErrBadBuf:     "bad buf",
-	StdErrBadLen:     "bad length",
-	StdErrBadIdx:     "bad idx",
-	StdErrBadFsm:     "bad fsm",
-	StdErrBadIntf:    "bad interface",
-	StdErrBadType:    "bad type",
-	StdErrBadMac:     "bad mac",
-	StdErrBadName:    "bad name",
-	StdErrBadJson:    "bad json",
-	StdErrBadBody:    "bad body",
-	StdErrBadConf:    "bad config",
-	StdErrBadFile:    "bad file",
-	StdErrBadProto:   "bad proto",
-	StdErrBadPktLen:  "invalid packet length",
-	StdErrBadPktDir:  "bad packet dir",
-	StdErrBadVersion: "bad version",
+	StdErrBadID:        "bad ID",
+	StdErrBadObj:       "bad obj",
+	StdErrBadBuf:       "bad buf",
+	StdErrBadLen:       "bad length",
+	StdErrBadIdx:       "bad idx",
+	StdErrBadFsm:       "bad fsm",
+	StdErrBadIntf:      "bad interface",
+	StdErrBadType:      "bad type",
+	StdErrBadMac:       "bad mac",
+	StdErrBadName:      "bad name",
+	StdErrBadJson:      "bad json",
+	StdErrBadBody:      "bad body",
+	StdErrBadConf:      "bad config",
+	StdErrBadFile:      "bad file",
+	StdErrBadProto:     "bad proto",
+	StdErrBadPktLen:    "invalid packet length",
+	StdErrBadPktDir:    "bad packet dir",
+	StdErrBadVersion:   "bad version",
+	StdErrBadIpAddress: "bad ip address",
 
 	StdErrBadHttpClientPost: "http client post error",
 
@@ -158,24 +160,25 @@ var (
 	ErrNoIpAddress = NewError(StdErrNoIpAddress)
 	ErrNoConnected = NewError(StdErrNoConnected)
 
-	ErrBadID      = NewError(StdErrBadID)
-	ErrBadObj     = NewError(StdErrBadObj)
-	ErrBadBuf     = NewError(StdErrBadBuf)
-	ErrBadLen     = NewError(StdErrBadLen)
-	ErrBadIdx     = NewError(StdErrBadIdx)
-	ErrBadFsm     = NewError(StdErrBadFsm)
-	ErrBadIntf    = NewError(StdErrBadIntf)
-	ErrBadType    = NewError(StdErrBadType)
-	ErrBadMac     = NewError(StdErrBadMac)
-	ErrBadName    = NewError(StdErrBadName)
-	ErrBadJson    = NewError(StdErrBadJson)
-	ErrBadBody    = NewError(StdErrBadBody)
-	ErrBadConf    = NewError(StdErrBadConf)
-	ErrBadFile    = NewError(StdErrBadFile)
-	ErrBadProto   = NewError(StdErrBadProto)
-	ErrBadPktLen  = NewError(StdErrBadPktLen)
-	ErrBadPktDir  = NewError(StdErrBadPktDir)
-	ErrBadVersion = NewError(StdErrBadVersion)
+	ErrBadID        = NewError(StdErrBadID)
+	ErrBadObj       = NewError(StdErrBadObj)
+	ErrBadBuf       = NewError(StdErrBadBuf)
+	ErrBadLen       = NewError(StdErrBadLen)
+	ErrBadIdx       = NewError(StdErrBadIdx)
+	ErrBadFsm       = NewError(StdErrBadFsm)
+	ErrBadIntf      = NewError(StdErrBadIntf)
+	ErrBadType      = NewError(StdErrBadType)
+	ErrBadMac       = NewError(StdErrBadMac)
+	ErrBadName      = NewError(StdErrBadName)
+	ErrBadJson      = NewError(StdErrBadJson)
+	ErrBadBody      = NewError(StdErrBadBody)
+	ErrBadConf      = NewError(StdErrBadConf)
+	ErrBadFile      = NewError(StdErrBadFile)
+	ErrBadProto     = NewError(StdErrBadProto)
+	ErrBadPktLen    = NewError(StdErrBadPktLen)
+	ErrBadPktDir    = NewError(StdErrBadPktDir)
+	ErrBadVersion   = NewError(StdErrBadVersion)
+	ErrBadIpAddress = NewError(StdErrBadIpAddress)
 
 	ErrBadHttpClientPost = NewError(StdErrBadHttpClientPost)
 
