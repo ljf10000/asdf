@@ -84,6 +84,14 @@ func (me Time64) String() string {
 	return me.Unix().Format(TimeFormat)
 }
 
+func (me Time64) Diff(tm Time64) int {
+	if me > tm {
+		return int(me - tm)
+	} else {
+		return int(tm - me)
+	}
+}
+
 func (me Time64) Unix() time.Time {
 	s, n := me.Split()
 
@@ -143,6 +151,10 @@ func MakeTimespec(second Time32, nano Timens) Timespec {
 		Second: second,
 		Nano:   nano,
 	}
+}
+
+func (me Timespec) Diff(tm Timespec) int {
+	return me.Time64().Diff(tm.Time64())
 }
 
 func (me Timespec) IsGood() bool {
@@ -500,4 +512,12 @@ func (me Timezone) Compare(v Timezone) int {
 		//       |--------------- v ----------------|
 		return 0
 	}
+}
+
+/******************************************************************************/
+
+type TimeTask struct {
+	Begin string `json:"begin"`
+	End   string `json:"end"`
+	Used  int
 }
