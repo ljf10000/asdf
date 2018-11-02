@@ -224,3 +224,67 @@ func (me *LogMsg) String() string {
 }
 
 var Log ILogger = Console
+
+/******************************************************************************/
+
+type LogModule uint64
+
+func (me *LogModule) isLog(module int) bool {
+	flag := uint64(1) << uint64(module)
+
+	return nil == me || flag == (flag&uint64(*me))
+}
+
+func (me *LogModule) Emerg(module int, format string, v ...interface{}) {
+	if me.isLog(module) {
+		Log.Log(LogLevelEmerg, format, v...)
+	}
+}
+
+func (me *LogModule) Alert(module int, format string, v ...interface{}) {
+	if me.isLog(module) {
+		Log.Log(LogLevelAlert, format, v...)
+	}
+}
+
+func (me *LogModule) Crit(module int, format string, v ...interface{}) {
+	if me.isLog(module) {
+		Log.Log(LogLevelCrit, format, v...)
+	}
+}
+
+func (me *LogModule) Error(module int, format string, v ...interface{}) {
+	if me.isLog(module) {
+		Log.Log(LogLevelError, format, v...)
+	}
+}
+
+func (me *LogModule) Warning(module int, format string, v ...interface{}) {
+	if me.isLog(module) {
+		Log.Log(LogLevelWarning, format, v...)
+	}
+}
+
+func (me *LogModule) Warn(module int, format string, v ...interface{}) {
+	if me.isLog(module) {
+		Log.Log(LogLevelWarn, format, v...)
+	}
+}
+
+func (me *LogModule) Notice(module int, format string, v ...interface{}) {
+	if me.isLog(module) {
+		Log.Log(LogLevelNotice, format, v...)
+	}
+}
+
+func (me *LogModule) Info(module int, format string, v ...interface{}) {
+	if me.isLog(module) {
+		Log.Log(LogLevelInfo, format, v...)
+	}
+}
+
+func (me *LogModule) Debug(module int, format string, v ...interface{}) {
+	if me.isLog(module) {
+		Log.Log(LogLevelDebug, format, v...)
+	}
+}
