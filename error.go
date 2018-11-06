@@ -30,6 +30,7 @@ const (
 	StdErrNoDir
 	StdErrNoMatch
 	StdErrNoSpace
+	StdErrNoMemory
 	StdErrNoPermit
 	StdErrNoAlign
 	StdErrNoIntf
@@ -93,6 +94,7 @@ var stdErrMap = map[int]string{
 	StdErrNoDir:       "no dir",
 	StdErrNoMatch:     "no match",
 	StdErrNoSpace:     "no space",
+	StdErrNoMemory:    "no memory",
 	StdErrNoPermit:    "no permit",
 	StdErrNoAlign:     "no align",
 	StdErrNoIntf:      "no intf",
@@ -154,6 +156,7 @@ var (
 	ErrNoDir       = NewError(StdErrNoDir)
 	ErrNoMatch     = NewError(StdErrNoMatch)
 	ErrNoSpace     = NewError(StdErrNoSpace)
+	ErrNoMemory    = NewError(StdErrNoMemory)
 	ErrNoPermit    = NewError(StdErrNoPermit)
 	ErrNoAlign     = NewError(StdErrNoAlign)
 	ErrNoIntf      = NewError(StdErrNoIntf)
