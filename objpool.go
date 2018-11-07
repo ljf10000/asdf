@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"unsafe"
 )
 
@@ -118,6 +119,22 @@ func (me *ObjPool) UpdateStat(stat *ObjPoolStat) {
 	stat.Obj.Using.Count = me.using.list.count
 	stat.Obj.Freed.Times = int(me.freed.times)
 	stat.Obj.Freed.Count = me.freed.list.count
+}
+
+func ObjPoolPrepare(root, prefix string) error {
+	Prefix := filepath.Join(root, prefix)
+
+	return filepath.Walk(root, func(path string, f os.FileInfo, err error) error {
+		if nil == f {
+			return err
+		}
+
+		if !f.IsDir() && strings.HasPrefix(path, Prefix) {
+			FileName(path).Delete()
+		}
+
+		return nil
+	})
 }
 
 type ObjPool struct {
