@@ -74,6 +74,52 @@ type objPoolList struct {
 	list  List
 }
 
+type ObjPoolStat struct {
+	Dev  string `json:"dev"`
+	Name string `json:"name"`
+
+	Block struct {
+		Limit int `json:"limit"`
+		Count int `json:"count"`
+		Size  int `json:"size"`
+	} `json:"block"`
+
+	Obj struct {
+		Size  int `json:"size"`
+		Using struct {
+			Times int `json:"times"`
+			Count int `json:"count"`
+		} `json:"using"`
+		Freed struct {
+			Times int `json:"times"`
+			Count int `json:"count"`
+		} `json:"freed"`
+	} `json:"obj"`
+}
+
+func (me *ObjPool) Stat() ObjPoolStat {
+	stat := ObjPoolStat{
+		Name: me.Name,
+		Dev:  me.Dev,
+	}
+
+	stat.Block.Limit = me.BlockLimit
+	stat.Block.Size = me.BlockSize
+
+	stat.Obj.Size = me.ObjSize
+
+	return stat
+}
+
+func (me *ObjPool) UpdateStat(stat *ObjPoolStat) {
+	stat.Block.Count = me.blockCount
+
+	stat.Obj.Using.Times = int(me.using.times)
+	stat.Obj.Using.Count = me.using.list.count
+	stat.Obj.Freed.Times = int(me.freed.times)
+	stat.Obj.Freed.Count = me.freed.list.count
+}
+
 type ObjPool struct {
 	*ObjPoolOps
 	*ObjPoolConf
