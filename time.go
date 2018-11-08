@@ -373,6 +373,10 @@ func (me Timezone32) Include(z Timezone32) bool {
 	return me.Begin <= z.Begin && me.End >= z.End
 }
 
+func (me Timezone32) Match(v Timezone32) bool {
+	return v.Begin.InZone(me) || v.End.InZone(me)
+}
+
 func (me Timezone32) Intersect(v Timezone32) Timezone32 {
 	if v.Begin.InZone(me) {
 		if v.End.InZone(me) {

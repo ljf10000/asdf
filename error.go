@@ -54,6 +54,7 @@ const (
 	StdErrBadProto
 	StdErrBadPktLen
 	StdErrBadPktDir
+	StdErrBadFormat
 	StdErrBadVersion
 	StdErrBadIpAddress
 
@@ -118,6 +119,7 @@ var stdErrMap = map[int]string{
 	StdErrBadProto:     "bad proto",
 	StdErrBadPktLen:    "invalid packet length",
 	StdErrBadPktDir:    "bad packet dir",
+	StdErrBadFormat:    "bad format",
 	StdErrBadVersion:   "bad version",
 	StdErrBadIpAddress: "bad ip address",
 
@@ -180,6 +182,7 @@ var (
 	ErrBadProto     = NewError(StdErrBadProto)
 	ErrBadPktLen    = NewError(StdErrBadPktLen)
 	ErrBadPktDir    = NewError(StdErrBadPktDir)
+	ErrBadFormat    = NewError(StdErrBadFormat)
 	ErrBadVersion   = NewError(StdErrBadVersion)
 	ErrBadIpAddress = NewError(StdErrBadIpAddress)
 
