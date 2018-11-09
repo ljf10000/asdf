@@ -661,14 +661,14 @@ func (me IpPairFilters) String() string {
 	return "[" + s + "]"
 }
 
-func (me IpPairFilters) Match(a, b IpAddress) bool {
+func (me IpPairFilters) Match(a, b IpAddress) (*IpPairFilter, bool) {
 	for _, v := range me {
 		if v.Match(a, b) {
-			return true
+			return v, true
 		}
 	}
 
-	return false
+	return nil, false
 }
 
 func (me IpPairFilters) Itoa() IpPairFilterStrs {
