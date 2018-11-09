@@ -244,23 +244,20 @@ func (me IpZone) String() string {
 }
 
 func (me *IpZone) FromString(s string) error {
-	var sBegin, sEnd string
-
-	n, err := fmt.Sscanf(s, "%s-%s", &sBegin, &sEnd)
+	split := strings.Split(s, "/")
+	n := len(split)
 	if 2 != n {
 		return ErrSprintf("ip zone(%s) parse error: n(%d) not 2", s, n)
-	} else if nil != err {
-		return err
 	}
 
 	var Begin, End IpAddress
 
-	err = Begin.FromString(sBegin)
+	err := Begin.FromString(split[0])
 	if nil != err {
 		return err
 	}
 
-	err = End.FromString(sEnd)
+	err = End.FromString(split[1])
 	if nil != err {
 		return err
 	}
