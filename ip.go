@@ -187,7 +187,7 @@ func (me *IpSubnet) FromString(s string) error {
 	var Len IpMaskLen
 	var Ip IpAddress
 
-	err = Ip.FromString(split[0])
+	err := Ip.FromString(split[0])
 	if nil != err {
 		return err
 	}
