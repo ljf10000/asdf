@@ -12,10 +12,10 @@ func IpAddressFromString(s string) (IpAddress, error) {
 	ip := [4]byte{}
 
 	n, err := fmt.Sscanf(s, "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3])
-	if nil != err {
+	if 4 != n {
+		return 0, ErrSprintf("ip address(%s) parse error", s)
+	} else if nil != err {
 		return 0, err
-	} else if 4 != n {
-		return 0, ErrBadIpAddress
 	}
 
 	return *(*IpAddress)(SlicePointer(ip[:])), nil
@@ -179,7 +179,7 @@ func (me *IpSubnet) FromString(s string) error {
 
 	n, err := fmt.Sscanf(s, "%s/%s", sIp, sLen)
 	if 2 != n {
-		return ErrBadFormat
+		return ErrSprintf("ip subnet(%s) parse error", s)
 	} else if nil != err {
 		return err
 	}
@@ -248,7 +248,7 @@ func (me *IpZone) FromString(s string) error {
 
 	n, err := fmt.Sscanf(s, "%s-%s", sBegin, sEnd)
 	if 2 != n {
-		return ErrBadFormat
+		return ErrSprintf("ip zone(%s) parse error", s)
 	} else if nil != err {
 		return err
 	}
@@ -538,21 +538,21 @@ func (me *IpFilterStr) Atoi() (*IpFilter, error) {
 		if Empty != me.Ip {
 			err := obj.Ip.FromString(me.Ip)
 			if nil != err {
-				return nil, ErrSprintf("ip: %s, error: %s", me.Ip, err)
+				return nil, ErrSprintf("parse ip-filter's ip error: %s", err)
 			}
 		}
 
 		if Empty != me.Subnet {
 			err := obj.Subnet.FromString(me.Subnet)
 			if nil != err {
-				return nil, ErrSprintf("subnet: %s, error: %s", me.Subnet, err)
+				return nil, ErrSprintf("parse ip-filter's subnet error: %s", err)
 			}
 		}
 
 		if Empty != me.Zone {
 			err := obj.Zone.FromString(me.Zone)
 			if nil != err {
-				return nil, ErrSprintf("zone: %s, error: %s", me.Zone, err)
+				return nil, ErrSprintf("parse ip-filter's zone error: %s", err)
 			}
 		}
 
@@ -562,7 +562,7 @@ func (me *IpFilterStr) Atoi() (*IpFilter, error) {
 			for k, v := range me.List {
 				err := ip.FromString(v)
 				if nil != err {
-					return nil, ErrSprintf("list[%d]: %s, error: %s", k, v, err)
+					return nil, ErrSprintf("parse ip-filter's list[%d] error: %s", k, err)
 				}
 
 				obj.Map[ip] = true
