@@ -417,6 +417,10 @@ func (me *IpFilter) setType(Type IpResType) {
 	me.TypeMask |= Type.TypeMask()
 }
 
+func (me *IpFilter) HasAny() bool {
+	return me.hasType(IpResAny)
+}
+
 func (me *IpFilter) SetAny() {
 	me.setType(IpResAny)
 }
@@ -470,7 +474,7 @@ func (me *IpFilter) Match(ip IpAddress) bool {
 func (me *IpFilter) Itoa() *IpFilterStr {
 	obj := &IpFilterStr{}
 
-	if me.hasType(IpResAny) {
+	if me.HasAny() {
 		obj.Any = true
 	} else {
 		if me.hasType(IpResAddress) {
@@ -553,6 +557,8 @@ func (me *IpFilterStr) Atoi() (*IpFilter, error) {
 			if nil != err {
 				return nil, ErrSprintf("parse ip-filter's ip error: %s", err)
 			}
+
+			obj.setType(IpResAddress)
 		}
 
 		if Empty != me.Subnet {
@@ -560,6 +566,8 @@ func (me *IpFilterStr) Atoi() (*IpFilter, error) {
 			if nil != err {
 				return nil, ErrSprintf("parse ip-filter's subnet error: %s", err)
 			}
+
+			obj.setType(IpResSubnet)
 		}
 
 		if Empty != me.Zone {
@@ -567,6 +575,8 @@ func (me *IpFilterStr) Atoi() (*IpFilter, error) {
 			if nil != err {
 				return nil, ErrSprintf("parse ip-filter's zone error: %s", err)
 			}
+
+			obj.setType(IpResZone)
 		}
 
 		if len(me.List) > 0 {
@@ -580,6 +590,8 @@ func (me *IpFilterStr) Atoi() (*IpFilter, error) {
 
 				obj.Map[ip] = true
 			}
+
+			obj.setType(IpResMap)
 		}
 	}
 
@@ -660,7 +672,7 @@ func (me IpPairFilters) Match(a, b IpAddress) bool {
 }
 
 func (me IpPairFilters) Itoa() IpPairFilterStrs {
-	obj := IpPairFilterStrs{}
+	var obj IpPairFilterStrs
 
 	for _, v := range me {
 		obj = append(obj, v.Itoa())
@@ -686,7 +698,7 @@ func (me IpPairFilterStrs) String() string {
 }
 
 func (me IpPairFilterStrs) Atoi() (IpPairFilters, error) {
-	obj := IpPairFilters{}
+	var obj IpPairFilters
 
 	for _, v := range me {
 		tmp, err := v.Atoi()
