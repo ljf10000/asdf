@@ -164,6 +164,7 @@ func (me IpAddress) InSubnet(v IpSubnet) bool {
 }
 
 /******************************************************************************/
+const IpSubnetSplit = "/"
 
 type IpSubnet struct {
 	Ip  IpAddress `json:"ip"`
@@ -171,14 +172,14 @@ type IpSubnet struct {
 }
 
 func (me IpSubnet) String() string {
-	return fmt.Sprintf("%s/%d", me.Ip, me.Len)
+	return me.Ip.String() + IpSubnetSplit + me.Len.String()
 }
 
 func (me *IpSubnet) FromString(s string) error {
 	// n, err := fmt.Sscanf(s, "%s/%d", &sIp, &Len)'
 	// fuck, n always 1, why ?
 
-	split := strings.Split(s, "/")
+	split := strings.Split(s, IpSubnetSplit)
 	n := len(split)
 	if 2 != n {
 		return ErrSprintf("ip subnet(%s) parse error: n(%d) not 2", s, n)
@@ -234,17 +235,19 @@ func (me IpSubnet) Include(v IpSubnet) bool {
 
 /******************************************************************************/
 
+const IpZoneSplit = "-"
+
 type IpZone struct {
 	Begin IpAddress `json:"begin"`
 	End   IpAddress `json:"end"`
 }
 
 func (me IpZone) String() string {
-	return fmt.Sprintf("%s-%s", me.Begin, me.End)
+	return me.Begin.String() + IpZoneSplit + me.End.String()
 }
 
 func (me *IpZone) FromString(s string) error {
-	split := strings.Split(s, "-")
+	split := strings.Split(s, IpZoneSplit)
 	n := len(split)
 	if 2 != n {
 		return ErrSprintf("ip zone(%s) parse error: n(%d) not 2", s, n)
@@ -373,15 +376,15 @@ func (me *IpFilter) String() string {
 		s := Empty
 
 		if me.hasType(IpResAddress) {
-			s += fmt.Sprintf(", ip: %s", me.Ip)
+			s += ", ip: " + me.Ip.String()
 		}
 
 		if me.hasType(IpResSubnet) {
-			s += fmt.Sprintf(", subnet: %s", &me.Subnet)
+			s += ", subnet: " + me.Subnet.String()
 		}
 
 		if me.hasType(IpResZone) {
-			s += fmt.Sprintf(", zone: %s", &me.Zone)
+			s += ", zone: " + me.Zone.String()
 		}
 
 		if me.hasType(IpResMap) {
@@ -391,10 +394,16 @@ func (me *IpFilter) String() string {
 				ss += ", " + k.String()
 			}
 
-			s += ", map:[" + ss[2:] + "]"
+			if len(ss) > 0 {
+				s += ", map:[" + ss[2:] + "]"
+			}
 		}
 
-		return s[2:]
+		if len(s) > 0 {
+			s = s[2:]
+		}
+
+		return s
 	}
 }
 
@@ -501,15 +510,15 @@ func (me *IpFilterStr) String() string {
 		s := Empty
 
 		if Empty != me.Ip {
-			s += fmt.Sprintf(", ip: %s", me.Ip)
+			s += ", ip: " + me.Ip
 		}
 
 		if Empty != me.Subnet {
-			s += fmt.Sprintf(", subnet: %s", me.Subnet)
+			s += ", subnet: " + me.Subnet
 		}
 
 		if Empty != me.Zone {
-			s += fmt.Sprintf(", zone: %s", me.Zone)
+			s += ", zone: " + me.Zone
 		}
 
 		if len(me.List) > 0 {
@@ -519,10 +528,17 @@ func (me *IpFilterStr) String() string {
 				ss += ", " + v
 			}
 
-			s += ", list:[" + ss[2:] + "]"
+			if len(ss) > 0 {
+				s += ", list:[" + ss[2:] + "]"
+			}
+
 		}
 
-		return s[2:]
+		if len(s) > 0 {
+			s = s[2:]
+		}
+
+		return s
 	}
 }
 
@@ -626,7 +642,11 @@ func (me IpPairFilters) String() string {
 		s += fmt.Sprintf(", %d:%s", k, v)
 	}
 
-	return "[" + s[2:] + "]"
+	if len(s) > 0 {
+		s = s[2:]
+	}
+
+	return "[" + s + "]"
 }
 
 func (me IpPairFilters) Match(a, b IpAddress) bool {
@@ -658,7 +678,11 @@ func (me IpPairFilterStrs) String() string {
 		s += fmt.Sprintf(", %d:%s", k, v)
 	}
 
-	return "[" + s[2:] + "]"
+	if len(s) > 0 {
+		s = s[2:]
+	}
+
+	return "[" + s + "]"
 }
 
 func (me IpPairFilterStrs) Atoi() (IpPairFilters, error) {
