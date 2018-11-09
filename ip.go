@@ -178,7 +178,7 @@ func (me *IpSubnet) FromString(s string) error {
 	var sIp string
 	var Len IpMaskLen
 
-	n, err := fmt.Sscanf(s, "%s\/%d", &sIp, &Len)
+	n, err := fmt.Sscanf(s, "%s/%d", &sIp, &Len)
 	if 2 != n {
 		return ErrSprintf("ip subnet(%s) parse error: n(%d) not 2", s, n)
 	} else if nil != err {
