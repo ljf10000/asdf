@@ -13,7 +13,7 @@ func IpAddressFromString(s string) (IpAddress, error) {
 
 	n, err := fmt.Sscanf(s, "%d.%d.%d.%d", &ip[0], &ip[1], &ip[2], &ip[3])
 	if 4 != n {
-		return 0, ErrSprintf("ip address(%s) parse error", s)
+		return 0, ErrSprintf("ip address(%s) parse error: n(%d) not 4", s, n)
 	} else if nil != err {
 		return 0, err
 	}
@@ -180,7 +180,7 @@ func (me *IpSubnet) FromString(s string) error {
 
 	n, err := fmt.Sscanf(s, "%s/%d", &sIp, &Len)
 	if 2 != n {
-		return ErrSprintf("ip subnet(%s) parse error", s)
+		return ErrSprintf("ip subnet(%s) parse error: n(%d) not 2", s, n)
 	} else if nil != err {
 		return err
 	}
@@ -240,7 +240,7 @@ func (me *IpZone) FromString(s string) error {
 
 	n, err := fmt.Sscanf(s, "%s-%s", &sBegin, &sEnd)
 	if 2 != n {
-		return ErrSprintf("ip zone(%s) parse error", s)
+		return ErrSprintf("ip zone(%s) parse error: n(%d) not 2", s, n)
 	} else if nil != err {
 		return err
 	}
