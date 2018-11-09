@@ -175,29 +175,21 @@ func (me IpSubnet) String() string {
 }
 
 func (me *IpSubnet) FromString(s string) error {
-	var sIp, sLen string
+	var sIp string
+	var Len IpMaskLen
 
-	n, err := fmt.Sscanf(s, "%s/%s", sIp, sLen)
+	n, err := fmt.Sscanf(s, "%s/%d", &sIp, &Len)
 	if 2 != n {
 		return ErrSprintf("ip subnet(%s) parse error", s)
 	} else if nil != err {
 		return err
 	}
 
-	var Ip IpAddress
-	var Len IpMaskLen
-
-	err = Ip.FromString(sIp)
+	err = me.Ip.FromString(sIp)
 	if nil != err {
 		return err
 	}
 
-	err = Len.FromString(sLen)
-	if nil != err {
-		return err
-	}
-
-	me.Ip = Ip
 	me.Len = Len
 
 	return nil
@@ -246,7 +238,7 @@ func (me IpZone) String() string {
 func (me *IpZone) FromString(s string) error {
 	var sBegin, sEnd string
 
-	n, err := fmt.Sscanf(s, "%s-%s", sBegin, sEnd)
+	n, err := fmt.Sscanf(s, "%s-%s", &sBegin, &sEnd)
 	if 2 != n {
 		return ErrSprintf("ip zone(%s) parse error", s)
 	} else if nil != err {
