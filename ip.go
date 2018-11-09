@@ -538,31 +538,35 @@ func (me *IpFilterStr) Atoi() (*IpFilter, error) {
 		if Empty != me.Ip {
 			err := obj.Ip.FromString(me.Ip)
 			if nil != err {
-				return nil, err
+				return nil, ErrLog("[fs web: bad ip filter] ip: %s, error: %s",
+					me.Ip, err)
 			}
 		}
 
 		if Empty != me.Subnet {
 			err := obj.Subnet.FromString(me.Subnet)
 			if nil != err {
-				return nil, err
+				return nil, ErrLog("[fs web: bad ip filter] subnet: %s, error: %s",
+					me.Subnet, err)
 			}
 		}
 
 		if Empty != me.Zone {
 			err := obj.Zone.FromString(me.Zone)
 			if nil != err {
-				return nil, err
+				return nil, ErrLog("[fs web: bad ip filter] zone: %s, error: %s",
+					me.Zone, err)
 			}
 		}
 
 		if len(me.List) > 0 {
 			var ip IpAddress
 
-			for _, v := range me.List {
+			for k, v := range me.List {
 				err := ip.FromString(v)
 				if nil != err {
-					return nil, err
+					return nil, ErrLog("[fs web: bad ip filter] list[%d]: %s, error: %s",
+						k, v, err)
 				}
 
 				obj.Map[ip] = true
