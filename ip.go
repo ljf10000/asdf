@@ -244,7 +244,7 @@ func (me IpZone) String() string {
 }
 
 func (me *IpZone) FromString(s string) error {
-	split := strings.Split(s, "/")
+	split := strings.Split(s, "-")
 	n := len(split)
 	if 2 != n {
 		return ErrSprintf("ip zone(%s) parse error: n(%d) not 2", s, n)
