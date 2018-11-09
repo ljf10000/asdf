@@ -176,7 +176,7 @@ func (me IpSubnet) String() string {
 
 func (me *IpSubnet) FromString(s string) error {
 	// n, err := fmt.Sscanf(s, "%s/%d", &sIp, &Len)'
-	// fuck, n always 1, why ???
+	// fuck, n always 1, why ?
 
 	split := strings.Split(s, "/")
 	n := len(split)
