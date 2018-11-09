@@ -177,7 +177,7 @@ func (me IpSubnet) String() string {
 func (me *IpSubnet) FromString(s string) error {
 	var sIp, sLen string
 
-	n, err := fmt.Sscanf("%s/%s", s, sIp, sLen)
+	n, err := fmt.Sscanf(s, "%s/%s", sIp, sLen)
 	if 2 != n {
 		return ErrBadFormat
 	} else if nil != err {
@@ -246,7 +246,7 @@ func (me IpZone) String() string {
 func (me *IpZone) FromString(s string) error {
 	var sBegin, sEnd string
 
-	n, err := fmt.Sscanf("%s-%s", s, sBegin, sEnd)
+	n, err := fmt.Sscanf(s, "%s-%s", sBegin, sEnd)
 	if 2 != n {
 		return ErrBadFormat
 	} else if nil != err {
@@ -538,24 +538,21 @@ func (me *IpFilterStr) Atoi() (*IpFilter, error) {
 		if Empty != me.Ip {
 			err := obj.Ip.FromString(me.Ip)
 			if nil != err {
-				return nil, ErrLog("[fs web: bad ip filter] ip: %s, error: %s",
-					me.Ip, err)
+				return nil, ErrSprintf("ip: %s, error: %s", me.Ip, err)
 			}
 		}
 
 		if Empty != me.Subnet {
 			err := obj.Subnet.FromString(me.Subnet)
 			if nil != err {
-				return nil, ErrLog("[fs web: bad ip filter] subnet: %s, error: %s",
-					me.Subnet, err)
+				return nil, ErrSprintf("subnet: %s, error: %s", me.Subnet, err)
 			}
 		}
 
 		if Empty != me.Zone {
 			err := obj.Zone.FromString(me.Zone)
 			if nil != err {
-				return nil, ErrLog("[fs web: bad ip filter] zone: %s, error: %s",
-					me.Zone, err)
+				return nil, ErrSprintf("zone: %s, error: %s", me.Zone, err)
 			}
 		}
 
@@ -565,8 +562,7 @@ func (me *IpFilterStr) Atoi() (*IpFilter, error) {
 			for k, v := range me.List {
 				err := ip.FromString(v)
 				if nil != err {
-					return nil, ErrLog("[fs web: bad ip filter] list[%d]: %s, error: %s",
-						k, v, err)
+					return nil, ErrSprintf("list[%d]: %s, error: %s", k, v, err)
 				}
 
 				obj.Map[ip] = true
