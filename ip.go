@@ -535,7 +535,6 @@ func (me *IpFilterStr) String() string {
 			if len(ss) > 0 {
 				s += ", list:[" + ss[2:] + "]"
 			}
-
 		}
 
 		if len(s) > 0 {
@@ -610,7 +609,7 @@ func (me *IpPairFilter) String() string {
 
 func (me *IpPairFilter) Match(a, b IpAddress) bool {
 	return (me.Pair[0].Match(a) && me.Pair[1].Match(b)) ||
-		(me.Pair[1].Match(a) && me.Pair[0].Match(b))
+		(me.Pair[0].Match(b) && me.Pair[1].Match(a))
 }
 
 func (me *IpPairFilter) Itoa() *IpPairFilterStr {
@@ -710,4 +709,32 @@ func (me IpPairFilterStrs) Atoi() (IpPairFilters, error) {
 	}
 
 	return obj, nil
+}
+
+/******************************************************************************/
+
+type IpPairCache map[Ip2Tuple]bool
+
+func (me IpPairCache) isMatch(sip, dip IpAddress) bool {
+	tuple := Ip2Tuple{
+		Sip: sip,
+		Dip: dip,
+	}
+
+	_, ok := me[tuple]
+
+	return ok
+}
+
+func (me IpPairCache) AddCache(sip, dip IpAddress) {
+	tuple := Ip2Tuple{
+		Sip: sip,
+		Dip: dip,
+	}
+
+	me[tuple] = true
+}
+
+func (me IpPairCache) IsMatch(sip, dip IpAddress) bool {
+	return me.isMatch(sip, dip) || me.isMatch(dip, sip)
 }

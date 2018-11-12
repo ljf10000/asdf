@@ -5,6 +5,7 @@ var sizeCheckers = []*SizeChecker{
 	scList,
 	scHashNode,
 	scUnsafeStimerNode,
+	scIp2Tuple,
 }
 
 func initEnum() {
