@@ -26,7 +26,7 @@ func IpAddressFromString(s string) (IpAddress, error) {
 	}
 
 	for i := 0; i < 4; i++ {
-		v, err := strconv.Atoi(split[0])
+		v, err := strconv.Atoi(split[i])
 		if nil != err {
 			return 0, ErrSprintf("ip address(%s) parse error: %s", s, err)
 		}
