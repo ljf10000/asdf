@@ -8,6 +8,8 @@ import (
 	"unsafe"
 )
 
+/******************************************************************************/
+
 func IpAddressFromString(s string) (IpAddress, error) {
 	ip := [4]byte{}
 
