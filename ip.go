@@ -602,12 +602,14 @@ func (me *IpFilterStr) Atoi() (*IpFilter, error) {
 /******************************************************************************/
 
 type IpPairFilter struct {
-	Hit  [2]uint64
+	Hit  [2]int
 	Pair [2]IpFilter
 }
 
 func (me *IpPairFilter) String() string {
-	return "[" + me.Pair[0].String() + ", " + me.Pair[1].String() + "]"
+	return "[" +
+		strconv.Itoa(me.Hit[0]) + ":" + me.Pair[0].String() + ", " +
+		strconv.Itoa(me.Hit[1]) + ":" + me.Pair[1].String() + "]"
 }
 
 func (me *IpPairFilter) IsMatch(a, b IpAddress) bool {
@@ -724,29 +726,53 @@ func (me IpPairFilterStrs) Atoi() (IpPairFilters, error) {
 }
 
 /******************************************************************************/
+func MakeIpPairCache() IpPairCache {
+	return IpPairCache{
+		Cache: map[Ip2Tuple]bool{},
+	}
+}
 
-type IpPairCache map[Ip2Tuple]bool
+type IpPairCache struct {
+	Hit   [2]int
+	Cache map[Ip2Tuple]bool
+}
 
-func (me IpPairCache) isMatch(sip, dip IpAddress) bool {
+func (me *IpPairCache) String() string {
+	return "[" +
+		strconv.Itoa(me.Hit[0]) + ", " +
+		strconv.Itoa(me.Hit[1]) + "]"
+}
+
+func (me *IpPairCache) isMatch(sip, dip IpAddress) bool {
 	tuple := Ip2Tuple{
 		Sip: sip,
 		Dip: dip,
 	}
 
-	_, ok := me[tuple]
+	_, ok := me.Cache[tuple]
 
 	return ok
 }
 
-func (me IpPairCache) Add(sip, dip IpAddress) {
+func (me *IpPairCache) Add(sip, dip IpAddress) {
 	tuple := Ip2Tuple{
 		Sip: sip,
 		Dip: dip,
 	}
 
-	me[tuple] = true
+	me.Cache[tuple] = true
 }
 
-func (me IpPairCache) IsMatch(sip, dip IpAddress) bool {
-	return me.isMatch(sip, dip) || me.isMatch(dip, sip)
+func (me *IpPairCache) IsMatch(sip, dip IpAddress) bool {
+	if me.isMatch(sip, dip) {
+		me.Hit[0]++
+
+		return true
+	} else if me.isMatch(dip, sip) {
+		me.Hit[1]++
+
+		return true
+	} else {
+		return false
+	}
 }
