@@ -87,16 +87,23 @@ func (me *RwLock) Write(handler func() error) error {
 type RwLockOperator func(handler func())
 type RwLockOperatorE func(handler func() error) error
 
-func (me *RwLock) Operator(readonly bool) RwLockOperator {
-	if readonly {
+const (
+	LOCK_RO = 0
+	LOCK_RW = 1
+)
+
+type LockOpt byte
+
+func (me *RwLock) Operator(op LockOpt) RwLockOperator {
+	if LOCK_RO == op {
 		return me.RHandle
 	} else {
 		return me.WHandle
 	}
 }
 
-func (me *RwLock) OperatorE(readonly bool) RwLockOperatorE {
-	if readonly {
+func (me *RwLock) OperatorE(op LockOpt) RwLockOperatorE {
+	if LOCK_RO == op {
 		return me.Read
 	} else {
 		return me.Write
