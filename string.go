@@ -1,7 +1,7 @@
 package asdf
 
 import (
-	"fmt"
+	"strconv"
 	"strings"
 	"unicode/utf8"
 )
@@ -90,15 +90,33 @@ type IField interface {
 	String() string
 }
 
-func MakeFieldListString(fields ...IField) string {
-	first := fields[0]
-	fields = fields[1:]
+func PrefixString(s string) string {
+	if len(s) > 0 {
+		return s[2:]
+	} else {
+		return Empty
+	}
+}
 
-	s := fmt.Sprintf("%s:%s", first.Name(), first.String())
+func MakeFieldListString(fields ...IField) string {
+	s := Empty
 
 	for _, field := range fields {
-		s += fmt.Sprintf(", %s:%s", field.Name(), field.String())
+		s += ", " + field.Name() + ":" + field.String()
 	}
 
-	return s
+	return PrefixString(s)
+}
+
+func Itoa(v int) string {
+	return strconv.Itoa(v)
+}
+
+func Atoi(s string) int {
+	v, err := strconv.Atoi(s)
+	if nil != err {
+		return 0
+	} else {
+		return v
+	}
 }
