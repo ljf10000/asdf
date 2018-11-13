@@ -108,8 +108,28 @@ func MakeFieldListString(fields ...IField) string {
 	return PrefixString(s)
 }
 
+func Utoa(v uint) string {
+	return strconv.FormatUint(uint64(v), 10)
+}
+
+func UtoaX(v uint) string {
+	return strconv.FormatUint(uint64(v), 16)
+}
+
+func UtoaO(v uint) string {
+	return strconv.FormatUint(uint64(v), 8)
+}
+
 func Itoa(v int) string {
-	return strconv.Itoa(v)
+	return strconv.FormatInt(int64(v), 10)
+}
+
+func ItoaX(v int) string {
+	return strconv.FormatInt(int64(v), 16)
+}
+
+func ItoaO(v int) string {
+	return strconv.FormatInt(int64(v), 8)
 }
 
 func Atoi(s string) int {
