@@ -108,10 +108,6 @@ func MakeFieldListString(fields ...IField) string {
 	return PrefixString(s)
 }
 
-func Utoa(v uint) string {
-	return strconv.FormatUint(uint64(v), 10)
-}
-
 func UtoaX(v uint) string {
 	return strconv.FormatUint(uint64(v), 16)
 }
@@ -120,8 +116,24 @@ func UtoaO(v uint) string {
 	return strconv.FormatUint(uint64(v), 8)
 }
 
-func Itoa(v int) string {
-	return strconv.FormatInt(int64(v), 10)
+func Utoa(v uint) string {
+	return strconv.FormatUint(uint64(v), 10)
+}
+
+func Utoa8(v uint8) string {
+	return strconv.FormatUint(uint64(v), 10)
+}
+
+func Utoa16(v uint16) string {
+	return strconv.FormatUint(uint64(v), 10)
+}
+
+func Utoa32(v uint32) string {
+	return strconv.FormatUint(uint64(v), 10)
+}
+
+func Utoa64(v uint64) string {
+	return strconv.FormatUint(uint64(v), 10)
 }
 
 func ItoaX(v int) string {
@@ -130,6 +142,26 @@ func ItoaX(v int) string {
 
 func ItoaO(v int) string {
 	return strconv.FormatInt(int64(v), 8)
+}
+
+func Itoa(v int) string {
+	return strconv.FormatInt(int64(v), 10)
+}
+
+func Itoa8(v int8) string {
+	return strconv.FormatInt(int64(v), 10)
+}
+
+func Itoa16(v int16) string {
+	return strconv.FormatInt(int64(v), 10)
+}
+
+func Itoa32(v int32) string {
+	return strconv.FormatInt(int64(v), 10)
+}
+
+func Itoa64(v int64) string {
+	return strconv.FormatInt(int64(v), 10)
 }
 
 func Atoi(s string) int {
