@@ -115,7 +115,9 @@ type EnumMapper struct {
 }
 
 func (me *EnumMapper) Init() {
-	me.values = map[string]int{}
+	if nil == me.values {
+		me.values = map[string]int{}
+	}
 
 	for k, v := range me.Names {
 		me.values[v] = k
