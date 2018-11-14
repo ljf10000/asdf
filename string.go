@@ -210,5 +210,13 @@ func (me *String) Add(v ...string) {
 }
 
 func (me *String) Build(sep string) string {
-	return strings.Join(me.ss[:me.cur], sep)
+	if me.cur > 0 {
+		return strings.Join(me.ss[:me.cur], sep)
+	} else {
+		return Empty
+	}
+}
+
+func (me *String) String() string {
+	return me.Build(", ")
 }
