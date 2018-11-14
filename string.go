@@ -172,3 +172,43 @@ func Atoi(s string) int {
 		return v
 	}
 }
+
+/******************************************************************************/
+
+func NewString(n int) String {
+	if n <= 0 {
+		n = 128
+	}
+
+	return String{
+		ss: make([]string, n),
+	}
+}
+
+type String struct {
+	ss  []string
+	cur int
+}
+
+func (me *String) grow(n int) {
+	ss := make([]string, len(me.ss), 2*cap(me.ss)+n)
+	copy(ss, me.ss)
+	me.ss = ss
+}
+
+func (me *String) Add(v ...string) {
+	count := len(v)
+
+	if me.cur+count < len(me.ss) {
+		me.grow(count)
+	}
+
+	for i := 0; i < count; i++ {
+		me.ss[me.cur+i] = v[i]
+		me.cur++
+	}
+}
+
+func (me *String) Build(sep string) string {
+	return strings.Join(me.ss[:me.cur], sep)
+}
