@@ -85,6 +85,43 @@ func FirstRune(line string) (rune, string) {
 	}
 }
 
+// Join concatenates the elements of a to create a single string. The separator string
+// sep is placed between elements in the resulting string.
+func StringsToBin(a []string, sep string) []byte {
+	switch len(a) {
+	case 0:
+		return []byte("")
+	case 1:
+		return []byte(a[0])
+	case 2:
+		// Special case for common small values.
+		// Remove if golang.org/issue/6714 is fixed
+		return []byte(a[0] + sep + a[1])
+	case 3:
+		// Special case for common small values.
+		// Remove if golang.org/issue/6714 is fixed
+		return []byte(a[0] + sep + a[1] + sep + a[2])
+	case 4:
+		// Special case for common small values.
+		// Remove if golang.org/issue/6714 is fixed
+		return []byte(a[0] + sep + a[1] + sep + a[2] + sep + a[3])
+	}
+
+	n := len(sep) * (len(a) - 1)
+	for i := 0; i < len(a); i++ {
+		n += len(a[i])
+	}
+
+	b := make([]byte, n)
+	bp := copy(b, a[0])
+	for _, s := range a[1:] {
+		bp += copy(b[bp:], sep)
+		bp += copy(b[bp:], s)
+	}
+
+	return b
+}
+
 type IField interface {
 	Name() string
 	String() string
