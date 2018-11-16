@@ -112,7 +112,7 @@ func StringsToBin(a []string, sep string) []byte {
 		n += len(a[i])
 	}
 
-	b := make([]byte, n)
+	b := make([]byte, n, n+1) // 1 for append crlf
 	bp := copy(b, a[0])
 	for _, s := range a[1:] {
 		bp += copy(b[bp:], sep)
