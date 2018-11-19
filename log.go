@@ -107,8 +107,9 @@ func (me LogType) String() string {
 
 func (me *LogType) FromString(s string) error {
 	idx, err := logTypes.Index(s)
-
-	*me = LogType(idx)
+	if nil == err {
+		*me = LogType(idx)
+	}
 
 	return err
 }

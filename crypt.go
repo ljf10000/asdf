@@ -95,9 +95,9 @@ func (me *CryptType) FromString(s string) error {
 }
 
 func cryptToBinary(b *Crypt, s *CryptString) {
-	(&b.Key).FromString(s.Key)
-	(&b.CryptType).FromString(s.CryptType)
-	(&b.HmacType).FromString(s.HmacType)
+	b.Key.FromString(s.Key)
+	b.CryptType.FromString(s.CryptType)
+	b.HmacType.FromString(s.HmacType)
 
 	b.init()
 }
