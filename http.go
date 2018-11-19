@@ -10,6 +10,43 @@ import (
 )
 
 const (
+	HttpMethodGet    HttpMethod = 0
+	HttpMethodPost   HttpMethod = 1
+	HttpMethodDelete HttpMethod = 2
+	HttpMethodEnd    HttpMethod = 3
+)
+
+type HttpMethod byte
+
+var httpMethods = &EnumMapper{
+	Enum: "HttpMethod",
+	Names: []string{
+		HttpMethodGet:    "GET",
+		HttpMethodPost:   "POST",
+		HttpMethodDelete: "DELETE",
+	},
+}
+
+func (me HttpMethod) IsGood() bool {
+	return httpMethods.IsGoodIndex(int(me))
+}
+
+func (me HttpMethod) String() string {
+	return httpMethods.Name(int(me))
+}
+
+func (me *HttpMethod) FromString(s string) error {
+	idx, err := httpMethods.Index(s)
+	if nil == err {
+		*me = HttpMethod(idx)
+	}
+
+	return err
+}
+
+/******************************************************************************/
+
+const (
 	httpBodyType = "text/plain"
 )
 

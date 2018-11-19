@@ -15,6 +15,7 @@ var sizeCheckers = []*SizeChecker{
 func initEnum() {
 	logTypes.Init()
 	ipProtos.Init()
+	httpMethods.Init()
 }
 
 func init() {
