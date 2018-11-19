@@ -213,6 +213,14 @@ func ErrLog(format string, v ...interface{}) error {
 	return errors.New(s)
 }
 
+func DebugLog(format string, v ...interface{}) error {
+	s := fmt.Sprintf(format, v...)
+
+	Log.Debug("%s", s)
+
+	return errors.New(s)
+}
+
 type StdError struct {
 	Error       int    `json:"error"`
 	ErrorString string `json:"errors"`
