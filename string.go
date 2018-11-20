@@ -128,7 +128,7 @@ type IField interface {
 }
 
 func PrefixString(s string) string {
-	if len(s) > 0 {
+	if len(s) > 2 {
 		return s[2:]
 	} else {
 		return Empty
