@@ -19,6 +19,22 @@ const (
 	FilePermDir    = os.ModeDir | FilePermExec
 )
 
+func FileCopy(DstOpen, SrcOpen func() (*os.File, error)) (int64, error) {
+	dst, err := DstOpen()
+	if nil != err {
+		return 0, err
+	}
+	defer dst.Close()
+
+	src, err := SrcOpen()
+	if nil != err {
+		return 0, err
+	}
+	defer src.Close()
+
+	return io.Copy(dst, src)
+}
+
 func FileSize(f *os.File) int64 {
 	st, err := f.Stat()
 	if err != nil {
