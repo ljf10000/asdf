@@ -11,6 +11,8 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+
+	yaml "gopkg.in/yaml.v2"
 )
 
 const (
@@ -260,6 +262,35 @@ func (me FileName) LoadJson(obj interface{}) error {
 	err = json.Unmarshal(buf, obj)
 	if nil != err {
 		Log.Error("unmarshal %s json error: %s", me, err)
+
+		return err
+	}
+
+	return nil
+}
+
+func (me FileName) SaveYaml(obj interface{}) error {
+	buf, err := yaml.Marshal(obj)
+	if nil != err {
+		Log.Error("save %s yaml error: %s", me, err)
+
+		return err
+	}
+
+	return me.Save(buf)
+}
+
+func (me FileName) LoadYaml(obj interface{}) error {
+	buf, err := me.Load()
+	if nil != err {
+		Log.Error("load %s yaml error: %s", me, err)
+
+		return err
+	}
+
+	err = yaml.Unmarshal(buf, obj)
+	if nil != err {
+		Log.Error("unmarshal %s yaml error: %s", me, err)
 
 		return err
 	}
