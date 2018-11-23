@@ -1,7 +1,6 @@
 package asdf
 
 import (
-	"fmt"
 	"unsafe"
 )
 
@@ -42,9 +41,8 @@ type PortTuple struct {
 }
 
 func (me *PortTuple) String() string {
-	return fmt.Sprintf("sport:%d, dport:%d",
-		me.Sport,
-		me.Dport)
+	return "sport:" + Utoa16(me.Sport) +
+		", dport:" + Utoa16(me.Dport)
 }
 
 func (me *PortTuple) Zero() {
@@ -94,9 +92,8 @@ type Ip2Tuple struct {
 }
 
 func (me *Ip2Tuple) String() string {
-	return fmt.Sprintf("sip:%s, dip:%s",
-		me.Sip,
-		me.Dip)
+	return "sip:" + me.Sip.String() +
+		", dip:" + me.Dip.String()
 }
 
 func (me *Ip2Tuple) Zero() {
@@ -141,9 +138,8 @@ type Ip2TupleStr struct {
 }
 
 func (me *Ip2TupleStr) String() string {
-	return fmt.Sprintf("sip:%s, dip:%s",
-		me.Sip,
-		me.Dip)
+	return "sip:" + me.Sip +
+		", dip:" + me.Dip
 }
 
 func (me *Ip2TupleStr) Atoi() (Ip2Tuple, error) {
@@ -192,10 +188,9 @@ type Ip4Tuple struct {
 }
 
 func (me *Ip4Tuple) String() string {
-	return fmt.Sprintf("%s, id:%d, proto:%d",
-		&me.Ip2Tuple,
-		me.Id,
-		me.Proto)
+	return me.Ip2Tuple.String() +
+		", id:" + Utoa16(me.Id) +
+		", proto:" + Utoa8(byte(me.Proto))
 }
 
 func (me *Ip4Tuple) Zero() {
@@ -247,10 +242,9 @@ type Ip4TupleStr struct {
 }
 
 func (me *Ip4TupleStr) String() string {
-	return fmt.Sprintf("%s, id:%d, proto:%d",
-		&me.Ip2TupleStr,
-		me.Id,
-		me.Proto)
+	return me.Ip2TupleStr.String() +
+		", id:" + Utoa16(me.Id) +
+		", proto:" + Utoa8(byte(me.Proto))
 }
 
 func (me *Ip4TupleStr) Atoi() (Ip4Tuple, error) {
@@ -306,10 +300,9 @@ type Ip5Tuple struct {
 }
 
 func (me *Ip5Tuple) String() string {
-	return fmt.Sprintf("%s, %s, proto:%s",
-		&me.Ip2Tuple,
-		&me.PortTuple,
-		me.Proto)
+	return me.Ip2Tuple.String() +
+		", " + me.PortTuple.String() +
+		", proto:" + Utoa8(byte(me.Proto))
 }
 
 func (me *Ip5Tuple) Zero() {
@@ -359,10 +352,9 @@ type Ip5TupleStr struct {
 }
 
 func (me *Ip5TupleStr) String() string {
-	return fmt.Sprintf("%s, %s, proto:%s",
-		&me.Ip2TupleStr,
-		&me.PortTuple,
-		me.Proto)
+	return me.Ip2TupleStr.String() +
+		", " + me.PortTuple.String() +
+		", proto:" + Utoa8(byte(me.Proto))
 }
 
 func (me *Ip5TupleStr) Atoi() (Ip5Tuple, error) {
@@ -414,10 +406,9 @@ type Ip6Tuple struct {
 }
 
 func (me *Ip6Tuple) String() string {
-	return fmt.Sprintf("%s, offset:%d, size:%d",
-		&me.Ip4Tuple,
-		me.Offset,
-		me.IpBodySize)
+	return me.Ip4Tuple.String() +
+		", offset" + Utoa16(me.Offset) +
+		", size:" + Utoa16(me.IpBodySize)
 }
 
 func (me *Ip6Tuple) Zero() {
@@ -473,10 +464,9 @@ type Ip6TupleStr struct {
 }
 
 func (me *Ip6TupleStr) String() string {
-	return fmt.Sprintf("%s, offset:%d, size:%d",
-		&me.Ip4TupleStr,
-		me.Offset,
-		me.IpBodySize)
+	return me.Ip4TupleStr.String() +
+		", offset" + Utoa16(me.Offset) +
+		", size:" + Utoa16(me.IpBodySize)
 }
 
 func (me *Ip6TupleStr) Atoi() (Ip6Tuple, error) {
