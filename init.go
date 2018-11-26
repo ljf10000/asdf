@@ -16,6 +16,7 @@ func initEnum() {
 	logTypes.Init()
 	ipProtos.Init()
 	httpMethods.Init()
+	configFileTypes.Init()
 }
 
 func init() {

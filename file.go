@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	yaml "gopkg.in/yaml.v2"
@@ -20,6 +21,41 @@ const (
 	FilePermNormal = 0644
 	FilePermDir    = os.ModeDir | FilePermExec
 )
+
+const (
+	ConfigFileTypeJson ConfigFileType = 0
+	ConfigFileTypeYaml ConfigFileType = 1
+	ConfigFileTypeDeft ConfigFileType = ConfigFileTypeJson
+)
+
+type ConfigFileType byte
+
+var configFileTypes = &EnumMapper{
+	Enum: "ConfigFileType",
+	Names: []string{
+		ConfigFileTypeJson: "json",
+		ConfigFileTypeYaml: "yaml",
+	},
+}
+
+func (me ConfigFileType) IsGood() bool {
+	return configFileTypes.IsGoodIndex(int(me))
+}
+
+func (me ConfigFileType) String() string {
+	return configFileTypes.Name(int(me))
+}
+
+func (me *ConfigFileType) FromString(s string) error {
+	idx, err := configFileTypes.Index(s)
+	if nil == err {
+		*me = ConfigFileType(idx)
+	}
+
+	return err
+}
+
+/******************************************************************************/
 
 func FileCopy(DstOpen, SrcOpen func() (*os.File, error)) (int64, error) {
 	dst, err := DstOpen()
@@ -296,6 +332,37 @@ func (me FileName) LoadYaml(obj interface{}) error {
 	}
 
 	return nil
+}
+
+func (me FileName) ConfigFileType() (ConfigFileType, error) {
+	var confType ConfigFileType
+
+	split := strings.Split(string(me), ".")
+	if 2 != len(split) {
+		return 0, ErrSprintf("bad config file name: %s", string(me))
+	} else if err := confType.FromString(split[1]); nil != err {
+		return 0, ErrSprintf("bad config file suffix: %s", string(me))
+	}
+
+	return confType, nil
+}
+
+func (me FileName) LoadConf(conf interface{}) error {
+	confType, err := me.ConfigFileType()
+	if nil != err {
+		return err
+	}
+
+	switch confType {
+	case ConfigFileTypeJson:
+		err = me.LoadJson(conf)
+	case ConfigFileTypeYaml:
+		err = me.LoadYaml(conf)
+	default:
+		err = ErrBadFormat
+	}
+
+	return err
 }
 
 func (me FileName) ReadPid() int {
