@@ -355,14 +355,12 @@ func (me FileName) LoadConf(conf interface{}) error {
 
 	switch confType {
 	case ConfigFileTypeJson:
-		err = me.LoadJson(conf)
+		return me.LoadJson(conf)
 	case ConfigFileTypeYaml:
-		err = me.LoadYaml(conf)
+		return me.LoadYaml(conf)
 	default:
-		err = ErrBadFormat
+		return ErrBadFormat
 	}
-
-	return err
 }
 
 func (me FileName) ReadPid() int {
