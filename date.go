@@ -7,25 +7,25 @@ import (
 const DATE_SPLIT = "-"
 
 type Date struct {
-	year  uint16
-	month byte
-	day   byte
+	Year  uint16
+	Month byte
+	Day   byte
 }
 
 func MakeDate(t time.Time) Date {
 	year, month, day := t.Date()
 
 	return Date{
-		year:  uint16(year),
-		month: byte(month),
-		day:   byte(day),
+		Year:  uint16(year),
+		Month: byte(month),
+		Day:   byte(day),
 	}
 }
 
 func (me *Date) String() string {
-	return Utoa16(me.year) +
-		DATE_SPLIT + Utoa8(me.month) +
-		DATE_SPLIT + Utoa8(me.day)
+	return Utoa16(me.Year) +
+		DATE_SPLIT + Utoa8(me.Month) +
+		DATE_SPLIT + Utoa8(me.Day)
 }
 
 func (me *Date) Load(t time.Time) {
@@ -33,7 +33,7 @@ func (me *Date) Load(t time.Time) {
 }
 
 func (me *Date) Unix() Time32 {
-	t := time.Date(int(me.year), time.Month(me.month), int(me.day),
+	t := time.Date(int(me.Year), time.Month(me.Month), int(me.Day),
 		0, 0, 0, 0, time.Local)
 
 	return Time32(t.Unix())
