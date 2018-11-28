@@ -383,7 +383,7 @@ func (me *Ip5Tuple) Itoa() Ip5TupleStr {
 
 /******************************************************************************/
 
-func MakeIp6Tuple(sip, dip IpAddress, id, size, offset uint16, proto IpProto) Ip6Tuple {
+func MakeIp6Tuple(sip, dip IpAddress, id uint16, proto IpProto, bodySize, offset uint16) Ip6Tuple {
 	return Ip6Tuple{
 		Ip4Tuple: Ip4Tuple{
 			Ip2Tuple: Ip2Tuple{
@@ -393,7 +393,7 @@ func MakeIp6Tuple(sip, dip IpAddress, id, size, offset uint16, proto IpProto) Ip
 			Id:    id,
 			Proto: proto,
 		},
-		IpBodySize: size,
+		IpBodySize: bodySize,
 		Offset:     offset,
 	}
 }
