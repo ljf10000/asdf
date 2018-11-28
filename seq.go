@@ -118,7 +118,7 @@ func (me Seqzone32) Intersect(v Seqzone32) Seqzone32 {
 }
 
 func (me Seqzone32) Compare(v Seqzone32) int {
-	if me.End < v .Begin {
+	if me.End < v.Begin {
 		// |--------- me ---------|
 		//                            |----- v -----|
 		return -1

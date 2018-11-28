@@ -5,7 +5,109 @@ import (
 	"time"
 )
 
-const TimeFormat = "2006-01-02 15:04:05"
+const (
+	TimeFormat = "2006-01-02 15:04:05"
+	TIME_SPLIT = ":"
+
+	INVALID_HOUR   = 255
+	INVALID_MINUTE = 255
+	INVALID_SECOND = 255
+
+	HOUR_PER_DAY   = 24
+	MINUTE_PER_DAY = HOUR_PER_DAY * MINUTE_PER_HOUR
+	SECOND_PER_DAY = HOUR_PER_DAY * SECOND_PER_HOUR
+
+	MINUTE_PER_HOUR = 60
+	SECOND_PER_HOUR = MINUTE_PER_HOUR * SECOND_PER_MINUTE
+
+	SECOND_PER_MINUTE = 60
+
+	HOUR_MIN = 0
+	HOUR_MAX = HOUR_PER_DAY - 1
+
+	MINUTE_MIN = 0
+	MINUTE_MAX = MINUTE_PER_HOUR - 1
+
+	SECOND_MIN = 0
+	SECOND_MAX = SECOND_PER_MINUTE - 1
+)
+
+/******************************************************************************/
+type Hour byte
+
+func (me Hour) String() string {
+	return Utoa8(byte(me))
+}
+
+func (me Hour) IsGood() bool {
+	return HOUR_MIN <= me && me <= HOUR_MAX
+}
+
+/******************************************************************************/
+type Minute byte
+
+func (me Minute) String() string {
+	return Utoa8(byte(me))
+}
+
+func (me Minute) IsGood() bool {
+	return MINUTE_MIN <= me && me <= MINUTE_MAX
+}
+
+/******************************************************************************/
+type Second byte
+
+func (me Second) String() string {
+	return Utoa8(byte(me))
+}
+
+func (me Second) IsGood() bool {
+	return SECOND_MIN <= me && me <= SECOND_MAX
+}
+
+/******************************************************************************/
+type Time struct {
+	Hour   `json:"hour"`
+	Minute `json:"minute"`
+	Second `json:"second"`
+	_      byte
+}
+
+func MakeTime(t time.Time) Time {
+	return Time{
+		Hour:   Hour(t.Hour()),
+		Minute: Minute(t.Minute()),
+		Second: Second(t.Second()),
+	}
+}
+
+func (me *Time) String() string {
+	return me.Hour.String() +
+		TIME_SPLIT + me.Minute.String() +
+		TIME_SPLIT + me.Second.String()
+}
+
+func (me *Time) IsGood() bool {
+	return me.Hour.IsGood() && me.Minute.IsGood() && me.Second.IsGood()
+}
+
+func (me *Time) Load(t time.Time) {
+	*me = MakeTime(t)
+}
+
+func (me *Time) Unix(date Date) Time32 {
+	t := time.Date(int(date.Year), time.Month(date.Month), int(date.Day),
+		int(me.Hour), int(me.Minute), int(me.Second), 0, time.Local)
+
+	return Time32(t.Unix())
+}
+
+func (me Time) AddSecond(date Date, second int) Time {
+	sec := me.Unix(date) + Time32(second)
+	t := time.Unix(int64(sec), 0)
+
+	return MakeTime(t)
+}
 
 /******************************************************************************/
 
@@ -21,6 +123,14 @@ func (me Time32) String() string {
 
 func (me Time32) Unix() time.Time {
 	return time.Unix(int64(me), 0)
+}
+
+func (me Time32) Date() Date {
+	return MakeDate(me.Unix())
+}
+
+func (me Time32) Time() Time {
+	return MakeTime(me.Unix())
 }
 
 func (me Time32) ToUnix() time.Time {
@@ -151,6 +261,14 @@ func MakeTimespec(second Time32, nano Timens) Timespec {
 		Second: second,
 		Nano:   nano,
 	}
+}
+
+func (me Timespec) Date() Date {
+	return me.Second.Date()
+}
+
+func (me Timespec) Time() Time {
+	return me.Second.Time()
 }
 
 func (me Timespec) Diff(tm Timespec) int {
@@ -429,9 +547,28 @@ func (me Timezone32) Compare(v Timezone32) int {
 
 type Timezone64 = Timezone
 
+type ITimezone32 interface {
+	Begin() Time32
+	End() Time32
+}
+
+func MakeTimezone(z ITimezone32) Timezone {
+	return Timezone{
+		Begin: MakeTimespec(z.Begin(), 0),
+		End:   MakeTimespec(z.End(), 0),
+	}
+}
+
 type Timezone struct {
 	Begin Timespec `json:"begin"`
 	End   Timespec `json:"end"`
+}
+
+func (me Timezone) Datezone() Datezone {
+	return Datezone{
+		Begin: me.Begin.Date(),
+		End:   me.End.Date(),
+	}
 }
 
 func (me Timezone) String() string {
