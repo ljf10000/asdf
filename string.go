@@ -127,9 +127,9 @@ type IField interface {
 	String() string
 }
 
-func PrefixString(s string) string {
-	if len(s) > 2 {
-		return s[2:]
+func SkipString(s string, head int) string {
+	if len(s) > head {
+		return s[head:]
 	} else {
 		return Empty
 	}
@@ -142,15 +142,27 @@ func MakeFieldListString(fields ...IField) string {
 		s += ", " + field.Name() + ":" + field.String()
 	}
 
-	return PrefixString(s)
+	return SkipString(s, 2)
 }
 
-func UtoaX(v uint) string {
+func Utox(v uint) string {
 	return strconv.FormatUint(uint64(v), 16)
 }
 
-func UtoaO(v uint) string {
-	return strconv.FormatUint(uint64(v), 8)
+func Utox8(v uint8) string {
+	return strconv.FormatUint(uint64(v), 16)
+}
+
+func Utox16(v uint16) string {
+	return strconv.FormatUint(uint64(v), 16)
+}
+
+func Utox32(v uint32) string {
+	return strconv.FormatUint(uint64(v), 16)
+}
+
+func Utox64(v uint64) string {
+	return strconv.FormatUint(uint64(v), 16)
 }
 
 func Utoa(v uint) string {
@@ -173,12 +185,24 @@ func Utoa64(v uint64) string {
 	return strconv.FormatUint(uint64(v), 10)
 }
 
-func ItoaX(v int) string {
+func Itox(v int) string {
 	return strconv.FormatInt(int64(v), 16)
 }
 
-func ItoaO(v int) string {
-	return strconv.FormatInt(int64(v), 8)
+func Itox8(v int8) string {
+	return strconv.FormatInt(int64(v), 16)
+}
+
+func Itox16(v int16) string {
+	return strconv.FormatInt(int64(v), 16)
+}
+
+func Itox32(v int32) string {
+	return strconv.FormatInt(int64(v), 16)
+}
+
+func Itox64(v int64) string {
+	return strconv.FormatInt(int64(v), 16)
 }
 
 func Itoa(v int) string {
