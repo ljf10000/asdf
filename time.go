@@ -279,7 +279,7 @@ func (me Timespec) IsGood() bool {
 	return me.Second > 0
 }
 
-func (me Timespec) Zero() {
+func (me *Timespec) Zero() {
 	me.Second = 0
 	me.Nano = 0
 }
