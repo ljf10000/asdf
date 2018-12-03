@@ -145,6 +145,8 @@ func MakeFieldListString(fields ...IField) string {
 	return SkipString(s, 2)
 }
 
+/******************************************************************************/
+
 func Utox(v uint) string {
 	return strconv.FormatUint(uint64(v), 16)
 }
@@ -164,6 +166,8 @@ func Utox32(v uint32) string {
 func Utox64(v uint64) string {
 	return strconv.FormatUint(uint64(v), 16)
 }
+
+/******************************************************************************/
 
 func Utoa(v uint) string {
 	return strconv.FormatUint(uint64(v), 10)
@@ -185,6 +189,8 @@ func Utoa64(v uint64) string {
 	return strconv.FormatUint(uint64(v), 10)
 }
 
+/******************************************************************************/
+
 func Itox(v int) string {
 	return strconv.FormatInt(int64(v), 16)
 }
@@ -205,6 +211,8 @@ func Itox64(v int64) string {
 	return strconv.FormatInt(int64(v), 16)
 }
 
+/******************************************************************************/
+
 func Itoa(v int) string {
 	return strconv.FormatInt(int64(v), 10)
 }
@@ -224,6 +232,8 @@ func Itoa32(v int32) string {
 func Itoa64(v int64) string {
 	return strconv.FormatInt(int64(v), 10)
 }
+
+/******************************************************************************/
 
 func Atoi(s string) int {
 	v, err := strconv.Atoi(s)
