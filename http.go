@@ -129,6 +129,7 @@ func HttpError(w http.ResponseWriter, error int, codec ICodec) {
 }
 
 type IHttpLogEnable interface {
+	// enable/disable http log
 	LogEnable() bool
 }
 
