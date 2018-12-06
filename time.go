@@ -190,6 +190,10 @@ func MakeTime64(second Time32, nano Timens) Time64 {
 	return Time64(second)*1e9 + Time64(nano)
 }
 
+func (me Time64) NowCost() Time64 {
+	return NowTime64() - me
+}
+
 func (me Time64) String() string {
 	return me.Unix().Format(TimeFormat)
 }
