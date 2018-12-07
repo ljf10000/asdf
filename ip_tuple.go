@@ -45,6 +45,13 @@ func (me *PortTuple) String() string {
 		", dport:" + Utoa16(me.Dport)
 }
 
+func (me *PortTuple) Reverse() PortTuple {
+	return PortTuple{
+		Sport: me.Dport,
+		Dport: me.Sport,
+	}
+}
+
 func (me *PortTuple) Zero() {
 	*me = zPortTuple
 }
@@ -94,6 +101,13 @@ type Ip2Tuple struct {
 func (me *Ip2Tuple) String() string {
 	return "sip:" + me.Sip.String() +
 		", dip:" + me.Dip.String()
+}
+
+func (me *Ip2Tuple) Reverse() Ip2Tuple {
+	return Ip2Tuple{
+		Sip: me.Dip,
+		Dip: me.Sip,
+	}
 }
 
 func (me *Ip2Tuple) Zero() {
@@ -191,6 +205,14 @@ func (me *Ip4Tuple) String() string {
 	return me.Ip2Tuple.String() +
 		", id:" + Utoa16(me.Id) +
 		", proto:" + Utoa8(byte(me.Proto))
+}
+
+func (me *Ip4Tuple) Reverse() Ip4Tuple {
+	return Ip4Tuple{
+		Ip2Tuple: me.Ip2Tuple.Reverse(),
+		Id:       me.Id,
+		Proto:    me.Proto,
+	}
 }
 
 func (me *Ip4Tuple) Zero() {
@@ -305,6 +327,14 @@ func (me *Ip5Tuple) String() string {
 		", proto:" + Utoa8(byte(me.Proto))
 }
 
+func (me *Ip5Tuple) Reverse() Ip5Tuple {
+	return Ip5Tuple{
+		Ip2Tuple:  me.Ip2Tuple.Reverse(),
+		PortTuple: me.PortTuple.Reverse(),
+		Proto:     me.Proto,
+	}
+}
+
 func (me *Ip5Tuple) Zero() {
 	*me = zIp5Tuple
 }
@@ -409,6 +439,14 @@ func (me *Ip6Tuple) String() string {
 	return me.Ip4Tuple.String() +
 		", offset" + Utoa16(me.Offset) +
 		", size:" + Utoa16(me.IpBodySize)
+}
+
+func (me *Ip6Tuple) Reverse() Ip6Tuple {
+	return Ip6Tuple{
+		Ip4Tuple:   me.Ip4Tuple.Reverse(),
+		IpBodySize: me.IpBodySize,
+		Offset:     me.Offset,
+	}
 }
 
 func (me *Ip6Tuple) Zero() {

@@ -2,6 +2,7 @@ package asdf
 
 import (
 	"fmt"
+	"sync/atomic"
 	"time"
 )
 
@@ -265,6 +266,20 @@ func MakeTimespec(second Time32, nano Timens) Timespec {
 		Second: second,
 		Nano:   nano,
 	}
+}
+
+func (me *Timespec) Update(t Timespec) {
+	atomic.StoreUint32((*uint32)(&me.Second), uint32(t.Second))
+	atomic.StoreUint32((*uint32)(&me.Nano), uint32(t.Nano))
+}
+
+func (me *Timespec) Export() Timespec {
+	t := Timespec{}
+
+	atomic.StoreUint32((*uint32)(&t.Second), uint32(me.Second))
+	atomic.StoreUint32((*uint32)(&t.Nano), uint32(me.Nano))
+
+	return t
 }
 
 func (me Timespec) Date() Date {
@@ -566,6 +581,18 @@ func MakeTimezone(z ITimezone32) Timezone {
 type Timezone struct {
 	Begin Timespec `json:"begin"`
 	End   Timespec `json:"end"`
+}
+
+func (me *Timezone) Update(t Timezone) {
+	me.Begin.Update(t.Begin)
+	me.End.Update(t.End)
+}
+
+func (me *Timezone) Export() Timezone {
+	return Timezone{
+		Begin: me.Begin.Export(),
+		End:   me.End.Export(),
+	}
 }
 
 func (me Timezone) Datezone() Datezone {
