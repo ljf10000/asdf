@@ -5,8 +5,8 @@ import (
 )
 
 type Capacity struct {
-	Count uint32
-	Cap   uint32
+	Count uint32 `json:"count"`
+	Cap   uint32 `json:"cap"`
 }
 
 func (me *Capacity) String() string {
@@ -27,8 +27,8 @@ func (me *Capacity) IsFull() bool {
 }
 
 type BlockCap32 struct {
-	Size uint32
-	Cap  uint32
+	Size uint32 `json:"size"`
+	Cap  uint32 `json:"cap"`
 }
 
 func (me *BlockCap32) String() string {
