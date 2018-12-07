@@ -274,12 +274,10 @@ func (me *Timespec) Update(t Timespec) {
 }
 
 func (me *Timespec) Export() Timespec {
-	t := Timespec{}
-
-	atomic.StoreUint32((*uint32)(&t.Second), uint32(me.Second))
-	atomic.StoreUint32((*uint32)(&t.Nano), uint32(me.Nano))
-
-	return t
+	return Timespec{
+		Second: Time32(atomic.LoadUint32((*uint32)(&me.Second))),
+		Nano:   Timens(atomic.LoadUint32((*uint32)(&me.Nano))),
+	}
 }
 
 func (me Timespec) Date() Date {
