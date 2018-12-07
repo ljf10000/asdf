@@ -411,6 +411,59 @@ func (me *Ip5Tuple) Itoa() Ip5TupleStr {
 	}
 }
 
+type Ip5Tuples map[Ip5Tuple]uint64
+
+func (me Ip5Tuples) AddEx(tuple Ip5Tuple) uint64 {
+	count, ok := me[tuple]
+	if ok {
+		me[tuple] = count + 1
+
+		return count + 1
+	}
+
+	r := tuple.Reverse()
+	count, ok = me[r]
+	if ok {
+		me[r] = count + 1
+
+		return count + 1
+	}
+
+	me[tuple] = 1
+
+	return 1
+}
+
+func (me Ip5Tuples) Add(tuple Ip5Tuple) uint64 {
+	count, ok := me[tuple]
+	if ok {
+		me[tuple] = count + 1
+
+		return count + 1
+	} else {
+		me[tuple] = 1
+
+		return 1
+	}
+}
+
+func (me Ip5Tuples) ToList() Ip5TupleList {
+	count := len(me)
+
+	list := make(Ip5TupleList, 0, count)
+
+	for k, v := range me {
+		st := Ip5TupleStat{
+			Ip5Tuple: k,
+			Count:    v,
+		}
+
+		list = append(list, st.String())
+	}
+
+	return list
+}
+
 type Ip5TupleStat struct {
 	Ip5Tuple
 
@@ -421,6 +474,8 @@ func (me *Ip5TupleStat) String() string {
 	return me.Ip5Tuple.String() +
 		", count:" + Utoa64(me.Count)
 }
+
+type Ip5TupleList []string
 
 /******************************************************************************/
 
