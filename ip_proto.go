@@ -60,6 +60,15 @@ var ipProtos = EnumMapper{
 	},
 }
 
+func (me IpProto) HavePort() bool {
+	switch me {
+	case IPPROTO_TCP, IPPROTO_UDP:
+		return true
+	default:
+		return false
+	}
+}
+
 func (me IpProto) IsGood() bool {
 	return ipProtos.IsGoodIndex(int(me))
 }
