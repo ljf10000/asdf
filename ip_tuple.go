@@ -411,6 +411,17 @@ func (me *Ip5Tuple) Itoa() Ip5TupleStr {
 	}
 }
 
+type Ip5TupleStat struct {
+	Ip5Tuple
+
+	Count uint64 `json:"count"`
+}
+
+func (me *Ip5TupleStat) String() string {
+	return me.Ip5Tuple.String() +
+		", count:" + Utoa64(me.Count)
+}
+
 /******************************************************************************/
 
 func MakeIp6Tuple(sip, dip IpAddress, id uint16, proto IpProto, bodySize, offset uint16) Ip6Tuple {
