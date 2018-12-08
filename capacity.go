@@ -106,6 +106,7 @@ func (me *SizeCountStat) Add(size, count uint64) {
 	me.Count += count
 }
 
+//
 type SizeCountStat32 struct {
 	Size  uint32 `json:"size"`
 	Count uint32 `json:"count"`
