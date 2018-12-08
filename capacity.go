@@ -90,7 +90,7 @@ func (me *BlockCap64) Sub32(v BlockCap32) {
 }
 
 /******************************************************************************/
-//
+
 type SizeCountStat struct {
 	Size  uint64 `json:"size"`
 	Count uint64 `json:"count"`
