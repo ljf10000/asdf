@@ -26,6 +26,8 @@ func (me *Capacity) IsFull() bool {
 	return me.Count == me.Cap
 }
 
+/******************************************************************************/
+
 type BlockCap32 struct {
 	Size uint32 `json:"size"`
 	Cap  uint32 `json:"cap"`
@@ -53,9 +55,11 @@ func (me *BlockCap32) AddAlign(v uint32, align uint32) {
 	me.Cap += Align32(v, align)
 }
 
+/******************************************************************************/
+
 type BlockCap64 struct {
-	Size uint64
-	Cap  uint64
+	Size uint64 `json:"size"`
+	Cap  uint64 `json:"cap"`
 }
 
 func (me *BlockCap64) String() string {
@@ -83,4 +87,36 @@ func (me *BlockCap64) Add32(v BlockCap32) {
 func (me *BlockCap64) Sub32(v BlockCap32) {
 	me.Size -= uint64(v.Size)
 	me.Cap -= uint64(v.Cap)
+}
+
+/******************************************************************************/
+
+type SizeCountStat struct {
+	Size  uint64 `json:"Size"`
+	Count uint64 `json:"Count"`
+}
+
+func (me *SizeCountStat) String() string {
+	return "size: " + Utoa64(me.Size) +
+		", count: " + Utoa64(me.Count)
+}
+
+func (me *SizeCountStat) Add(size, count uint64) {
+	me.Size += size
+	me.Count += count
+}
+
+type SizeCountStat32 struct {
+	Size  uint32 `json:"Size"`
+	Count uint32 `json:"Count"`
+}
+
+func (me *SizeCountStat32) String() string {
+	return "size: " + Utoa32(me.Size) +
+		", count: " + Utoa32(me.Count)
+}
+
+func (me *SizeCountStat32) Add(size, count uint32) {
+	me.Size += size
+	me.Count += count
 }
