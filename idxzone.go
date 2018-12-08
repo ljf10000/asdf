@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+// [begin, end]
 type Idxzone struct {
 	Begin uint32
 	End   uint32
@@ -19,7 +20,7 @@ func (me *Idxzone) Zero() {
 }
 
 func (me *Idxzone) IsGood() bool {
-	return me.Begin > 0 && me.End > 0
+	return me.Begin >= 0 && me.End >= me.Begin
 }
 
 func (me *Idxzone) Count() int {
@@ -28,6 +29,12 @@ func (me *Idxzone) Count() int {
 
 func (me *Idxzone) Diff() int {
 	return int(me.End - me.Begin)
+}
+
+func (me *Idxzone) Include(z Idxzone) bool {
+	// |--------- me ---------|
+	//      |----- z -----|
+	return me.Begin <= z.Begin && me.End >= z.End
 }
 
 func (me *Idxzone) InZone(idx int) bool {
