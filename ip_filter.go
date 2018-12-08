@@ -36,7 +36,7 @@ type IpFilter struct {
 }
 
 func (me *IpFilter) String() string {
-	if me.hasType(IpResAny) {
+	if me.HasAny() {
 		return "any: true"
 	} else {
 		s := Empty
@@ -112,7 +112,7 @@ func (me *IpFilter) AddIp(ip IpAddress) {
 }
 
 func (me *IpFilter) Match(ip IpAddress) bool {
-	if me.hasType(IpResAny) {
+	if me.HasAny() {
 		return true
 	}
 
@@ -216,48 +216,42 @@ func (me *IpFilterStr) Atoi() (*IpFilter, error) {
 
 	if me.Any {
 		obj.SetAny()
+	} else if Empty != me.Ip {
+		err := obj.Ip.FromString(me.Ip)
+		if nil != err {
+			return nil, ErrSprintf("parse ip-filter's ip error: %s", err)
+		}
+
+		obj.setType(IpResAddress)
+	} else if Empty != me.Subnet {
+		err := obj.Subnet.FromString(me.Subnet)
+		if nil != err {
+			return nil, ErrSprintf("parse ip-filter's subnet error: %s", err)
+		}
+
+		obj.setType(IpResSubnet)
+	} else if Empty != me.Zone {
+		err := obj.Zone.FromString(me.Zone)
+		if nil != err {
+			return nil, ErrSprintf("parse ip-filter's zone error: %s", err)
+		}
+
+		obj.setType(IpResZone)
+	} else if len(me.List) > 0 {
+		var ip IpAddress
+
+		for k, v := range me.List {
+			err := ip.FromString(v)
+			if nil != err {
+				return nil, ErrSprintf("parse ip-filter's list[%d] error: %s", k, err)
+			}
+
+			obj.Map[ip] = true
+		}
+
+		obj.setType(IpResMap)
 	} else {
-		if Empty != me.Ip {
-			err := obj.Ip.FromString(me.Ip)
-			if nil != err {
-				return nil, ErrSprintf("parse ip-filter's ip error: %s", err)
-			}
-
-			obj.setType(IpResAddress)
-		}
-
-		if Empty != me.Subnet {
-			err := obj.Subnet.FromString(me.Subnet)
-			if nil != err {
-				return nil, ErrSprintf("parse ip-filter's subnet error: %s", err)
-			}
-
-			obj.setType(IpResSubnet)
-		}
-
-		if Empty != me.Zone {
-			err := obj.Zone.FromString(me.Zone)
-			if nil != err {
-				return nil, ErrSprintf("parse ip-filter's zone error: %s", err)
-			}
-
-			obj.setType(IpResZone)
-		}
-
-		if len(me.List) > 0 {
-			var ip IpAddress
-
-			for k, v := range me.List {
-				err := ip.FromString(v)
-				if nil != err {
-					return nil, ErrSprintf("parse ip-filter's list[%d] error: %s", k, err)
-				}
-
-				obj.Map[ip] = true
-			}
-
-			obj.setType(IpResMap)
-		}
+		obj.SetAny()
 	}
 
 	return obj, nil
