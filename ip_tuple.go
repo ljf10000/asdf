@@ -503,7 +503,7 @@ type Ip6Tuple struct {
 
 func (me *Ip6Tuple) String() string {
 	return me.Ip4Tuple.String() +
-		", offset" + Utoa16(me.Offset) +
+		", offset:" + Utoa16(me.Offset) +
 		", size:" + Utoa16(me.IpBodySize)
 }
 
