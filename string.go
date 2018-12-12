@@ -269,7 +269,7 @@ type String struct {
 }
 
 func (me *String) grow(n int) {
-	ss := make([]string, len(me.ss), 2*len(me.ss)+n)
+	ss := make([]string, 2*len(me.ss)+n)
 
 	copy(ss, me.ss)
 
