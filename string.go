@@ -247,8 +247,15 @@ func Atoi(s string) int {
 /******************************************************************************/
 
 func NewString(n int) String {
-	if n <= 0 {
-		n = 128
+	const (
+		min = 1024
+		max = SizeofM / 24
+	)
+
+	if n < min {
+		n = min
+	} else if n > max {
+		n = max
 	}
 
 	return String{
