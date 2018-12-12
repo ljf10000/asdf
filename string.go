@@ -269,7 +269,15 @@ type String struct {
 }
 
 func (me *String) grow(n int) {
-	ss := make([]string, 2*len(me.ss)+n)
+	Len := len(me.ss)
+	if Len > n {
+		n = Len + Len
+	} else {
+		n = n + n
+	}
+	n = AlignI(n, 1024)
+
+	ss := make([]string, n)
 
 	copy(ss, me.ss)
 
