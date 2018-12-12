@@ -285,6 +285,9 @@ func (me *String) Add(v ...string) {
 
 	for i := 0; i < count; i++ {
 		me.ss[me.cur+i] = v[i]
+
+		// BUGFIX: out of memory
+		// me.cur++
 	}
 
 	me.cur += count
