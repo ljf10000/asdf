@@ -269,8 +269,10 @@ type String struct {
 }
 
 func (me *String) grow(n int) {
-	ss := make([]string, len(me.ss), 2*cap(me.ss)+n)
+	ss := make([]string, len(me.ss), 2*len(me.ss)+n)
+
 	copy(ss, me.ss)
+
 	me.ss = ss
 }
 
@@ -283,8 +285,9 @@ func (me *String) Add(v ...string) {
 
 	for i := 0; i < count; i++ {
 		me.ss[me.cur+i] = v[i]
-		me.cur++
 	}
+
+	me.cur += count
 }
 
 func (me *String) Build(sep string) string {
