@@ -6,5 +6,5 @@ import (
 )
 
 func TestNetwork(t *testing.T) {
-	fmt.Printf("little endian: %v", isLittleEndian)
+	fmt.Printf("little endian: %v", LITTLE_ENDIAN)
 }

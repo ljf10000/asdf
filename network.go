@@ -5,24 +5,28 @@ import (
 	"unsafe"
 )
 
-type ENetworkDir int
-
 const (
-	ToServer ENetworkDir = 0
-	ToClient ENetworkDir = 1
+	ToServer DirofNetwork = 0
+	ToClient DirofNetwork = 1
 )
 
-var isLittleEndian = !IsBigEndian()
+type DirofNetwork byte
 
-func IsBigEndian() bool {
-	p := 0x11223344
-	bin := MakeSlice(unsafe.Pointer(&p), 4, 4)
+/******************************************************************************/
+
+var BIG_ENDIAN = isBigEndian()
+var LITTLE_ENDIAN = !BIG_ENDIAN
+
+func isBigEndian() bool {
+	v := uint32(0x11223344)
+
+	bin := MakeSlice(unsafe.Pointer(&v), 4, 4)
 
 	return 0x11 == bin[0]
 }
 
 func Swap16(v uint16) uint16 {
-	if isLittleEndian {
+	if LITTLE_ENDIAN {
 		return (v&0x00ff)<<8 | (v&0xff00)>>8
 	} else {
 		return v
@@ -30,7 +34,7 @@ func Swap16(v uint16) uint16 {
 }
 
 func Swap32(v uint32) uint32 {
-	if isLittleEndian {
+	if LITTLE_ENDIAN {
 		return (v&0x000000ff)<<24 |
 			(v&0x0000ff00)<<8 |
 			(v&0x00ff0000)>>8 |
@@ -41,7 +45,7 @@ func Swap32(v uint32) uint32 {
 }
 
 func Swap64(v uint64) uint64 {
-	if isLittleEndian {
+	if LITTLE_ENDIAN {
 		return (v&0x00000000000000ff)<<56 |
 			(v&0x000000000000ff00)<<40 |
 			(v&0x0000000000ff0000)<<24 |
