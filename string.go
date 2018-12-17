@@ -27,6 +27,22 @@ const (
 	Crlf4 = Crlf3 + Crlf
 )
 
+func SkipString(s string, skip int) string {
+	if len(s) > skip {
+		return s[skip:]
+	} else {
+		return Empty
+	}
+}
+
+func SquareString(s string) string {
+	return "[" + s + "]"
+}
+
+func CurvesString(s string) string {
+	return "(" + s + ")"
+}
+
 func YesNo(yes bool) string {
 	if yes {
 		return "yes"
@@ -125,14 +141,6 @@ func StringsToBin(a []string, sep string) []byte {
 type IField interface {
 	Name() string
 	String() string
-}
-
-func SkipString(s string, head int) string {
-	if len(s) > head {
-		return s[head:]
-	} else {
-		return Empty
-	}
 }
 
 func MakeFieldListString(fields ...IField) string {

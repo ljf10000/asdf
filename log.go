@@ -212,6 +212,8 @@ func (me *LogLevel) FromString(s string) {
 	}
 }
 
+const LogTimeFormat = "2006-01-02@15:04:05.999999999"
+
 type LogMsg struct {
 	s     string
 	level LogLevel
@@ -220,7 +222,7 @@ type LogMsg struct {
 func (me *LogMsg) String() string {
 	return fmt.Sprintf("[%s] %s %s",
 		me.level.Short(),
-		time.Now().Format("2006-01-02@15:04:05"),
+		time.Now().Format(LogTimeFormat),
 		me.s)
 }
 
