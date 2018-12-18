@@ -7,7 +7,11 @@ import (
 
 func Panic(format string, v ...interface{}) {
 	Log.Emerg("Panic: "+format, v...)
-	time.Sleep(3 * time.Second)
+
+	for i := 0; i < 2000; i++ {
+		time.Sleep(time.Millisecond)
+	}
+
 	Log.Close()
 
 	panic(fmt.Sprintf(format, v...))
