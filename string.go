@@ -294,7 +294,8 @@ func (me *String) grow(n int) {
 func (me *String) Add(v ...string) {
 	count := len(v)
 
-	// BUGFIX: bug is <, fuck! fuck!! fuck!!!
+	// BUGFIX: bug is <
+	// 	fuck! fuck!! fuck!!!
 	if me.cur+count > len(me.ss) {
 		me.grow(count)
 	}
