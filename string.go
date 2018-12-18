@@ -256,8 +256,8 @@ func Atoi(s string) int {
 
 func NewString(n int) String {
 	const (
-		min = 1024
-		max = SizeofM / 24
+		min = 128
+		max = 1024
 	)
 
 	if n < min {
@@ -277,13 +277,12 @@ type String struct {
 }
 
 func (me *String) grow(n int) {
-	Len := len(me.ss)
-	if Len > n {
-		n = Len + Len
+	count := len(me.ss)
+	if count > n {
+		n += count
 	} else {
-		n = n + n
+		n += n
 	}
-	n = AlignI(n, 1024)
 
 	ss := make([]string, n)
 
@@ -295,7 +294,8 @@ func (me *String) grow(n int) {
 func (me *String) Add(v ...string) {
 	count := len(v)
 
-	if me.cur+count < len(me.ss) {
+	// BUGFIX: bug is <, fuck! fuck!! fuck!!!
+	if me.cur+count > len(me.ss) {
 		me.grow(count)
 	}
 
