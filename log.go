@@ -84,7 +84,7 @@ const (
 type LogType int
 
 var logTypes = EnumMapper{
-	Enum: "LogType",
+	Type: "asdf.LogType",
 	Names: []string{
 		LogTypeInvalid: "invalid",
 		LogTypeConsole: "console",

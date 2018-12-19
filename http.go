@@ -19,7 +19,7 @@ const (
 type HttpMethod byte
 
 var httpMethods = &EnumMapper{
-	Enum: "HttpMethod",
+	Type: "asdf.HttpMethod",
 	Names: []string{
 		HttpMethodGet:    "GET",
 		HttpMethodPost:   "POST",

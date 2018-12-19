@@ -109,7 +109,7 @@ func (me *EnumManager) IsGoodIndex(idx int) bool {
 /******************************************************************************/
 
 type EnumMapper struct {
-	Enum   string
+	Type   string
 	Names  []string
 	values map[string]int
 }
@@ -129,7 +129,7 @@ func (me *EnumMapper) Index(name string) (int, error) {
 	if ok {
 		return idx, nil
 	} else {
-		return 0, ErrSprintf("invalid %s: %s", me.Enum, name)
+		return 0, ErrSprintf("invalid %s: %s", me.Type, name)
 	}
 }
 

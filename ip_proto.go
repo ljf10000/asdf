@@ -31,7 +31,7 @@ const (
 type IpProto byte
 
 var ipProtos = EnumMapper{
-	Enum: "IpProto",
+	Type: "asdf.IpProto",
 	Names: []string{
 		IPPROTO_IP:      "ip",
 		IPPROTO_ICMP:    "icmp",

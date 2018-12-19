@@ -31,7 +31,7 @@ const (
 type ConfigFileType byte
 
 var configFileTypes = &EnumMapper{
-	Enum: "ConfigFileType",
+	Type: "asdf.ConfigFileType",
 	Names: []string{
 		ConfigFileTypeJson: "json",
 		ConfigFileTypeYaml: "yaml",
