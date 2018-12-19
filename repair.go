@@ -1,16 +1,34 @@
 package asdf
 
+const (
+	INTZONE_F_IGNORE = 1
+)
+
 type IntZone struct {
-	Name string
-	Min  int
-	Max  int
-	Deft int
+	Name   string
+	Flag   int
+	Ignore int
+	Min    int
+	Max    int
+	Deft   int
+}
+
+func (me *IntZone) CanIgnore() bool {
+	return INTZONE_F_IGNORE == (INTZONE_F_IGNORE & me.Flag)
+}
+
+func (me *IntZone) IsIgnore(v int) bool {
+	return me.CanIgnore() && v == me.Ignore
+}
+
+func (me *IntZone) CanRepair(v int) bool {
+	return !me.IsIgnore(v) && (v < me.Min || v > me.Max)
 }
 
 func (me *IntZone) Repair(pv *int) {
 	v := *pv
 
-	if v < me.Min || v > me.Max {
+	if me.CanRepair(v) {
 		*pv = me.Deft
 
 		name := me.Name
