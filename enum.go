@@ -1,7 +1,7 @@
 package asdf
 
 import (
-	"fmt"
+	"strings"
 )
 
 const InvalidEnum = -1
@@ -160,6 +160,7 @@ func (me *EnumMapper) IsGoodIndex(idx int) bool {
 }
 
 /******************************************************************************/
+const FLAG_SPLIT = "|"
 
 type FlagMapper struct {
 	Type   string
@@ -184,16 +185,32 @@ func (me *FlagMapper) Flag(name string) (int, error) {
 	}
 }
 
+func (me *FlagMapper) FlagEx(s string) (int, error) {
+	split := strings.Split(s, FLAG_SPLIT)
+
+	flags := 0
+	for _, s := range split {
+		flag, err := me.Flag(s)
+		if nil != err {
+			return 0, err
+		}
+
+		flags |= flag
+	}
+
+	return flags, nil
+}
+
 func (me *FlagMapper) Name(flag int) string {
 	s := Empty
 
 	for k, v := range me.Names {
 		if k == (k & flag) {
-			s += "|" + v
+			s += FLAG_SPLIT + v
 		}
 	}
 
-	return fmt.Sprintf("0x%x", flag) + s
+	return SkipString(s, 1)
 }
 
 func (me *FlagMapper) IsGoodFlag(flag int) bool {
