@@ -691,3 +691,34 @@ type TimeTask struct {
 	End   string `json:"end"`
 	Used  int
 }
+
+type TimeStat struct {
+	Start Timespec `json:"start"`
+	Stop  Timespec `json:"stop"`
+
+	Time TimeTask `json:"time"`
+}
+
+func (me *TimeStat) Init() {
+	me.Start = NowTime64().Timespec()
+	me.Time.Begin = me.Start.String()
+}
+
+func (me *TimeStat) Fini() {
+	me.Stop = NowTime64().Timespec()
+	me.Time.End = me.Stop.String()
+
+	me.Update()
+}
+
+func (me *TimeStat) Update() {
+	var now Timespec
+
+	if me.Stop.IsGood() {
+		now = me.Stop
+	} else {
+		now = NowTime64().Timespec()
+	}
+
+	me.Time.Used = now.Diff(me.Start) / 1e9
+}

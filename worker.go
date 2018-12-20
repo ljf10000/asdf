@@ -7,10 +7,17 @@ type WorkerProgress struct {
 	Percent string `json:"percent"`
 }
 
+func (me *WorkerProgress) String() string {
+	return "begin:" + Itoa(me.Begin) +
+		", end:" + Itoa(me.End) +
+		", current:" + Itoa(me.Current) +
+		", percent:" + me.Percent
+}
+
 func (me *WorkerProgress) Calc() {
 	if (1 + me.Current) < me.End {
 		count := me.End - me.Begin
-		diff := 1 + me.End - me.Current
+		diff := 1 + me.Current - me.Begin
 
 		percent := 100 * diff / count
 
