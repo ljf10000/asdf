@@ -396,9 +396,16 @@ type IpPairCache struct {
 }
 
 func (me *IpPairCache) String() string {
+	s := Empty
+
+	for k, _ := range me.Cache {
+		s += ", (" + k.String() + ")"
+	}
+
 	return "[" +
 		strconv.Itoa(me.Hit[0]) + ", " +
-		strconv.Itoa(me.Hit[1]) + "]"
+		strconv.Itoa(me.Hit[1]) + ", " +
+		SkipString(s, 2) + "]"
 }
 
 func (me *IpPairCache) isMatch(sip, dip IpAddress) bool {
