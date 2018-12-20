@@ -689,7 +689,7 @@ func (me Timezone) Compare(v Timezone) int {
 type TimeTask struct {
 	Begin string `json:"begin"`
 	End   string `json:"end"`
-	Used  int
+	Used  int    `json:"used"`
 }
 
 type TimeStat struct {

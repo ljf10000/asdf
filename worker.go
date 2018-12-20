@@ -3,6 +3,7 @@ package asdf
 type WorkerProgress struct {
 	Begin   int    `json:"begin"`
 	End     int    `json:"end"`
+	Count   int    `json:"count"`
 	Current int    `json:"current"`
 	Percent string `json:"percent"`
 }
@@ -15,11 +16,12 @@ func (me *WorkerProgress) String() string {
 }
 
 func (me *WorkerProgress) Calc() {
+	me.Count = me.End - me.Begin
+
 	if (1 + me.Current) < me.End {
-		count := me.End - me.Begin
 		diff := 1 + me.Current - me.Begin
 
-		percent := 100 * diff / count
+		percent := 100 * diff / me.Count
 
 		me.Percent = Itoa(percent) + "%"
 	} else {
