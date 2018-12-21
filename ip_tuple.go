@@ -13,17 +13,11 @@ const (
 )
 
 var (
-	zPortTuple = PortTuple{}
-	zIp2Tuple  = Ip2Tuple{}
-	zIp4Tuple  = Ip4Tuple{}
-	zIp5Tuple  = Ip5Tuple{}
-	zIp6Tuple  = Ip6Tuple{}
-
-	scPortTuple = NewSizeChecker("PortTuple", unsafe.Sizeof(zPortTuple), SizeofPortTuple)
-	scIp2Tuple  = NewSizeChecker("Ip2Tuple", unsafe.Sizeof(zIp2Tuple), SizeofIp2Tuple)
-	scIp4Tuple  = NewSizeChecker("Ip4Tuple", unsafe.Sizeof(zIp4Tuple), SizeofIp4Tuple)
-	scIp5Tuple  = NewSizeChecker("Ip5Tuple", unsafe.Sizeof(zIp5Tuple), SizeofIp5Tuple)
-	scIp6Tuple  = NewSizeChecker("Ip6Tuple", unsafe.Sizeof(zIp6Tuple), SizeofIp6Tuple)
+	scPortTuple = NewSizeChecker("PortTuple", unsafe.Sizeof(PortTuple{}), SizeofPortTuple)
+	scIp2Tuple  = NewSizeChecker("Ip2Tuple", unsafe.Sizeof(Ip2Tuple{}), SizeofIp2Tuple)
+	scIp4Tuple  = NewSizeChecker("Ip4Tuple", unsafe.Sizeof(Ip4Tuple{}), SizeofIp4Tuple)
+	scIp5Tuple  = NewSizeChecker("Ip5Tuple", unsafe.Sizeof(Ip5Tuple{}), SizeofIp5Tuple)
+	scIp6Tuple  = NewSizeChecker("Ip6Tuple", unsafe.Sizeof(Ip6Tuple{}), SizeofIp6Tuple)
 )
 
 /******************************************************************************/
@@ -53,7 +47,7 @@ func (me *PortTuple) Reverse() PortTuple {
 }
 
 func (me *PortTuple) Zero() {
-	*me = zPortTuple
+	*me = PortTuple{}
 }
 
 func (me *PortTuple) Compare(obj *PortTuple) int {
@@ -111,7 +105,7 @@ func (me *Ip2Tuple) Reverse() Ip2Tuple {
 }
 
 func (me *Ip2Tuple) Zero() {
-	*me = zIp2Tuple
+	*me = Ip2Tuple{}
 }
 
 func (me *Ip2Tuple) IsGood() bool {
@@ -161,12 +155,12 @@ func (me *Ip2TupleStr) Atoi() (Ip2Tuple, error) {
 
 	err := tuple.Sip.FromString(me.Sip)
 	if nil != err {
-		return zIp2Tuple, err
+		return Ip2Tuple{}, err
 	}
 
 	err = tuple.Dip.FromString(me.Dip)
 	if nil != err {
-		return zIp2Tuple, err
+		return Ip2Tuple{}, err
 	}
 
 	return tuple, nil
@@ -216,7 +210,7 @@ func (me *Ip4Tuple) Reverse() Ip4Tuple {
 }
 
 func (me *Ip4Tuple) Zero() {
-	*me = zIp4Tuple
+	*me = Ip4Tuple{}
 }
 
 func (me *Ip4Tuple) IsGood() bool {
@@ -279,7 +273,7 @@ func (me *Ip4TupleStr) Atoi() (Ip4Tuple, error) {
 
 	tuple.Ip2Tuple, err = me.Ip2TupleStr.Atoi()
 	if nil != err {
-		return zIp4Tuple, err
+		return Ip4Tuple{}, err
 	}
 
 	return tuple, nil
@@ -336,7 +330,7 @@ func (me *Ip5Tuple) Reverse() Ip5Tuple {
 }
 
 func (me *Ip5Tuple) Zero() {
-	*me = zIp5Tuple
+	*me = Ip5Tuple{}
 }
 
 func (me *Ip5Tuple) IsGood() bool {
@@ -397,7 +391,7 @@ func (me *Ip5TupleStr) Atoi() (Ip5Tuple, error) {
 
 	tuple.Ip2Tuple, err = me.Ip2TupleStr.Atoi()
 	if nil != err {
-		return zIp5Tuple, err
+		return Ip5Tuple{}, err
 	}
 
 	return tuple, nil
@@ -583,7 +577,7 @@ func (me *Ip6TupleStr) Atoi() (Ip6Tuple, error) {
 
 	tuple.Ip4Tuple, err = me.Ip4TupleStr.Atoi()
 	if nil != err {
-		return zIp6Tuple, err
+		return Ip6Tuple{}, err
 	}
 
 	return tuple, nil
