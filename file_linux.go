@@ -3,7 +3,6 @@
 package asdf
 
 import (
-	"fmt"
 	"os"
 	"syscall"
 )
