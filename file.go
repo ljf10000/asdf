@@ -126,6 +126,10 @@ func (me FileName) create(size, flag int) error {
 	return nil
 }
 
+func (me FileName) Lock() error {
+	return fileLock(string(me))
+}
+
 func (me FileName) CreateEx(size int) error {
 	return me.create(size, 0)
 }

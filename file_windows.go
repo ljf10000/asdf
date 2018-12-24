@@ -2,6 +2,6 @@
 
 package asdf
 
-func (me FileName) Lock() error {
+func fileLock(file string) error {
 	return nil
 }
