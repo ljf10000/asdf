@@ -126,6 +126,7 @@ func (me FileName) create(size, flag int) error {
 	return nil
 }
 
+// call once init
 func (me FileName) Lock() error {
 	return fileLock(string(me))
 }
