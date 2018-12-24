@@ -3,6 +3,7 @@
 package asdf
 
 import (
+	"fmt"
 	"os"
 	"syscall"
 )
@@ -12,13 +13,13 @@ func (me FileName) Lock() error {
 	if nil != err {
 		return err
 	}
-	Log.Info("OK: open %s", me)
+	fmt.Printf("OK: open %s\n", me)
 
 	err = syscall.Flock(int(f.Fd()), syscall.LOCK_EX|syscall.LOCK_NB)
 	if nil != err {
 		return err
 	}
-	Log.Info("OK: lock %s", me)
+	fmt.Printf("OK: lock %s\n", me)
 
 	return nil
 }
