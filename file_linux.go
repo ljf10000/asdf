@@ -8,6 +8,7 @@ import (
 )
 
 func fileLock(file string) error {
+	// readonly
 	f, err := os.OpenFile(file, os.O_RDONLY|os.O_CREATE, 0666)
 	if nil != err {
 		return err
