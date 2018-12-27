@@ -14,7 +14,7 @@ type IZoneNode interface {
 	Add(v IZoneNode) IZoneNode
 }
 
-type IZone interface {
+type IZoneEx interface {
 	NodeBegin() IZoneNode
 	NodeEnd() IZoneNode
 
@@ -25,3 +25,5 @@ type IZone interface {
 	Match(v IZone) bool
 	Intersect(v IZone) IZone
 }
+
+type IZone interface{}
