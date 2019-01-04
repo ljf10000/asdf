@@ -18,7 +18,7 @@ func (me CmdOptions) Help() string {
 		s += opt + Space
 	}
 
-	return s[:len(s)-1]
+	return s
 }
 
 func (me CmdOptions) check() (int, error) {

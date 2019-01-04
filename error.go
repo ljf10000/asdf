@@ -15,6 +15,7 @@ const (
 	StdErrExist
 	StdErrExistSame
 	StdErrHolding
+	StdErrRunning
 	StdErrPending
 	StdErrTimeout
 	StdErrListen
@@ -80,6 +81,7 @@ var stdErrMap = map[int]string{
 	StdErrExist:     "exist",
 	StdErrExistSame: "exist same",
 	StdErrHolding:   "holding",
+	StdErrRunning:   "running",
 	StdErrPending:   "pending",
 	StdErrTimeout:   "timeout",
 	StdErrListen:    "listen",
@@ -143,6 +145,7 @@ var (
 	ErrExist     = NewError(StdErrExist)
 	ErrExistSame = NewError(StdErrExistSame)
 	ErrHolding   = NewError(StdErrHolding)
+	ErrRunning   = NewError(StdErrRunning)
 	ErrPending   = NewError(StdErrPending)
 	ErrTimeout   = NewError(StdErrTimeout)
 	ErrListen    = NewError(StdErrListen)
