@@ -662,10 +662,12 @@ func (me Timezone) Intersect(v Timezone) (Timezone, bool) {
 		begin = v.Begin
 	}
 
-	Log.Debug("Timezone Intersect: get max begin[%s] from [%s] and [%s]",
-		begin.String(),
-		me.Begin.String(),
-		v.Begin.String())
+	/*
+		Log.Debug("Timezone Intersect: get max begin[%s] from [%s] and [%s]",
+			begin.String(),
+			me.Begin.String(),
+			v.Begin.String())
+	*/
 
 	// get min end
 	end := me.End
@@ -673,10 +675,12 @@ func (me Timezone) Intersect(v Timezone) (Timezone, bool) {
 		end = v.End
 	}
 
-	Log.Debug("Timezone Intersect: get min end[%s] from [%s] and [%s]",
-		end.String(),
-		me.End.String(),
-		v.End.String())
+	/*
+		Log.Debug("Timezone Intersect: get min end[%s] from [%s] and [%s]",
+			end.String(),
+			me.End.String(),
+			v.End.String())
+	*/
 
 	return Timezone{
 		Begin: begin,
