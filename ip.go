@@ -331,31 +331,24 @@ func (me IpZone) Match(v IpZone) bool {
 }
 
 func (me IpZone) Intersect(v IpZone) IpZone {
-	if v.Begin.InZone(me) {
-		if v.End.InZone(me) {
-			// |--------- me ---------|
-			//     |----- v -----|
-			return v
-		} else {
-			// |--------- me ---------|
-			//               |----- v -----|
-			return IpZone{
-				Begin: v.Begin,
-				End:   me.End,
-			}
-		}
-	} else {
-		if v.End.InZone(me) {
-			//     |--------- me ---------|
-			// |----- v -----|
-			return IpZone{
-				Begin: me.Begin,
-				End:   v.End,
-			}
-		} else {
-			//                  |--------- me ---------|
-			// |----- v -----|              or              |----- v -----|
-			return IpZone{}
-		}
+	if 0 != me.Compare(v) {
+		return IpZone{}
+	}
+
+	// get max begin
+	begin := me.Begin
+	if me.Begin < v.Begin {
+		begin = v.Begin
+	}
+
+	// get min end
+	end := me.End
+	if me.End > v.End {
+		end = v.End
+	}
+
+	return IpZone{
+		Begin: begin,
+		End:   end,
 	}
 }

@@ -531,32 +531,25 @@ func (me Timezone32) Match(v Timezone32) bool {
 }
 
 func (me Timezone32) Intersect(v Timezone32) Timezone32 {
-	if v.Begin.InZone(me) {
-		if v.End.InZone(me) {
-			// |--------- me ---------|
-			//     |----- v -----|
-			return v
-		} else {
-			// |--------- me ---------|
-			//               |----- v -----|
-			return Timezone32{
-				Begin: v.Begin,
-				End:   me.End,
-			}
-		}
-	} else {
-		if v.End.InZone(me) {
-			//     |--------- me ---------|
-			// |----- v -----|
-			return Timezone32{
-				Begin: me.Begin,
-				End:   v.End,
-			}
-		} else {
-			//                  |--------- me ---------|
-			// |----- v -----|              or              |----- v -----|
-			return Timezone32{}
-		}
+	if 0 != me.Compare(v) {
+		return Timezone32{}
+	}
+
+	// get max begin
+	begin := me.Begin
+	if me.Begin < v.Begin {
+		begin = v.Begin
+	}
+
+	// get min end
+	end := me.End
+	if me.End > v.End {
+		end = v.End
+	}
+
+	return Timezone32{
+		Begin: begin,
+		End:   end,
 	}
 }
 

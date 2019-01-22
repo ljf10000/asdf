@@ -20,7 +20,7 @@ func (me *Idxzone) Zero() {
 }
 
 func (me *Idxzone) IsGood() bool {
-	return me.Begin >= 0 && me.End >= me.Begin
+	return me.Begin >= 0 && me.End > me.Begin
 }
 
 func (me *Idxzone) Count() int {
@@ -64,33 +64,25 @@ func (me *Idxzone) Match(v Idxzone) bool {
 	return 0 == me.Compare(v)
 }
 
-func (me *Idxzone) Intersect(v *Idxzone) Idxzone {
-	if me.InZone(int(v.Begin)) {
-		if me.InZone(int(v.End)) {
-			// |--------- me ---------|
-			//     |----- v -----|
-			return *v
-		} else {
-			// |--------- me ---------|
-			//               |----- v -----|
-			return Idxzone{
-				Begin: v.Begin,
-				End:   me.End,
-			}
-		}
-	} else {
-		if me.InZone(int(v.End)) {
-			//     |--------- me ---------|
-			// |----- v -----|
-			return Idxzone{
-				Begin: me.Begin,
-				End:   v.End,
-			}
+func (me *Idxzone) Intersect(v Idxzone) Idxzone {
+	if 0 != me.Compare(v) {
+		return Idxzone{}
+	}
 
-		} else {
-			//                  |--------- me ---------|
-			// |----- v -----|              or              |----- v -----|
-			return Idxzone{}
-		}
+	// get max begin
+	begin := me.Begin
+	if me.Begin < v.Begin {
+		begin = v.Begin
+	}
+
+	// get min end
+	end := me.End
+	if me.End > v.End {
+		end = v.End
+	}
+
+	return Idxzone{
+		Begin: begin,
+		End:   end,
 	}
 }

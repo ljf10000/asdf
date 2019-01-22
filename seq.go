@@ -105,33 +105,25 @@ func (me Seqzone32) Match(v Seqzone32) bool {
 }
 
 func (me Seqzone32) Intersect(v Seqzone32) Seqzone32 {
-	if v.Begin.InZone(me) {
-		if v.End.InZone(me) {
-			// |--------- me ---------|
-			//     |----- v -----|
-			return v
-		} else {
-			// |--------- me ---------|
-			//               |----- v -----|
-			return Seqzone32{
-				Begin: v.Begin,
-				End:   me.End,
-			}
-		}
-	} else {
-		if v.End.InZone(me) {
-			//     |--------- me ---------|
-			// |----- v -----|
-			return Seqzone32{
-				Begin: me.Begin,
-				End:   v.End,
-			}
+	if 0 != me.Compare(v) {
+		return Seqzone32{}
+	}
 
-		} else {
-			//                  |--------- me ---------|
-			// |----- v -----|              or              |----- v -----|
-			return Seqzone32{}
-		}
+	// get max begin
+	begin := me.Begin
+	if me.Begin < v.Begin {
+		begin = v.Begin
+	}
+
+	// get min end
+	end := me.End
+	if me.End > v.End {
+		end = v.End
+	}
+
+	return Seqzone32{
+		Begin: begin,
+		End:   end,
 	}
 }
 
@@ -231,32 +223,24 @@ func (me Seqzone) Match(v Seqzone) bool {
 }
 
 func (me Seqzone) Intersect(v Seqzone) Seqzone {
-	if v.Begin.InZone(me) {
-		if v.End.InZone(me) {
-			// |--------- me ---------|
-			//     |----- v -----|
-			return v
-		} else {
-			// |--------- me ---------|
-			//               |----- v -----|
-			return Seqzone{
-				Begin: v.Begin,
-				End:   me.End,
-			}
-		}
-	} else {
-		if v.End.InZone(me) {
-			//     |--------- me ---------|
-			// |----- v -----|
-			return Seqzone{
-				Begin: me.Begin,
-				End:   v.End,
-			}
+	if 0 != me.Compare(v) {
+		return Seqzone{}
+	}
 
-		} else {
-			//                  |--------- me ---------|
-			// |----- v -----|              or              |----- v -----|
-			return Seqzone{}
-		}
+	// get max begin
+	begin := me.Begin
+	if me.Begin < v.Begin {
+		begin = v.Begin
+	}
+
+	// get min end
+	end := me.End
+	if me.End > v.End {
+		end = v.End
+	}
+
+	return Seqzone{
+		Begin: begin,
+		End:   end,
 	}
 }
