@@ -294,7 +294,7 @@ func (me *IpZone) FromString(s string) error {
 }
 
 func (me IpZone) IsGood() bool {
-	return me.Begin.IsGood() || me.End.IsGood()
+	return me.Begin.IsGood() && me.End.IsGood()
 }
 
 func (me *IpZone) Zero() {
