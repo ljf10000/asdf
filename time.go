@@ -626,17 +626,17 @@ func (me *Timezone) Zero() {
 	me.End.Zero()
 }
 
-func (me Timezone) Include(z Timezone) bool {
+func (me Timezone) Include(v Timezone) bool {
 	// |--------- me ---------|
 	//      |----- z -----|
-	a, _ := me.Begin.Compare(z.Begin)
-	b, _ := me.End.Compare(z.End)
+	a, _ := me.Begin.Compare(v.Begin)
+	b, _ := me.End.Compare(v.End)
 
 	return a <= 0 && b >= 0
 }
 
 func (me Timezone) Match(v Timezone) bool {
-	return v.Begin.InZone(me) || v.End.InZone(me)
+	return 0 == me.Compare(v)
 }
 
 func (me Timezone) Intersect(v Timezone) Timezone {
