@@ -581,6 +581,10 @@ type Timezone struct {
 	End   Timespec `json:"end"`
 }
 
+func (me *Timezone) Diff() Time64 {
+	return me.End.Time64() - me.Begin.Time64()
+}
+
 func (me *Timezone) Update(t Timezone) {
 	me.Begin.Update(t.Begin)
 	me.End.Update(t.End)
