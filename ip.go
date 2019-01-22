@@ -330,9 +330,9 @@ func (me IpZone) Match(v IpZone) bool {
 	return 0 == me.Compare(v)
 }
 
-func (me IpZone) Intersect(v IpZone) IpZone {
+func (me IpZone) Intersect(v IpZone) (IpZone, bool) {
 	if 0 != me.Compare(v) {
-		return IpZone{}
+		return IpZone{}, false
 	}
 
 	// get max begin
@@ -350,5 +350,5 @@ func (me IpZone) Intersect(v IpZone) IpZone {
 	return IpZone{
 		Begin: begin,
 		End:   end,
-	}
+	}, true
 }

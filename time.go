@@ -530,9 +530,9 @@ func (me Timezone32) Match(v Timezone32) bool {
 	return 0 == me.Compare(v)
 }
 
-func (me Timezone32) Intersect(v Timezone32) Timezone32 {
+func (me Timezone32) Intersect(v Timezone32) (Timezone32, bool) {
 	if 0 != me.Compare(v) {
-		return Timezone32{}
+		return Timezone32{}, false
 	}
 
 	// get max begin
@@ -550,7 +550,7 @@ func (me Timezone32) Intersect(v Timezone32) Timezone32 {
 	return Timezone32{
 		Begin: begin,
 		End:   end,
-	}
+	}, true
 }
 
 /******************************************************************************/
@@ -651,9 +651,9 @@ func (me Timezone) Match(v Timezone) bool {
 	return 0 == me.Compare(v)
 }
 
-func (me Timezone) Intersect(v Timezone) Timezone {
+func (me Timezone) Intersect(v Timezone) (Timezone, bool) {
 	if 0 != me.Compare(v) {
-		return Timezone{}
+		return Timezone{}, false
 	}
 
 	// get max begin
@@ -662,16 +662,26 @@ func (me Timezone) Intersect(v Timezone) Timezone {
 		begin = v.Begin
 	}
 
+	Log.Debug("Timezone Intersect: get max begin[%s] from [%s] and [%s]",
+		begin.String(),
+		me.Begin.String(),
+		v.Begin.String())
+
 	// get min end
 	end := me.End
 	if cmp, _ := me.End.Compare(v.End); cmp > 0 {
 		end = v.End
 	}
 
+	Log.Debug("Timezone Intersect: get min end[%s] from [%s] and [%s]",
+		end.String(),
+		me.End.String(),
+		v.End.String())
+
 	return Timezone{
 		Begin: begin,
 		End:   end,
-	}
+	}, true
 }
 
 /******************************************************************************/

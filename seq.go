@@ -104,9 +104,9 @@ func (me Seqzone32) Match(v Seqzone32) bool {
 	return 0 == me.Compare(v)
 }
 
-func (me Seqzone32) Intersect(v Seqzone32) Seqzone32 {
+func (me Seqzone32) Intersect(v Seqzone32) (Seqzone32, bool) {
 	if 0 != me.Compare(v) {
-		return Seqzone32{}
+		return Seqzone32{}, false
 	}
 
 	// get max begin
@@ -124,7 +124,7 @@ func (me Seqzone32) Intersect(v Seqzone32) Seqzone32 {
 	return Seqzone32{
 		Begin: begin,
 		End:   end,
-	}
+	}, true
 }
 
 /******************************************************************************/
@@ -222,9 +222,9 @@ func (me Seqzone) Match(v Seqzone) bool {
 	return 0 == me.Compare(v)
 }
 
-func (me Seqzone) Intersect(v Seqzone) Seqzone {
+func (me Seqzone) Intersect(v Seqzone) (Seqzone, bool) {
 	if 0 != me.Compare(v) {
-		return Seqzone{}
+		return Seqzone{}, false
 	}
 
 	// get max begin
@@ -242,5 +242,5 @@ func (me Seqzone) Intersect(v Seqzone) Seqzone {
 	return Seqzone{
 		Begin: begin,
 		End:   end,
-	}
+	}, true
 }

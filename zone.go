@@ -23,7 +23,7 @@ type IZoneEx interface {
 	Zero()
 	Include(v IZone) bool
 	Match(v IZone) bool
-	Intersect(v IZone) IZone
+	Intersect(v IZone) (IZone, bool)
 }
 
 type IZone interface{}

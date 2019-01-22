@@ -64,9 +64,9 @@ func (me *Idxzone) Match(v Idxzone) bool {
 	return 0 == me.Compare(v)
 }
 
-func (me *Idxzone) Intersect(v Idxzone) Idxzone {
+func (me *Idxzone) Intersect(v Idxzone) (Idxzone, bool) {
 	if 0 != me.Compare(v) {
-		return Idxzone{}
+		return Idxzone{}, false
 	}
 
 	// get max begin
@@ -84,5 +84,5 @@ func (me *Idxzone) Intersect(v Idxzone) Idxzone {
 	return Idxzone{
 		Begin: begin,
 		End:   end,
-	}
+	}, true
 }
