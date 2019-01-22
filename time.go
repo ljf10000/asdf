@@ -508,8 +508,26 @@ func (me Timezone32) Include(z Timezone32) bool {
 	return me.Begin <= z.Begin && me.End >= z.End
 }
 
+func (me Timezone32) Compare(v Timezone32) int {
+	if me.End < v.Begin {
+		// |--------- me ---------|
+		//                            |----- v -----|
+		return -1
+	} else if me.Begin > v.End {
+		//                  |--------- me ---------|
+		// |----- v -----|
+		return 1
+	} else {
+		//            |--------- me ---------|
+		// |----- v -----|
+		//                 |----- v -----|
+		//                                 |----- v -----|
+		return 0
+	}
+}
+
 func (me Timezone32) Match(v Timezone32) bool {
-	return v.Begin.InZone(me) || v.End.InZone(me)
+	return 0 == me.Compare(v)
 }
 
 func (me Timezone32) Intersect(v Timezone32) Timezone32 {
@@ -539,24 +557,6 @@ func (me Timezone32) Intersect(v Timezone32) Timezone32 {
 			// |----- v -----|              or              |----- v -----|
 			return Timezone32{}
 		}
-	}
-}
-
-func (me Timezone32) Compare(v Timezone32) int {
-	if me.End < v.Begin {
-		// |--------- me ---------|
-		//                            |----- v -----|
-		return -1
-	} else if me.Begin > v.End {
-		//                  |--------- me ---------|
-		// |----- v -----|
-		return 1
-	} else {
-		//            |--------- me ---------|
-		// |----- v -----|
-		//                 |----- v -----|
-		//                                 |----- v -----|
-		return 0
 	}
 }
 
@@ -635,40 +635,6 @@ func (me Timezone) Include(v Timezone) bool {
 	return a <= 0 && b >= 0
 }
 
-func (me Timezone) Match(v Timezone) bool {
-	return 0 == me.Compare(v)
-}
-
-func (me Timezone) Intersect(v Timezone) Timezone {
-	if v.Begin.InZone(me) {
-		if v.End.InZone(me) {
-			// |--------- me ---------|
-			//     |----- v -----|
-			return v
-		} else {
-			// |--------- me ---------|
-			//               |----- v -----|
-			return Timezone{
-				Begin: v.Begin,
-				End:   me.End,
-			}
-		}
-	} else {
-		if v.End.InZone(me) {
-			//     |--------- me ---------|
-			// |----- v -----|
-			return Timezone{
-				Begin: me.Begin,
-				End:   v.End,
-			}
-		} else {
-			//                  |--------- me ---------|
-			// |----- v -----|              or              |----- v -----|
-			return Timezone{}
-		}
-	}
-}
-
 func (me Timezone) Compare(v Timezone) int {
 	if cmp, _ := me.End.Compare(v.Begin); cmp < 0 {
 		// |--------- me ---------|
@@ -685,6 +651,33 @@ func (me Timezone) Compare(v Timezone) int {
 		//                                 |----- v -----|
 		//       |--------------- v ----------------|
 		return 0
+	}
+}
+
+func (me Timezone) Match(v Timezone) bool {
+	return 0 == me.Compare(v)
+}
+
+func (me Timezone) Intersect(v Timezone) Timezone {
+	if 0 != me.Compare(v) {
+		return Timezone{}
+	}
+
+	// get max begin
+	begin := me.Begin
+	if cmp, _ := me.Begin.Compare(v.Begin); cmp < 0 {
+		begin = v.Begin
+	}
+
+	// get min end
+	end := me.End
+	if cmp, _ := me.End.Compare(v.End); cmp > 0 {
+		end = v.End
+	}
+
+	return Timezone{
+		Begin: begin,
+		End:   end,
 	}
 }
 

@@ -308,8 +308,26 @@ func (me IpZone) Include(z IpZone) bool {
 	return me.Begin <= z.Begin && me.End >= z.End
 }
 
+func (me IpZone) Compare(v IpZone) int {
+	if me.End < v.Begin {
+		// |--------- me ---------|
+		//                            |----- v -----|
+		return -1
+	} else if me.Begin > v.End {
+		//                  |--------- me ---------|
+		// |----- v -----|
+		return 1
+	} else {
+		//            |--------- me ---------|
+		// |----- v -----|
+		//                 |----- v -----|
+		//                                 |----- v -----|
+		return 0
+	}
+}
+
 func (me IpZone) Match(v IpZone) bool {
-	return v.Begin.InZone(me) || v.End.InZone(me)
+	return 0 == me.Compare(v)
 }
 
 func (me IpZone) Intersect(v IpZone) IpZone {
@@ -339,23 +357,5 @@ func (me IpZone) Intersect(v IpZone) IpZone {
 			// |----- v -----|              or              |----- v -----|
 			return IpZone{}
 		}
-	}
-}
-
-func (me IpZone) Compare(v IpZone) int {
-	if me.End < v.Begin {
-		// |--------- me ---------|
-		//                            |----- v -----|
-		return -1
-	} else if me.Begin > v.End {
-		//                  |--------- me ---------|
-		// |----- v -----|
-		return 1
-	} else {
-		//            |--------- me ---------|
-		// |----- v -----|
-		//                 |----- v -----|
-		//                                 |----- v -----|
-		return 0
 	}
 }

@@ -82,8 +82,26 @@ func (me Seqzone32) Include(z Seqzone32) bool {
 	return me.Begin <= z.Begin && me.End >= z.End
 }
 
+func (me Seqzone32) Compare(v Seqzone32) int {
+	if me.End < v.Begin {
+		// |--------- me ---------|
+		//                            |----- v -----|
+		return -1
+	} else if me.Begin > v.End {
+		//                  |--------- me ---------|
+		// |----- v -----|
+		return 1
+	} else {
+		//            |--------- me ---------|
+		// |----- v -----|
+		//                 |----- v -----|
+		//                                 |----- v -----|
+		return 0
+	}
+}
+
 func (me Seqzone32) Match(v Seqzone32) bool {
-	return v.Begin.InZone(me) || v.End.InZone(me)
+	return 0 == me.Compare(v)
 }
 
 func (me Seqzone32) Intersect(v Seqzone32) Seqzone32 {
@@ -114,24 +132,6 @@ func (me Seqzone32) Intersect(v Seqzone32) Seqzone32 {
 			// |----- v -----|              or              |----- v -----|
 			return Seqzone32{}
 		}
-	}
-}
-
-func (me Seqzone32) Compare(v Seqzone32) int {
-	if me.End < v.Begin {
-		// |--------- me ---------|
-		//                            |----- v -----|
-		return -1
-	} else if me.Begin > v.End {
-		//                  |--------- me ---------|
-		// |----- v -----|
-		return 1
-	} else {
-		//            |--------- me ---------|
-		// |----- v -----|
-		//                 |----- v -----|
-		//                                 |----- v -----|
-		return 0
 	}
 }
 
@@ -208,8 +208,26 @@ func (me Seqzone) Include(z Seqzone) bool {
 	return me.Begin <= z.Begin && me.End >= z.End
 }
 
+func (me Seqzone) Compare(v Seqzone) int {
+	if me.End < v.Begin {
+		// |--------- me ---------|
+		//                            |----- v -----|
+		return -1
+	} else if me.Begin > v.End {
+		//                  |--------- me ---------|
+		// |----- v -----|
+		return 1
+	} else {
+		//            |--------- me ---------|
+		// |----- v -----|
+		//                 |----- v -----|
+		//                                 |----- v -----|
+		return 0
+	}
+}
+
 func (me Seqzone) Match(v Seqzone) bool {
-	return v.Begin.InZone(me) || v.End.InZone(me)
+	return 0 == me.Compare(v)
 }
 
 func (me Seqzone) Intersect(v Seqzone) Seqzone {
@@ -240,23 +258,5 @@ func (me Seqzone) Intersect(v Seqzone) Seqzone {
 			// |----- v -----|              or              |----- v -----|
 			return Seqzone{}
 		}
-	}
-}
-
-func (me Seqzone) Compare(v Seqzone) int {
-	if me.End < v.Begin {
-		// |--------- me ---------|
-		//                            |----- v -----|
-		return -1
-	} else if me.Begin > v.End {
-		//                  |--------- me ---------|
-		// |----- v -----|
-		return 1
-	} else {
-		//            |--------- me ---------|
-		// |----- v -----|
-		//                 |----- v -----|
-		//                                 |----- v -----|
-		return 0
 	}
 }
