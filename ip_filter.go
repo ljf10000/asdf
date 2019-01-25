@@ -391,6 +391,8 @@ func MakeIpPairCache() IpPairCache {
 }
 
 type IpPairCache struct {
+	// 0: 正向命中, sip/dip 命中 ip2tuple
+	// 1: 反向命中, dip/sip 命中 ip2tuple
 	Hit   [2]int
 	Cache map[Ip2Tuple]bool
 }
@@ -414,9 +416,7 @@ func (me *IpPairCache) isMatch(sip, dip IpAddress) bool {
 		Dip: dip,
 	}
 
-	_, ok := me.Cache[tuple]
-
-	return ok
+	return me.Cache[tuple]
 }
 
 func (me *IpPairCache) Add(sip, dip IpAddress) {
