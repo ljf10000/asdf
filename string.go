@@ -254,6 +254,12 @@ func Atoi(s string) int {
 
 /******************************************************************************/
 
+func NewStringEx(n int) String {
+	return String{
+		ss: make([]string, n),
+	}
+}
+
 func NewString(n int) String {
 	const (
 		min = 128
@@ -266,9 +272,7 @@ func NewString(n int) String {
 		n = max
 	}
 
-	return String{
-		ss: make([]string, n),
-	}
+	return NewStringEx(n)
 }
 
 type String struct {
