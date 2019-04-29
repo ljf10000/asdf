@@ -390,10 +390,9 @@ func MakeIpPairCache() IpPairCache {
 	}
 }
 
+// 存储和匹配时，地址小的ip作为 Ip2Tuple 的 Sip
 type IpPairCache struct {
-	// 0: 正向命中, sip/dip 命中 ip2tuple
-	// 1: 反向命中, dip/sip 命中 ip2tuple
-	Hit   [2]int
+	Hit   [IpTupleDirEnd]int
 	Cache map[Ip2Tuple]bool
 }
 
@@ -405,39 +404,25 @@ func (me *IpPairCache) String() string {
 	}
 
 	return "[" +
-		strconv.Itoa(me.Hit[0]) + ", " +
-		strconv.Itoa(me.Hit[1]) + ", " +
+		strconv.Itoa(me.Hit[IpTupleDirNormal]) + ", " +
+		strconv.Itoa(me.Hit[IpTupleDirReverse]) + ", " +
 		SkipString(s, 2) + "]"
 }
 
-func (me *IpPairCache) isMatch(sip, dip IpAddress) bool {
-	tuple := Ip2Tuple{
-		Sip: sip,
-		Dip: dip,
-	}
-
-	return me.Cache[tuple]
-}
-
 func (me *IpPairCache) Add(sip, dip IpAddress) {
-	tuple := Ip2Tuple{
-		Sip: sip,
-		Dip: dip,
-	}
+	tuple, _ := MakeIp2TupleByDir(sip, dip)
 
 	me.Cache[tuple] = true
 }
 
 func (me *IpPairCache) IsMatch(sip, dip IpAddress) bool {
-	if me.isMatch(sip, dip) {
-		me.Hit[0]++
+	tuple, dir := MakeIp2TupleByDir(sip, dip)
+
+	if _, ok := me.Cache[tuple]; ok {
+		me.Hit[dir]++
 
 		return true
-	} else if me.isMatch(dip, sip) {
-		me.Hit[1]++
-
-		return true
-	} else {
-		return false
 	}
+
+	return false
 }

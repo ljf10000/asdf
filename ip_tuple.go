@@ -79,6 +79,28 @@ func (me *PortTuple) Index() int {
 }
 
 /******************************************************************************/
+type IpTupleDir int
+
+const (
+	IpTupleDirNormal  IpTupleDir = 0
+	IpTupleDirReverse IpTupleDir = 1
+	IpTupleDirEnd     IpTupleDir = 2
+)
+
+// 地址小的ip作为 Ip2Tuple 的 Sip
+func MakeIp2TupleByDir(sip, dip IpAddress) (Ip2Tuple, IpTupleDir) {
+	if sip < dip {
+		return Ip2Tuple{
+			Sip: sip,
+			Dip: dip,
+		}, IpTupleDirNormal
+	} else {
+		return Ip2Tuple{
+			Sip: dip,
+			Dip: sip,
+		}, IpTupleDirReverse
+	}
+}
 
 func MakeIp2Tuple(sip, dip IpAddress) Ip2Tuple {
 	return Ip2Tuple{
