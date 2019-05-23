@@ -56,7 +56,7 @@ func (me Slice) Eq(it interface{}) bool {
 func ObjToSlice(obj unsafe.Pointer, size int) []byte {
 	if nil != obj {
 		bin := Slice{}
-		
+
 		hdr := bin.Header()
 		hdr.Data = uintptr(obj)
 		hdr.Len = size

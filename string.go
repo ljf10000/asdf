@@ -1,9 +1,11 @@
 package asdf
 
 import (
+	"reflect"
 	"strconv"
 	"strings"
 	"unicode/utf8"
+	"unsafe"
 )
 
 const (
@@ -254,13 +256,13 @@ func Atoi(s string) int {
 
 /******************************************************************************/
 
-func NewStringEx(n int) String {
-	return String{
+func NewStringArrayEx(n int) StringArray {
+	return StringArray{
 		ss: make([]string, n),
 	}
 }
 
-func NewString(n int) String {
+func NewStringArray(n int) StringArray {
 	const (
 		min = 128
 		max = 1024
@@ -272,15 +274,15 @@ func NewString(n int) String {
 		n = max
 	}
 
-	return NewStringEx(n)
+	return NewStringArrayEx(n)
 }
 
-type String struct {
+type StringArray struct {
 	ss  []string
 	cur int
 }
 
-func (me *String) grow(n int) {
+func (me *StringArray) grow(n int) {
 	count := len(me.ss)
 	if count > n {
 		n += count
@@ -295,7 +297,7 @@ func (me *String) grow(n int) {
 	me.ss = ss
 }
 
-func (me *String) Add(v ...string) {
+func (me *StringArray) Add(v ...string) {
 	count := len(v)
 
 	// BUGFIX: bug is <
@@ -314,7 +316,7 @@ func (me *String) Add(v ...string) {
 	me.cur += count
 }
 
-func (me *String) Build(sep string) string {
+func (me *StringArray) Build(sep string) string {
 	if me.cur > 0 {
 		return strings.Join(me.ss[:me.cur], sep)
 	} else {
@@ -322,6 +324,70 @@ func (me *String) Build(sep string) string {
 	}
 }
 
-func (me *String) String() string {
+func (me *StringArray) String() string {
 	return me.Build(", ")
+}
+
+/******************************************************************************/
+
+type String string
+
+func (me *String) Header() *reflect.StringHeader {
+	return (*reflect.StringHeader)(unsafe.Pointer(me))
+}
+
+func (me String) String() string {
+	return string(me)
+}
+
+func (me String) Eq(it interface{}) bool {
+	v, ok := it.(IString)
+	if !ok {
+		return false
+	}
+
+	return string(me) == v.String()
+}
+
+func ObjToString(obj unsafe.Pointer, size int) string {
+	if nil != obj {
+		var s String
+
+		hdr := s.Header()
+		hdr.Data = uintptr(obj)
+		hdr.Len = size
+
+		return string(s)
+	} else {
+		return Empty
+	}
+}
+
+func MemberToString(obj unsafe.Pointer, offset, size uintptr) string {
+	member := unsafe.Pointer(uintptr(obj) + offset)
+
+	return ObjToString(member, int(size))
+}
+
+func MakeStringEx(Data uintptr, Len int) string {
+	var s String
+
+	h := s.Header()
+
+	h.Data = Data
+	h.Len = Len
+
+	return string(s)
+}
+
+func MakeString(obj unsafe.Pointer, Len int) string {
+	return MakeStringEx(uintptr(obj), Len)
+}
+
+func StringAddress(s string) uintptr {
+	return ((*reflect.StringHeader)(unsafe.Pointer(&s))).Data
+}
+
+func StringPointer(s string) unsafe.Pointer {
+	return unsafe.Pointer(((*reflect.StringHeader)(unsafe.Pointer(&s))).Data)
 }
