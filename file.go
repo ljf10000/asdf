@@ -20,6 +20,8 @@ const (
 	FilePermExec   = 0755
 	FilePermNormal = 0644
 	FilePermDir    = os.ModeDir | FilePermExec
+
+	FileNameSplit = "."
 )
 
 const (
@@ -342,7 +344,7 @@ func (me FileName) LoadYaml(obj interface{}) error {
 func (me FileName) ConfigFileType() (ConfigFileType, error) {
 	var confType ConfigFileType
 
-	split := strings.Split(string(me), ".")
+	split := strings.Split(string(me), FileNameSplit)
 	if 2 != len(split) {
 		return 0, ErrSprintf("bad config file name: %s", string(me))
 	} else if err := confType.FromString(split[1]); nil != err {

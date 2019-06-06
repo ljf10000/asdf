@@ -88,7 +88,7 @@ func lineSprintf(iLine int, bin []byte) string {
 		if v >= 0x20 && v <= 0x7e {
 			s += string(v)
 		} else {
-			s += "."
+			s += FileNameSplit
 		}
 	}
 	s += Crlf

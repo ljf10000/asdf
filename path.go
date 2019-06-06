@@ -8,7 +8,7 @@ import (
 func CurrentDirectory() string {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
-		return "."
+		return FileNameSplit
 	}
 
 	return dir
