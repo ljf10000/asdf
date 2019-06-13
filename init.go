@@ -10,6 +10,7 @@ var sizeCheckers = []*SizeChecker{
 	scIp4Tuple,
 	scIp5Tuple,
 	scIp6Tuple,
+	scFlatString,
 }
 
 func initEnum() {
