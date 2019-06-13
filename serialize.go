@@ -33,7 +33,7 @@ func GobMarshal(obj interface{}) ([]byte, error) {
 	return w.Bytes(), nil
 }
 
-func GobUnmarshal(obj interface{}, data []byte) error {
+func GobUnmarshal(data []byte, obj interface{}) error {
 	r := bytes.NewBuffer(data)
 	dec := gob.NewDecoder(r)
 

@@ -283,6 +283,16 @@ func (me FileName) LoadByLine(lineHandle func(line string) error) error {
 	return nil
 }
 
+type JsonFile FileName
+
+func (me JsonFile) Save(obj interface{}) error {
+	return FileName(me).SaveJson(obj)
+}
+
+func (me JsonFile) Load(obj interface{}) error {
+	return FileName(me).LoadJson(obj)
+}
+
 func (me FileName) SaveJson(obj interface{}) error {
 	buf, err := json.MarshalIndent(obj, Empty, "\t")
 	if nil != err {
@@ -312,6 +322,16 @@ func (me FileName) LoadJson(obj interface{}) error {
 	return nil
 }
 
+type YamlFile FileName
+
+func (me YamlFile) Save(obj interface{}) error {
+	return FileName(me).SaveYaml(obj)
+}
+
+func (me YamlFile) Load(obj interface{}) error {
+	return FileName(me).LoadYaml(obj)
+}
+
 func (me FileName) SaveYaml(obj interface{}) error {
 	buf, err := yaml.Marshal(obj)
 	if nil != err {
@@ -334,6 +354,45 @@ func (me FileName) LoadYaml(obj interface{}) error {
 	err = yaml.Unmarshal(buf, obj)
 	if nil != err {
 		Log.Error("unmarshal %s yaml error: %s", me, err)
+
+		return err
+	}
+
+	return nil
+}
+
+type GobFile FileName
+
+func (me GobFile) Save(obj interface{}) error {
+	return FileName(me).SaveGob(obj)
+}
+
+func (me GobFile) Load(obj interface{}) error {
+	return FileName(me).LoadGob(obj)
+}
+
+func (me FileName) SaveGob(obj interface{}) error {
+	buf, err := GobMarshal(obj)
+	if nil != err {
+		Log.Error("save %s gob error: %s", me, err)
+
+		return err
+	}
+
+	return me.Save(buf)
+}
+
+func (me FileName) LoadGob(obj interface{}) error {
+	buf, err := me.Load()
+	if nil != err {
+		Log.Error("load %s gob error: %s", me, err)
+
+		return err
+	}
+
+	err = GobUnmarshal(buf, obj)
+	if nil != err {
+		Log.Error("unmarshal %s gob error: %s", me, err)
 
 		return err
 	}
@@ -435,7 +494,7 @@ func (me FileName) DirScanSimple(scan func(path string, info os.FileInfo) error)
 		return errors.New(fmt.Sprintf("dir:%s not exist", me))
 	}
 
-	return filepath.Walk(me.String(), func(path string, info os.FileInfo, err error) error {
+	return filepath.Walk(string(me), func(path string, info os.FileInfo, err error) error {
 		if nil != err {
 			return err
 		} else if info.IsDir() {
