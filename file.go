@@ -84,16 +84,6 @@ func FileSize(f *os.File) int64 {
 	return st.Size()
 }
 
-type FileName string
-
-func (me FileName) String() string {
-	return string(me)
-}
-
-func (me FileName) Abs() FileName {
-	return FileName(CurrentDirFile(string(me)))
-}
-
 func FileShortName(path string) string {
 	for i := len(path) - 1; i >= 0; i-- {
 		if os.IsPathSeparator(path[i]) {
@@ -102,6 +92,54 @@ func FileShortName(path string) string {
 	}
 
 	return Empty
+}
+
+/******************************************************************************/
+
+type GobFile FileName
+
+func (me GobFile) Save(obj interface{}) error {
+	return FileName(me).SaveGob(obj)
+}
+
+func (me GobFile) Load(obj interface{}) error {
+	return FileName(me).LoadGob(obj)
+}
+
+/******************************************************************************/
+
+type JsonFile FileName
+
+func (me JsonFile) Save(obj interface{}) error {
+	return FileName(me).SaveJson(obj)
+}
+
+func (me JsonFile) Load(obj interface{}) error {
+	return FileName(me).LoadJson(obj)
+}
+
+/******************************************************************************/
+
+type YamlFile FileName
+
+func (me YamlFile) Save(obj interface{}) error {
+	return FileName(me).SaveYaml(obj)
+}
+
+func (me YamlFile) Load(obj interface{}) error {
+	return FileName(me).LoadYaml(obj)
+}
+
+/******************************************************************************/
+
+type FileName string
+
+func (me FileName) String() string {
+	return string(me)
+}
+
+func (me FileName) Abs() FileName {
+	return FileName(CurrentDirFile(string(me)))
 }
 
 func (me FileName) ShortName() string {
@@ -283,16 +321,6 @@ func (me FileName) LoadByLine(lineHandle func(line string) error) error {
 	return nil
 }
 
-type JsonFile FileName
-
-func (me JsonFile) Save(obj interface{}) error {
-	return FileName(me).SaveJson(obj)
-}
-
-func (me JsonFile) Load(obj interface{}) error {
-	return FileName(me).LoadJson(obj)
-}
-
 func (me FileName) SaveJson(obj interface{}) error {
 	buf, err := json.MarshalIndent(obj, Empty, "\t")
 	if nil != err {
@@ -322,16 +350,6 @@ func (me FileName) LoadJson(obj interface{}) error {
 	return nil
 }
 
-type YamlFile FileName
-
-func (me YamlFile) Save(obj interface{}) error {
-	return FileName(me).SaveYaml(obj)
-}
-
-func (me YamlFile) Load(obj interface{}) error {
-	return FileName(me).LoadYaml(obj)
-}
-
 func (me FileName) SaveYaml(obj interface{}) error {
 	buf, err := yaml.Marshal(obj)
 	if nil != err {
@@ -359,16 +377,6 @@ func (me FileName) LoadYaml(obj interface{}) error {
 	}
 
 	return nil
-}
-
-type GobFile FileName
-
-func (me GobFile) Save(obj interface{}) error {
-	return FileName(me).SaveGob(obj)
-}
-
-func (me GobFile) Load(obj interface{}) error {
-	return FileName(me).LoadGob(obj)
 }
 
 func (me FileName) SaveGob(obj interface{}) error {
