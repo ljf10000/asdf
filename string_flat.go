@@ -10,7 +10,7 @@ const (
 	FLAT_STRING_ALIGN_MASK = FLAT_STRING_ALIGN - 1
 )
 
-func flatStringAlign(v int) int {
+func FlatStringAlign(v int) int {
 	return (v + FLAT_STRING_ALIGN - 1) & ^FLAT_STRING_ALIGN_MASK
 }
 
@@ -51,7 +51,7 @@ func (me *FlatString) Write(s string) {
 func (me *FlatString) Len() int {
 	size := int(me.size)
 
-	return flatStringAlign(size) + SizeofFlatString
+	return FlatStringAlign(size) + SizeofFlatString
 }
 
 func (me *FlatString) Bin() []byte {
