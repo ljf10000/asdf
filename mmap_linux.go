@@ -11,22 +11,22 @@ func mmap(Len int, inprot, inflags, fd uintptr, off int64) ([]byte, error) {
 	prot := syscall.PROT_READ
 
 	switch {
-	case inprot&COPY != 0:
+	case inprot&MMAP_COPY != 0:
 		prot |= syscall.PROT_WRITE
 		flags = syscall.MAP_PRIVATE
-	case inprot&RDWR != 0:
+	case inprot&MMAP_RW != 0:
 		prot |= syscall.PROT_WRITE
 	}
 
-	if inprot&EXEC != 0 {
+	if inprot&MMAP_EXEC != 0 {
 		prot |= syscall.PROT_EXEC
 	}
 
-	if inflags&ANON != 0 {
+	if inflags&MMAP_ANON != 0 {
 		flags |= syscall.MAP_ANON
 	}
 
-	if inflags&HUGE != 0 {
+	if inflags&MMAP_HUGE != 0 {
 		flags |= syscall.MAP_HUGETLB
 	}
 
