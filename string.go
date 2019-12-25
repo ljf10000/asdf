@@ -13,6 +13,10 @@ const (
 	Space  = " "
 	Unknow = "unknow"
 
+	Space2 = Space + Space
+	Space4 = Space2 + Space2
+	Space8 = Space4 + Space4
+
 	Tab  = Space + Space + Space + Space
 	Tab2 = Tab + Tab
 	Tab3 = Tab2 + Tab
@@ -262,6 +266,16 @@ func (me *String) Header() *reflect.StringHeader {
 	return (*reflect.StringHeader)(unsafe.Pointer(me))
 }
 
+func (me String) Slice() []byte {
+	h := me.Header()
+
+	return MakeSliceEx(h.Data, h.Len, h.Len)
+}
+
+func (me String) Bin() []byte {
+	return me.Slice()
+}
+
 func (me String) String() string {
 	return string(me)
 }
@@ -316,4 +330,14 @@ func StringAddress(s string) uintptr {
 
 func StringPointer(s string) unsafe.Pointer {
 	return unsafe.Pointer(((*reflect.StringHeader)(unsafe.Pointer(&s))).Data)
+}
+
+func StringToBin(v string) []byte {
+	s := String(v)
+
+	return s.Bin()
+}
+
+func BinToString(v []byte) string {
+	return MakeString(SlicePointer(v), len(v))
 }
