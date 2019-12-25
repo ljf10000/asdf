@@ -68,6 +68,14 @@ func ObjToSlice(obj unsafe.Pointer, size int) []byte {
 	}
 }
 
+func AddPointer(obj unsafe.Pointer, offset uintptr) unsafe.Pointer {
+	return unsafe.Pointer(uintptr(obj) + offset)
+}
+
+func SubPointer(obj unsafe.Pointer, offset uintptr) unsafe.Pointer {
+	return unsafe.Pointer(uintptr(obj) - offset)
+}
+
 func MemberToSlice(obj unsafe.Pointer, offset, size uintptr) []byte {
 	member := unsafe.Pointer(uintptr(obj) + offset)
 
