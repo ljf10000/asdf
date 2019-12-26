@@ -218,6 +218,28 @@ func (me FileName) Append(buf []byte) error {
 	return nil
 }
 
+func (me FileName) AppendList(bufs [][]byte) error {
+	f, err := os.OpenFile(string(me), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if nil != err {
+		Log.Error("open %s error: %s", me, err)
+
+		return err
+	}
+
+	for _, buf := range bufs {
+		_, err = f.Write(buf)
+		if nil != err {
+			Log.Error("write %s error: %s", me, err)
+
+			return err
+		}
+	}
+
+	f.Close()
+
+	return err
+}
+
 func (me FileName) AppendLine(line string) error {
 	return me.Append([]byte(line + Crlf))
 }
