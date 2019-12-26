@@ -5,6 +5,12 @@ import (
 	"time"
 )
 
+func Panicf(format string, v ...interface{}) {
+	Log.Emerg("Panic: "+format, v...)
+
+	panic(fmt.Sprintf(format, v...))
+}
+
 func Panic(format string, v ...interface{}) {
 	Log.Emerg("Panic: "+format, v...)
 
