@@ -122,6 +122,10 @@ func (me Time32) String() string {
 	return me.Unix().Format(TimeFormat)
 }
 
+func (me Time32) Swap() Time32 {
+	return Time32(uint32(me))
+}
+
 func (me Time32) Unix() time.Time {
 	return time.Unix(int64(me), 0)
 }
@@ -280,6 +284,10 @@ func (me *Timespec) Export() Timespec {
 	}
 }
 
+func (me Timespec) Swap() Timespec {
+	return MakeTimespec(me.Second.Swap(), me.Nano.Swap())
+}
+
 func (me Timespec) Date() Date {
 	return me.Second.Date()
 }
@@ -394,6 +402,10 @@ func (me Timeval) IsGood() bool {
 	return me.Second > 0 || me.Micro > 0
 }
 
+func (me Timeval) Swap() Timeval {
+	return MakeTimeval(me.Second.Swap(), me.Micro.Swap())
+}
+
 func (me *Timeval) Zero() {
 	me.Second = 0
 	me.Micro = 0
@@ -488,6 +500,13 @@ func (me Timezone32) String() string {
 
 func (me Timezone32) IsGood() bool {
 	return me.Begin.IsGood() || me.End.IsGood()
+}
+
+func (me Timezone32) Swap() Timezone32 {
+	return Timezone32{
+		Begin: me.Begin.Swap(),
+		End:   me.End.Swap(),
+	}
 }
 
 func (me *Timezone32) Zero() {
@@ -587,6 +606,13 @@ func (me *Timezone) Export() Timezone {
 	return Timezone{
 		Begin: me.Begin.Export(),
 		End:   me.End.Export(),
+	}
+}
+
+func (me Timezone) Swap() Timezone {
+	return Timezone{
+		Begin: me.Begin.Swap(),
+		End:   me.End.Swap(),
 	}
 }
 
