@@ -17,6 +17,29 @@ type DirofNetwork byte
 var BIG_ENDIAN = isBigEndian()
 var LITTLE_ENDIAN = !BIG_ENDIAN
 
+const (
+	NETWORK_SORT ByteSort = 0
+	HOST_SORT    ByteSort = 1
+)
+
+type ByteSort byte
+
+func (me ByteSort) String() string {
+	if me.IsHostSort() {
+		return "host"
+	} else {
+		return "network"
+	}
+}
+
+func (me ByteSort) IsHostSort() bool {
+	return HOST_SORT == me
+}
+
+func (me ByteSort) IsNetworkSort() bool {
+	return NETWORK_SORT == me
+}
+
 func isBigEndian() bool {
 	v := uint32(0x11223344)
 
