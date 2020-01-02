@@ -14,10 +14,10 @@ func CurrentDirectory() string {
 	return dir
 }
 
-func MakeDirectory(dir string) {
-	// dirs := filepath.SplitList(dir)
-}
-
 func CurrentDirFile(file string) string {
 	return filepath.Join(CurrentDirectory(), file)
+}
+
+func WorkDirectory() string {
+	return CurrentDirectory()
 }

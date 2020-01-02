@@ -6,6 +6,8 @@ import (
 )
 
 const (
+	LOCAL_HOST = "127.0.0.1"
+
 	ToServer DirofNetwork = 0
 	ToClient DirofNetwork = 1
 )
