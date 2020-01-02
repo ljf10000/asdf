@@ -198,6 +198,8 @@ var (
 	ErrTooMore                = NewError(StdErrTooMore)
 	ErrTooShortBuffer         = NewError(StdErrTooShortBuffer)
 	ErrPktLenNoMatchBufferLen = NewError(StdErrPktLenNoMatchBufferLen)
+
+	ErrNetClosing = errors.New("use of closed network connection")
 )
 
 func NewError(err int) error {
