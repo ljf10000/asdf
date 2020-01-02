@@ -81,6 +81,8 @@ func (me *CoLogger) tryCut() error {
 func (me *CoLogger) run(ch CoLogChan, show bool) {
 	fmt.Printf("cologger running...\n")
 
+	me.tryCut()
+
 	for {
 		msg, ok := <-ch
 		if !ok {

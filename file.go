@@ -10,7 +10,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"time"
 
 	yaml "gopkg.in/yaml.v2"
@@ -433,14 +432,15 @@ func (me FileName) LoadGob(obj interface{}) error {
 func (me FileName) ConfigFileType() (ConfigFileType, error) {
 	var confType ConfigFileType
 
-	split := strings.Split(string(me), FileNameSplit)
-	if 2 != len(split) {
-		return 0, ErrSprintf("bad config file name: %s", string(me))
-	} else if err := confType.FromString(split[1]); nil != err {
-		return 0, ErrSprintf("bad config file suffix: %s", string(me))
+	suffix := filepath.Ext(string(me))
+	suffix = suffix[1:]
+	if 0 == len(suffix) {
+		return 0, ErrSprintf("bad config file name: %s, without suffix", string(me))
+	} else if err := confType.FromString(suffix); nil != err {
+		return 0, ErrSprintf("bad config file suffix: %s, with suffix: %s", string(me), suffix)
+	} else {
+		return confType, nil
 	}
-
-	return confType, nil
 }
 
 func (me FileName) LoadConf(conf interface{}) error {

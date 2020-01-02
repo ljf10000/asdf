@@ -11,7 +11,7 @@ import (
 const (
 	IP_ANY IpAddress = 0
 
-	IpAddressSplit = FileNameSplit
+	IpAddressSplit = "."
 	IpSubnetSplit  = "/"
 	IpZoneSplit    = "-"
 )
