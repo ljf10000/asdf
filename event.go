@@ -5,12 +5,13 @@ const (
 	EvExit       Event = 1
 	EvQuit       Event = 2
 	EvStop       Event = 3
-	EvReadEof    Event = 4
-	EvReadError  Event = 5
-	EvWriteEof   Event = 6
-	EvWriteError Event = 7
+	EvClose      Event = 4
+	EvReadEof    Event = 5
+	EvReadError  Event = 6
+	EvWriteEof   Event = 7
+	EvWriteError Event = 8
 
-	EvEnd Event = 8
+	EvEnd Event = 9
 )
 
 type Event byte
@@ -18,10 +19,11 @@ type Event byte
 var evTypes = &EnumMapper{
 	Type: "asdf.Event",
 	Names: []string{
-		EvStop:       "stop",
 		EvTick:       "tick",
 		EvExit:       "exit",
 		EvQuit:       "quit",
+		EvStop:       "stop",
+		EvClose:      "close",
 		EvReadEof:    "reof",
 		EvReadError:  "rerr",
 		EvWriteEof:   "weof",
