@@ -20,6 +20,7 @@ const (
 	StdErrTimeout
 	StdErrListen
 	StdErrStop
+	StdErrRelease
 	StdErrLimit
 
 	StdErrNoEnv
@@ -86,6 +87,7 @@ var stdErrMap = map[int]string{
 	StdErrTimeout:   "timeout",
 	StdErrListen:    "listen",
 	StdErrStop:      "stop",
+	StdErrRelease:   "release",
 	StdErrLimit:     "limit",
 
 	StdErrNoEnv:       "no env",
@@ -150,6 +152,7 @@ var (
 	ErrTimeout   = NewError(StdErrTimeout)
 	ErrListen    = NewError(StdErrListen)
 	ErrStop      = NewError(StdErrStop)
+	ErrRelease   = NewError(StdErrRelease)
 	ErrLimit     = NewError(StdErrLimit)
 
 	ErrNoEnv       = NewError(StdErrNoEnv)
