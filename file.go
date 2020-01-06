@@ -506,7 +506,12 @@ func (me FileName) FileSize() (int64, error) {
 func (me FileName) Mkdir() error {
 	dir := filepath.Dir(string(me))
 
-	return os.MkdirAll(dir, FilePermDir)
+	err := os.MkdirAll(dir, FilePermDir)
+	if nil != err {
+		Log.Error("mkdir %s error: %s", me, err)
+	}
+
+	return err
 }
 
 func (me FileName) DirExist() bool {
