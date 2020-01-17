@@ -309,6 +309,16 @@ func (me *Timespec) Zero() {
 	me.Nano = 0
 }
 
+func (me *Timespec) SetMax() {
+	me.Second = 0xffffffff
+	me.Nano = 0xffffffff
+}
+
+func (me *Timespec) SetMin() {
+	me.Second = 0
+	me.Nano = 0
+}
+
 func (me Timespec) Up() Timespec {
 	return Timespec{
 		Second: me.Second + 1,
