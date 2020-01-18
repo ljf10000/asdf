@@ -155,7 +155,7 @@ var logLevels = [LogLevelEnd]LogLevelMapper{
 		Short: "E",
 	},
 	LogLevelWarning: LogLevelMapper{
-		Name:  "warning",
+		Name:  "warn",
 		Short: "W",
 	},
 	LogLevelNotice: LogLevelMapper{
