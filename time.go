@@ -217,7 +217,7 @@ func (me Time64) Unix() time.Time {
 	return time.Unix(int64(s), int64(n))
 }
 
-func (me Time64) Compare(v Time64) (int, Time64 /*diff*/) {
+func (me Time64) CompareEx(v Time64) (int, Time64 /*diff*/) {
 	switch {
 	case me > v:
 		return 1, me - v
@@ -226,6 +226,12 @@ func (me Time64) Compare(v Time64) (int, Time64 /*diff*/) {
 	default: // case me < v:
 		return -1, v - me
 	}
+}
+
+func (me Time64) Compare(v Time64) int {
+	cmp, _ := me.CompareEx(v)
+
+	return cmp
 }
 
 func (me Time64) Split() (Time32, Timens) {
@@ -352,21 +358,27 @@ func (me Timespec) Load(t Time64) {
 	me.Second, me.Nano = t.Split()
 }
 
-func (me Timespec) Compare(v Timespec) (int, Timespec /*diff*/) {
+func (me Timespec) CompareEx(v Timespec) (int, Timespec /*diff*/) {
 	a := me.Time64()
 	b := v.Time64()
 
-	cmp, diff := a.Compare(b)
+	cmp, diff := a.CompareEx(b)
 
 	return cmp, diff.Timespec()
 }
 
+func (me Timespec) Compare(v Timespec) int {
+	cmp, _ := me.CompareEx(v)
+
+	return cmp
+}
+
 func (me Timespec) inRange(a, b Timespec) bool {
-	if cmp, _ := me.Compare(a); cmp < 0 { // me < a
+	if me.Compare(a) < 0 { // me < a
 		return false
 	}
 
-	if cmp, _ := me.Compare(b); cmp > 0 { // me > b
+	if me.Compare(b) > 0 { // me > b
 		return false
 	}
 
@@ -374,8 +386,7 @@ func (me Timespec) inRange(a, b Timespec) bool {
 }
 
 func (me Timespec) InRange(a, b Timespec) bool {
-	cmp, _ := a.Compare(b)
-	if cmp < 0 {
+	if a.Compare(b) < 0 {
 		// a < b
 		return me.inRange(a, b)
 	} else {
@@ -456,21 +467,27 @@ func (me *Timeval) Load(t Time64) {
 	me.Micro /= 1000
 }
 
-func (me Timeval) Compare(v Timeval) (int, Timeval /*diff*/) {
+func (me Timeval) CompareEx(v Timeval) (int, Timeval /*diff*/) {
 	a := me.Time64()
 	b := me.Time64()
 
-	cmp, diff := a.Compare(b)
+	cmp, diff := a.CompareEx(b)
 
 	return cmp, diff.Timeval()
 }
 
+func (me Timeval) Compare(v Timeval) int {
+	cmp, _ := me.CompareEx(v)
+
+	return cmp
+}
+
 func (me Timeval) inRange(a, b Timeval) bool {
-	if cmp, _ := me.Compare(a); cmp < 0 { // me < a
+	if me.Compare(a) < 0 { // me < a
 		return false
 	}
 
-	if cmp, _ := me.Compare(b); cmp > 0 { // me > b
+	if me.Compare(b) > 0 { // me > b
 		return false
 	}
 
@@ -478,8 +495,7 @@ func (me Timeval) inRange(a, b Timeval) bool {
 }
 
 func (me Timeval) InRange(a, b Timeval) bool {
-	cmp, _ := a.Compare(b)
-	if cmp < 0 {
+	if a.Compare(b) < 0 {
 		// a < b
 		return me.inRange(a, b)
 	} else {
@@ -658,18 +674,18 @@ func (me *Timezone) Zero() {
 func (me Timezone) Include(v Timezone) bool {
 	// |--------- me ---------|
 	//      |----- z -----|
-	a, _ := me.Begin.Compare(v.Begin)
-	b, _ := me.End.Compare(v.End)
+	a := me.Begin.Compare(v.Begin)
+	b := me.End.Compare(v.End)
 
 	return a <= 0 && b >= 0
 }
 
 func (me Timezone) Compare(v Timezone) int {
-	if cmp, _ := me.End.Compare(v.Begin); cmp < 0 {
+	if me.End.Compare(v.Begin) < 0 {
 		// |--------- me ---------|
 		//                            |----- v -----|
 		return -1
-	} else if cmp, _ := me.Begin.Compare(v.End); cmp > 0 {
+	} else if me.Begin.Compare(v.End) > 0 {
 		//                  |--------- me ---------|
 		// |----- v -----|
 		return 1
@@ -694,7 +710,7 @@ func (me Timezone) Intersect(v Timezone) (Timezone, bool) {
 
 	// get max begin
 	begin := me.Begin
-	if cmp, _ := me.Begin.Compare(v.Begin); cmp < 0 {
+	if me.Begin.Compare(v.Begin) < 0 {
 		begin = v.Begin
 	}
 
@@ -707,7 +723,7 @@ func (me Timezone) Intersect(v Timezone) (Timezone, bool) {
 
 	// get min end
 	end := me.End
-	if cmp, _ := me.End.Compare(v.End); cmp > 0 {
+	if me.End.Compare(v.End) > 0 {
 		end = v.End
 	}
 
