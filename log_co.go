@@ -88,7 +88,7 @@ func (me *CoLogger) run(ch CoLogChan, show bool) {
 		if !ok {
 			me.Close()
 
-			return
+			panic("co-logger chan error")
 		}
 
 		s := msg.String()
@@ -102,7 +102,14 @@ func (me *CoLogger) run(ch CoLogChan, show bool) {
 		if nil != err {
 			me.Close()
 
-			return
+			panic("co-logger reopen error")
+		}
+
+		if msg.panic {
+			me.fd.WriteString("Panic: " + s)
+			me.Close()
+
+			panic("co-logger recv panic")
 		}
 	}
 }
@@ -113,6 +120,21 @@ func (me *CoLogger) GetLevel() LogLevel {
 
 func (me *CoLogger) SetLevel(level LogLevel) {
 	me.level = level
+}
+
+var CoLoggerPanicWait time.Duration = 15
+
+func (me *CoLogger) Panic(format string, v ...interface{}) {
+	me.ch <- LogMsg{
+		s:     fmt.Sprintf(format+Crlf, v...),
+		panic: true,
+	}
+
+	go func() {
+		time.Sleep(CoLoggerPanicWait * time.Second)
+
+		panic(fmt.Sprintf("co-logger[last] Panic: "+format+Crlf, v...))
+	}()
 }
 
 func (me *CoLogger) Log(level LogLevel, format string, v ...interface{}) {

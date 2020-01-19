@@ -51,6 +51,22 @@ func (me *FileLogger) Log(level LogLevel, format string, v ...interface{}) {
 	}
 }
 
+func (me *FileLogger) Panic(format string, v ...interface{}) {
+	me.lock.Handle(func() {
+		msg := LogMsg{
+			s:     fmt.Sprintf("Panic: "+format+Crlf, v...),
+			panic: true,
+		}
+
+		me.fd.WriteString(msg.String())
+		me.fd.Close()
+	})
+
+	go func() {
+		panic(fmt.Sprintf("file-logger Panic: "+format+Crlf, v...))
+	}()
+}
+
 func (me *FileLogger) Emerg(format string, v ...interface{}) {
 	if LogLevelEmerg <= me.level {
 		me.Log(LogLevelEmerg, format, v...)

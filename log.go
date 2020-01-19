@@ -13,6 +13,10 @@ type ILogSetLevel interface {
 	SetLevel(level LogLevel)
 }
 
+type ILogPanic interface {
+	Panic(format string, v ...interface{})
+}
+
 type ILogLog interface {
 	Log(level LogLevel, format string, v ...interface{})
 }
@@ -65,6 +69,7 @@ type ILogger interface {
 	ILogDebug
 
 	ILogLog
+	ILogPanic
 	ILogGetLevel
 	ILogSetLevel
 
@@ -130,7 +135,7 @@ const (
 	LogLevelDeft LogLevel = LogLevelInfo
 )
 
-type LogLevel int
+type LogLevel byte
 
 type LogLevelMapper struct {
 	Name  string
@@ -217,6 +222,7 @@ const LogTimeFormat = "2006-01-02@15:04:05.999999999"
 type LogMsg struct {
 	s     string
 	level LogLevel
+	panic bool
 }
 
 func (me *LogMsg) String() string {

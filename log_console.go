@@ -24,6 +24,14 @@ func (me *ConsoleLogger) Log(level LogLevel, format string, v ...interface{}) {
 	fmt.Printf(format+Crlf, v...)
 }
 
+func (me *ConsoleLogger) Panic(format string, v ...interface{}) {
+	fmt.Printf("Panic: "+format+Crlf, v...)
+
+	go func() {
+		panic(fmt.Sprintf("console-logger Panic: "+format+Crlf, v...))
+	}()
+}
+
 func (me *ConsoleLogger) Emerg(format string, v ...interface{}) {
 	if LogLevelEmerg <= me.level {
 		fmt.Printf(format+Crlf, v...)

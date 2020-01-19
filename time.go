@@ -123,7 +123,7 @@ func (me Time32) String() string {
 }
 
 func (me Time32) Swap() Time32 {
-	return Time32(uint32(me))
+	return Time32(Swap32(uint32(me)))
 }
 
 func (me Time32) Unix() time.Time {
@@ -201,6 +201,10 @@ func (me Time64) NowCost() Time64 {
 
 func (me Time64) String() string {
 	return me.Unix().Format(TimeFormat)
+}
+
+func (me Time64) Swap() Time64 {
+	return Time64(Swap64(uint64(me)))
 }
 
 func (me Time64) Diff(tm Time64) int {
