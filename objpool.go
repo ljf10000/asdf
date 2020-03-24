@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"unsafe"
 )
 
@@ -55,6 +56,7 @@ type ObjPoolOps struct {
 }
 
 type ObjPoolConf struct {
+	Lock       bool
 	Dev        string
 	Name       string
 	ObjSize    int // obj size
@@ -141,6 +143,8 @@ type ObjPool struct {
 	*ObjPoolOps
 	*ObjPoolConf
 
+	m sync.Mutex
+
 	blockCount int // block count
 	blocks     []ObjPoolBlock
 
@@ -148,14 +152,33 @@ type ObjPool struct {
 	freed objPoolList
 }
 
+func (me *ObjPool) lock() {
+	if me.Lock {
+		me.m.Lock()
+	}
+}
+
+func (me *ObjPool) unlock() {
+	if me.Lock {
+		me.m.Unlock()
+	}
+}
+
+func (me *ObjPool) handle(cb func()) {
+	me.lock()
+	cb()
+	me.unlock()
+}
+
 func (me *ObjPool) Init(conf *ObjPoolConf, ops *ObjPoolOps) error {
 	me.ObjPoolOps = ops
 	me.ObjPoolConf = conf
 
-	me.using.list.Init()
-	me.freed.list.Init()
-
-	me.blocks = make([]ObjPoolBlock, me.BlockLimit)
+	me.handle(func() {
+		me.using.list.Init()
+		me.freed.list.Init()
+		me.blocks = make([]ObjPoolBlock, me.BlockLimit)
+	})
 
 	Log.Debug("objpool %s init", me.Name)
 
@@ -163,36 +186,42 @@ func (me *ObjPool) Init(conf *ObjPoolConf, ops *ObjPoolOps) error {
 }
 
 func (me *ObjPool) Fini() error {
-	count := me.blockCount
-	for i := 0; i < count; i++ {
-		block := me.block(i)
+	me.handle(func() {
+		count := me.blockCount
+		for i := 0; i < count; i++ {
+			block := me.block(i)
 
-		block.fini(me.ObjPoolOps)
-	}
+			block.fini(me.ObjPoolOps)
+		}
 
-	me.using.list.Init()
-	me.freed.list.Init()
+		me.using.list.Init()
+		me.freed.list.Init()
+	})
 
 	Log.Debug("objpool %s fini", me.Name)
 
 	return nil
 }
 
-func (me *ObjPool) Malloc() (unsafe.Pointer, error) {
-	err := me.preMalloc()
-	if nil != err {
-		return nil, err
-	}
+func (me *ObjPool) Malloc() (ptr unsafe.Pointer, err error) {
+	me.handle(func() {
+		err = me.preMalloc()
+		if nil == err {
+			obj := me.malloc()
 
-	obj := me.malloc()
+			ptr = GetObjField(obj, SizeofListNode)
+		}
+	})
 
-	return GetObjField(obj, SizeofListNode), nil
+	return ptr, err
 }
 
 func (me *ObjPool) Free(obj unsafe.Pointer) {
-	node := GetObjByField(obj, SizeofListNode)
+	me.handle(func() {
+		node := GetObjByField(obj, SizeofListNode)
 
-	me.free(node)
+		me.free(node)
+	})
 }
 
 /******************************************************************************/
