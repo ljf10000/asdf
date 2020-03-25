@@ -100,6 +100,14 @@ type ObjPoolStat struct {
 	} `json:"obj"`
 }
 
+func (me *ObjPoolStat) String() string {
+	return fmt.Sprintf("using[%d:%d] freed[%d:%d]",
+		me.Obj.Using.Times,
+		me.Obj.Using.Count,
+		me.Obj.Freed.Times,
+		me.Obj.Freed.Count)
+}
+
 func (me *ObjPool) Stat() ObjPoolStat {
 	stat := ObjPoolStat{
 		Name: me.Name,
