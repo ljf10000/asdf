@@ -109,22 +109,22 @@ func BinSprintf(bin []byte) string {
 		tail = __DUMP_LINE_BYTES
 	}
 
-	// fmt.Printf("dump bin:%d\n", len(bin))
+	ss := NewStringArray(lineCount)
 
-	s := __DUMP_LINE_HEADER
+	ss.Add(__DUMP_LINE_HEADER)
 	for i := 0; i < lineCount-1; i++ {
 		begin := i * __DUMP_LINE_BYTES
 		end := begin + __DUMP_LINE_BYTES
 
 		// fmt.Printf("dump line[%d] begin:%d end:%d\n", i, begin, end)
-		s += lineSprintf(i, bin[begin:end])
+		ss.Add(lineSprintf(i, bin[begin:end]))
 	}
 
 	begin := (lineCount - 1) * __DUMP_LINE_BYTES
 	end := begin + tail
 
 	// fmt.Printf("dump line[%d] begin:%d end:%d\n", lineCount-1, begin, end)
-	s += lineSprintf(lineCount-1, bin[begin:end])
+	ss.Add(lineSprintf(lineCount-1, bin[begin:end]))
 
-	return s
+	return ss.Build(Empty)
 }

@@ -1,10 +1,10 @@
 package asdf
 
 const (
-	FrequencyLow    Frequency = 0
-	FrequencyNormal Frequency = 1
-	FrequencyHigh   Frequency = 2
-	FrequencyEnd    Frequency = 4
+	FrequencyLow    = Frequency(iota)
+	FrequencyNormal = Frequency(iota)
+	FrequencyHigh   = Frequency(iota)
+	FrequencyEnd    = Frequency(iota)
 )
 
 type Frequency byte

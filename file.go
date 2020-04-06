@@ -24,9 +24,11 @@ const (
 )
 
 const (
-	ConfigFileTypeJson ConfigFileType = 0
-	ConfigFileTypeYaml ConfigFileType = 1
-	ConfigFileTypeDeft ConfigFileType = ConfigFileTypeJson
+	ConfigFileTypeJson = ConfigFileType(iota)
+	ConfigFileTypeYaml = ConfigFileType(iota)
+	ConfigFileTypeEnd  = ConfigFileType(iota)
+
+	ConfigFileTypeDeft = ConfigFileTypeJson
 )
 
 type ConfigFileType byte
@@ -40,7 +42,7 @@ var configFileTypes = &EnumMapper{
 }
 
 func (me ConfigFileType) IsGood() bool {
-	return configFileTypes.IsGoodIndex(int(me))
+	return me < ConfigFileTypeEnd
 }
 
 func (me ConfigFileType) String() string {
@@ -433,7 +435,10 @@ func (me FileName) ConfigFileType() (ConfigFileType, error) {
 	var confType ConfigFileType
 
 	suffix := filepath.Ext(string(me))
-	suffix = suffix[1:]
+	if Empty != suffix {
+		suffix = suffix[1:]
+	}
+
 	if 0 == len(suffix) {
 		return 0, ErrSprintf("bad config file name: %s, without suffix", string(me))
 	} else if err := confType.FromString(suffix); nil != err {

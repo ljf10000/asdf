@@ -56,7 +56,7 @@ type ObjPoolOps struct {
 }
 
 type ObjPoolConf struct {
-	Lock       bool
+	Lock    bool
 	Dev        string
 	Name       string
 	ObjSize    int // obj size
@@ -123,12 +123,20 @@ func (me *ObjPool) Stat() ObjPoolStat {
 }
 
 func (me *ObjPool) UpdateStat(stat *ObjPoolStat) {
-	stat.Block.Count = me.blockCount
+	me.handle(func() {
+		stat.Block.Count = me.blockCount
 
-	stat.Obj.Using.Times = int(me.using.times)
-	stat.Obj.Using.Count = me.using.list.count
-	stat.Obj.Freed.Times = int(me.freed.times)
-	stat.Obj.Freed.Count = me.freed.list.count
+		stat.Obj.Using.Times = int(me.using.times)
+		stat.Obj.Using.Count = me.using.list.count
+		stat.Obj.Freed.Times = int(me.freed.times)
+		stat.Obj.Freed.Count = me.freed.list.count
+	})
+}
+
+func (me *ObjPool) GetStat(stat *ObjPoolStat) *ObjPoolStat {
+	me.UpdateStat(stat)
+
+	return stat
 }
 
 func ObjPoolPrepare(root, prefix string) error {
@@ -188,7 +196,7 @@ func (me *ObjPool) Init(conf *ObjPoolConf, ops *ObjPoolOps) error {
 		me.blocks = make([]ObjPoolBlock, me.BlockLimit)
 	})
 
-	Log.Debug("objpool %s init", me.Name)
+	Log.Crit("objpool %s init", me.Name)
 
 	return nil
 }
@@ -206,12 +214,14 @@ func (me *ObjPool) Fini() error {
 		me.freed.list.Init()
 	})
 
-	Log.Debug("objpool %s fini", me.Name)
+	Log.Crit("objpool %s fini", me.Name)
 
 	return nil
 }
 
 func (me *ObjPool) Malloc() (ptr unsafe.Pointer, err error) {
+	Log.Debug("objpool malloc ...")
+
 	me.handle(func() {
 		err = me.preMalloc()
 		if nil == err {
@@ -221,13 +231,17 @@ func (me *ObjPool) Malloc() (ptr unsafe.Pointer, err error) {
 		}
 	})
 
+	Log.Debug("objpool malloc pointer %p ok", ptr)
+
 	return ptr, err
+}
+
+func (me *ObjPool) SB(obj unsafe.Pointer) {
 }
 
 func (me *ObjPool) Free(obj unsafe.Pointer) {
 	me.handle(func() {
 		node := GetObjByField(obj, SizeofListNode)
-
 		me.free(node)
 	})
 }
@@ -257,9 +271,14 @@ func (me *ObjPool) malloc() unsafe.Pointer {
 
 func (me *ObjPool) free(obj unsafe.Pointer) {
 	node := (*objPoolNode)(obj)
+	Log.Debug("free %p 1", obj)
 
 	me.using.list.Remove(node)
+	Log.Debug("free %p 2", obj)
+
 	me.freed.list.InsertHead(node)
+	Log.Debug("free %p 3", obj)
+
 	me.freed.times++
 }
 
