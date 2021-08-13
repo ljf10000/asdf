@@ -16,4 +16,7 @@ const (
 	SizeofFloat32 = 4
 	SizeofFloat64 = 8
 	SizeofPointer = 8
+
+	SizeofPage      = 4 * SizeofK
+	SizeofCacheLine = 64
 )

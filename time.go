@@ -116,6 +116,11 @@ func NowTime32() Time32 {
 	return Time32(time.Now().Unix())
 }
 
+func NowUpTime() Time32 {
+	// TODO
+	return 0
+}
+
 type Time32 uint32
 
 func (me Time32) String() string {
