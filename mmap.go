@@ -154,6 +154,13 @@ func (me *MMap) header() *reflect.SliceHeader {
 	return (*reflect.SliceHeader)(unsafe.Pointer(me))
 }
 
+func (me MMap) Zero() {
+	count := len(me)
+	for i := 0; i < count; i++ {
+		me[i] = 0
+	}
+}
+
 func (me MMap) Lock() error {
 	h := me.header()
 

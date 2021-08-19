@@ -73,6 +73,8 @@ func (me *MpLockTm) try(
 	old_.Update(v)
 	old_.split(role, &self, &other)
 
+	// Log.Debug("mplock tm %s try %s:\n%s", role, act, BinSprintf(StructSlice(unsafe.Pointer(me), 8)))
+
 	if err := mplock_check(role, &self, &other); nil != err {
 		return MPLOCK_FAILED
 	}

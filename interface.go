@@ -19,10 +19,6 @@ type IFloat interface {
 	Float() float64
 }
 
-type ISlice interface {
-	Slice() []byte
-}
-
 type IEq interface {
 	Eq(interface{}) bool
 }
@@ -81,6 +77,10 @@ type ISize interface {
 
 type ICount interface {
 	Count() int
+}
+
+type ISlice interface {
+	Slice() []byte
 }
 
 type IToBinary interface {

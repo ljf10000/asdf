@@ -262,40 +262,155 @@ func HasBit(x, bit uint) bool {
 }
 
 /******************************************************************************/
-type BitMap []uint32
+type BitMap32 []uint32
 
-const BitMapSlot = 32
+const BitMapSlot32 = 32
 
-func (me BitMap) isGoodIdx(idx uint32) bool {
+func (me BitMap32) isGoodIdx(idx uint32) bool {
 	return int(idx) < len(me)
 }
 
-func (me BitMap) SetBit(bit uint32) {
-	idx := bit / BitMapSlot
+func (me BitMap32) SetBit(bit uint32) {
+	idx := bit / BitMapSlot32
 
 	if me.isGoodIdx(idx) {
-		SetBit32(me[idx], bit%BitMapSlot)
+		SetBit32(me[idx], bit%BitMapSlot32)
 	}
 }
 
-func (me BitMap) ClrBit(bit uint32) {
-	idx := bit / BitMapSlot
+func (me BitMap32) ClrBit(bit uint32) {
+	idx := bit / BitMapSlot32
 
 	if me.isGoodIdx(idx) {
-		ClrBit32(me[idx], bit%BitMapSlot)
+		ClrBit32(me[idx], bit%BitMapSlot32)
 	}
 }
 
-func (me BitMap) HasBit(bit uint32) bool {
-	idx := bit / BitMapSlot
+func (me BitMap32) HasBit(bit uint32) bool {
+	idx := bit / BitMapSlot32
 
 	if !me.isGoodIdx(idx) {
 		return false
 	}
 
-	return HasBit32(me[idx], bit%BitMapSlot)
+	return HasBit32(me[idx], bit%BitMapSlot32)
 }
 
+/******************************************************************************/
+type BitMap64 []uint64
+
+const BitMapSlot64 = 64
+
+func (me BitMap64) isGoodIdx(idx uint64) bool {
+	return int(idx) < len(me)
+}
+
+func (me BitMap64) SetBit(bit uint64) {
+	idx := bit / BitMapSlot64
+
+	if me.isGoodIdx(idx) {
+		SetBit64(me[idx], bit%BitMapSlot64)
+	}
+}
+
+func (me BitMap64) ClrBit(bit uint64) {
+	idx := bit / BitMapSlot64
+
+	if me.isGoodIdx(idx) {
+		ClrBit64(me[idx], bit%BitMapSlot64)
+	}
+}
+
+func (me BitMap64) HasBit(bit uint64) bool {
+	idx := bit / BitMapSlot64
+
+	if !me.isGoodIdx(idx) {
+		return false
+	}
+
+	return HasBit64(me[idx], bit%BitMapSlot64)
+}
+
+/******************************************************************************/
+type bitset_entry_t = uint64
+
+const (
+	__BITSET_HDRSIZE = 2 * SizeofInt32
+	__BITSET_N       = 8 * SizeofInt64
+	__BITSET_MAX     = SizeofG
+)
+
+func __BITSET_ELM(idx uint32) uint32 {
+	return idx / __BITSET_N
+}
+
+func __BITSET_MASK(idx uint32) bitset_entry_t {
+	return 1 << (bitset_entry_t(idx) % __BITSET_N)
+}
+
+func __BITSET_END(Cap uint32) uint32 {
+	return Align32(Cap, __BITSET_N)
+}
+
+func __BITSET_ENTRY_SIZE(Cap uint32) uint32 {
+	return SizeofInt64 * __BITSET_END(Cap)
+}
+
+func __BITSET_SIZE(Cap uint32) uint32 {
+	return __BITSET_ENTRY_SIZE(Cap) + __BITSET_HDRSIZE
+}
+
+type BitSet struct {
+	Cap   uint32
+	Count uint32
+
+	entry [__BITSET_MAX]bitset_entry_t
+}
+
+func (me *BitSet) Init(Cap uint32) {
+	me.Cap = Cap
+
+	me.Zero()
+}
+
+func (me *BitSet) Zero() {
+	me.Count = 0
+
+	count := __BITSET_END(me.Cap)
+	for i := uint32(0); i < count; i++ {
+		me.entry[i] = 0
+	}
+}
+
+func (me *BitSet) EntrySize() uint32 {
+	return __BITSET_ENTRY_SIZE(me.Cap)
+}
+
+func (me *BitSet) Size() uint32 {
+	return __BITSET_SIZE(me.Cap)
+}
+
+func (me *BitSet) IsSet(idx uint32) bool {
+	return 0 != me.entry[__BITSET_ELM(idx)]&__BITSET_MASK(idx)
+}
+
+func (me *BitSet) Clear(idx uint32) {
+	if me.IsSet(idx) {
+		me.Count--
+
+		me.entry[__BITSET_ELM(idx)] &= ^__BITSET_MASK(idx)
+	}
+}
+
+func (me *BitSet) Set(idx uint32) {
+	if false == me.IsSet(idx) {
+		me.Count++
+
+		me.entry[__BITSET_ELM(idx)] |= __BITSET_MASK(idx)
+	}
+}
+
+/******************************************************************************/
 type BitsMapper struct {
 	Type  string
 	Bits  uint64

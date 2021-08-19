@@ -157,13 +157,13 @@ func (me *mplock) sub() {
 
 func mplock_check(role mplock_role_t, self *mplock, other *mplock) error {
 	if self.want() && other.want() {
-		return ErrLog("rw lock have double wanted")
+		Panic("rw lock have double wanted")
 	} else if self.locked() && other.locked() {
-		return ErrLog("rw lock have double locked")
+		Panic("rw lock have double locked")
 	} else if MPLOCK_READER == role && self.want() {
-		return ErrLog("reader lock have wanted")
-	} else if MPLOCK_WRITER == role && self.locked() {
-		return ErrLog("writer lock have locked %d times", self.value())
+		Panic("reader lock have wanted")
+	} else if MPLOCK_WRITER == role && self.multi_locked() {
+		Panic("writer lock have locked %d times", self.value())
 	}
 
 	return nil
